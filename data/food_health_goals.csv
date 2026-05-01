@@ -1,0 +1,28 @@
+food_id,goal_id,evidence_strength,notes
+1,1,3,RCT (Noce 2021) + review (Esposito 2025); oleocanthal and hydroxytyrosol mechanisms well-characterised
+1,2,3,PREDIMED and Harvard cohort data; 15–30% CV event reduction
+1,3,2,CKD RCT showed gut-related inflammatory marker improvement; mechanistic pathway less direct
+1,4,2,Large cohort associations with longevity outcomes; not yet isolated from full MedDiet
+4,6,3,DB-RCT (Wightman 2018) n=155; reduced state anxiety and improved cognitive accuracy vs placebo and Ginkgo
+4,4,2,Animal Alzheimer model (Hofrichter 2016) showed Aβ42 reduction and neuronal rescue; human longevity evidence indirect
+4,2,2,Small RCT (Papanikolaou 2024) n=28; systolic BP −10.8 mmHg and HR reduction confirmed in humans
+4,5,2,Small RCT (Papanikolaou 2024); VO₂max improvement and liver enzyme reduction; metabolic mechanism via AMPK activation (animal data)
+4,1,2,Small RCT (Papanikolaou 2024) antioxidant capacity ↑ and lipid peroxidation ↓; mechanistic support from verbascoside NF-κB binding
+6,1,3,DB-RCT (Karimi 2024) n=86; pain VAS halved, DAS28 reduced, hs-CRP and TNF-α significantly decreased in RA patients
+6,2,3,Meta-analysis of T2DM RCTs (Guo 2024); TC −17.75 mg/dL, TG −21.30 mg/dL, LDL −6.10 mg/dL, HDL +6.17 mg/dL
+6,5,3,Meta-analysis of T2DM RCTs (Guo 2024); FBG −15.01 mg/dL; ALA mechanism supports glucose and lipid metabolism
+6,3,2,DB-RCT (Bang 2022) n=60; colonic transit time shortened, bowel frequency improved in functional constipation
+6,4,2,RA RCT (Karimi 2024) showed systemic antioxidant capacity increase; indirect longevity link via chronic inflammation reduction
+5,2,2,Observational meta-analyses (Zhang 2023; Zhuang 2025); cheese category evidence extrapolated to Graviera; CVD RR=0.92; stroke RR=0.93
+5,4,2,Umbrella review (Zhang 2023); all-cause mortality RR=0.95 and dementia RR=0.81; observational evidence only
+5,6,2,Umbrella review (Zhang 2023); dementia RR=0.81; observational; mechanism via vitamin K2 and ACE-inhibitory peptides
+5,3,1,In vitro only (Zoumpopoulou 2018); L. plantarum from Graviera shows gut epithelial adhesion and IL-10 upregulation — not yet validated in humans
+5,1,1,In vitro only (Zoumpopoulou 2018); IL-10 upregulation and anti-inflammatory modulation in macrophage assay — not yet validated in humans
+3,1,2,"Human RCT (Jahanbani Mazraeh 2023) n=110: thyme honey oral gel reduced chemotherapy-induced oral mucositis incidence, duration, and onset; in vitro biofilm inhibition vs S. aureus and A. baumannii (Nazzaro 2024); mechanistic support from thymol membrane disruption and polyphenol NF-κB suppression"
+3,2,1,"Animal model only (Lafraxo 2021): thyme honey + EVOO combination normalised lipid profiles and hepatic/renal oxidative markers in T1DM rats — honey contribution not isolatable from EVOO; no direct human cardiovascular RCT evidence for thyme honey"
+3,3,1,"In vitro only (Nazzaro 2024): thyme honey stimulated L. rhamnosus growth (+11.48%) and enhanced probiotic hydroxyl radical scavenging (OHRS 65.8%) — prebiotic potential not validated in human or animal models"
+3,5,1,"Animal model only (Lafraxo 2021): combined thyme honey + EVOO halved blood glucose (318→159 mg/dL) and normalised metabolic markers in T1DM rats — combination treatment prevents attribution to honey alone; no human metabolic evidence"
+2,4,1,"In vitro neuronal cell culture (Chalatsa 2018): C. spinosum extract reduced tau hyperphosphorylation and promoted non-amyloidogenic APP processing in AD models; Drosophila model (Mikropoulou 2024): proteostasis network modulation — no human or mammalian animal evidence"
+2,6,1,"In vitro only (Chalatsa 2018): C. spinosum extract blocked both AD pathological hallmarks (tau tangles and amyloid plaques) in neuronal cell culture — mechanistically relevant to cognitive decline prevention but not yet validated beyond cell models"
+2,1,1,"In vitro only (Stagos 2018): C. spinosum increased GSH +10.5% and reduced ROS −15.6% in human endothelial cells; (Brieudes 2016): Cretan decoction significantly reduced intracellular ROS in human fibroblasts; cichoric acid and caftaric acid are potent antioxidants"
+2,2,1,"In vitro only (Stagos 2018): C. spinosum extract protected human vascular endothelial cells from oxidative stress via GSH elevation and ROS reduction — relevant to endothelial function but not yet validated in cardiovascular animal or human models"

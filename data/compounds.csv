@@ -1,0 +1,22 @@
+compound_id,food_id,name,description
+1,1,Oleocanthal,Phenolic compound in EVOO that inhibits COX-1 and COX-2 enzymes — the same targets as ibuprofen — producing anti-inflammatory effects
+2,1,Hydroxytyrosol,Potent antioxidant polyphenol in EVOO; scavenges free radicals and reduces LDL oxidation
+3,1,Oleic acid,Monounsaturated fatty acid (>70% of EVOO); promotes reverse cholesterol transport and reduces vascular inflammation
+4,1,Oleuropein,Polyphenol precursor abundant in Cretan EVOO; anti-inflammatory and cardioprotective effects
+5,4,Apigenin,Flavone abundant in Sideritis scardica; anti-inflammatory (COX inhibition) comparable to indomethacin in animal models; gastroprotective
+6,4,Luteolin,Flavone in Sideritis scardica; anti-inflammatory and antioxidant; synergistic effects with apigenin
+7,4,Verbascoside (acteoside),Phenylpropanoid glycoside in Sideritis; binds NLRP3 inflammasome (Kd 0.67 μM) and NF-κB (Kd 0.01 μM); key mechanistic driver of anti-inflammatory activity
+8,4,Hydroxy-cinnamic acids,Class of phenolic acids in Sideritis (includes rosmarinic acid); implicated in monoamine reuptake inhibition and cerebral blood flow increase underlying cognitive effects
+9,6,Alpha-linolenic acid (ALA),Plant-derived omega-3 fatty acid; purslane is the richest known leafy vegetable source; anti-inflammatory precursor to EPA and DHA; lowers LDL and triglycerides
+10,6,Portulacaxanthin,Yellow betalain pigment unique to purslane; potent antioxidant; scavenges free radicals and reduces oxidative stress markers
+11,6,Kaempferol,Flavonol polyphenol in purslane; inhibits pro-inflammatory cytokines including TNF-α and IL-6; contributes to joint and vascular anti-inflammatory effects
+12,6,Purslane mucilage polysaccharides,Gel-forming soluble fibre in purslane; acts as a prebiotic and bulk-forming agent; supports gut motility and colonic transit time reduction
+13,5,Vitamin K2 (menaquinone),Produced during fermentation of aged hard cheese; activates matrix Gla-protein which prevents calcium from depositing in artery walls; may explain cheese's paradoxical cardiovascular protection despite saturated fat content
+14,5,Conjugated linoleic acid (CLA),Natural trans-fatty acid found at higher concentrations in sheep and goat dairy from pasture-fed animals; anti-inflammatory and potentially antiatherogenic
+15,5,ACE-inhibitory casein peptides,Bioactive peptides released from casein during cheese fermentation and digestion; inhibit angiotensin-converting enzyme (ACE) — the same target as antihypertensive drugs; identified in cultures of Graviera-native L. plantarum strains
+16,5,Lactobacillus plantarum (native LAB),Probiotic lactic acid bacteria strains isolated directly from traditional Graviera (ACA-DC 2640 and ACA-DC 4039); adhere to human gut epithelial cells; upregulate anti-inflammatory IL-10; produce ACE-inhibitory metabolites in cell-based studies
+17,3,Thymol,Phenolic monoterpene derived from Thymus plant nectar; primary marker compound of thyme honey; disrupts bacterial cell membrane integrity and inhibits biofilm formation (S. aureus inhibition up to 80%); key driver of thyme honey's antimicrobial activity and exceptionally high total phenolic content (up to 193 mg/100g — among the highest recorded for any honey variety)
+18,3,Kaempferol,Flavonol polyphenol transferred into honey from Thymus plant origin; anti-inflammatory and antioxidant; contributes to thyme honey's mucosal-protective properties and high DPPH radical-scavenging capacity (IC50 15.37 mg/mL)
+19,2,Cichoric acid,Primary phenolic acid of Cichorium spinosum (dicaffeoyl tartaric acid); strongest antioxidant compound in traditional stamnagathi decoctions; significantly reduces intracellular ROS in human cells; DPPH IC50 ~15 μg/mL; the defining phytochemical marker of the Cretan stamnagathi decoction
+20,2,Caftaric acid,Second major phenolic acid in stamnagathi decoctions (caffeoyl tartaric acid); strong free-radical scavenging activity; identified alongside cichoric acid as a primary antioxidant in Cretan C. spinosum; contributes to the vascular-protective polyphenol profile
+21,2,8-Deacetylmatricarin-8-O-sulphate (Cretan sesquiterpene lactone),Sulfoconjugate sesquiterpene lactone isolated exclusively from Cretan Cichorium spinosum — not found in C. intybus or other chicory varieties; represents a chemotaxonomic marker unique to the Cretan species; class of sesquiterpene lactones (including lactupicrin) associated with anti-inflammatory and neuroprotective biological activity

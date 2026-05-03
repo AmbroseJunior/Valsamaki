@@ -11,6 +11,25 @@ const withPWA = require('next-pwa')({
   disable: process.env.NODE_ENV === 'development',
   runtimeCaching: [
     {
+      // HTML navigation requests — always fetch from network so locale cookie is respected
+      urlPattern: /^https:\/\/valsamaki\.vercel\.app\/((?!api\/).)*$/,
+      handler: 'NetworkFirst',
+      options: {
+        cacheName: 'html-pages',
+        networkTimeoutSeconds: 10,
+        expiration: { maxEntries: 50, maxAgeSeconds: 60 },
+      },
+    },
+    {
+      urlPattern: /^https:\/\/valsamaki\.app\/((?!api\/).)*$/,
+      handler: 'NetworkFirst',
+      options: {
+        cacheName: 'html-pages',
+        networkTimeoutSeconds: 10,
+        expiration: { maxEntries: 50, maxAgeSeconds: 60 },
+      },
+    },
+    {
       urlPattern: /^https:\/\/fnevubaewpmbsbokonaj\.supabase\.co\/.*/i,
       handler: 'NetworkFirst',
       options: {

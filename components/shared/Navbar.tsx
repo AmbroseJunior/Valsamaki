@@ -187,6 +187,9 @@ export function Navbar() {
                   <Link href="/dashboard" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-[var(--color-muted)] transition-colors" onClick={() => setMenuOpen(false)}>
                     Dashboard
                   </Link>
+                  <Link href="/settings" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-[var(--color-muted)] transition-colors" onClick={() => setMenuOpen(false)}>
+                    Settings
+                  </Link>
                   {isProducer && (
                     <>
                       <Link href="/business" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-[var(--color-muted)] transition-colors" onClick={() => setMenuOpen(false)}>My Business</Link>

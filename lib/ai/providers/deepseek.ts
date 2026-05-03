@@ -2,7 +2,7 @@ import OpenAI from 'openai'
 import type { AIProvider, AIMessage, AIContext } from '@/types/ai'
 import { logger } from '@/lib/logger'
 
-const TIMEOUT_MS = 30_000
+const TIMEOUT_MS = 8_000
 const CRETAN_SYSTEM_PREAMBLE = `You are Valsamaki, an AI assistant specializing in Crete, Greece.
 You have deep knowledge of Cretan cuisine, the Mediterranean diet, local producers, events,
 and places. Always prioritize information from the provided local context before using your

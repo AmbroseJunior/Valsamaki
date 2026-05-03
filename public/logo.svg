@@ -1,17 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" fill="none">
-  <!-- Yellow rounded square background -->
-  <rect width="40" height="40" rx="10" fill="#FCDA06"/>
-  <!-- Olive branch: stem -->
-  <path d="M20 32 C20 32 18 24 16 18" stroke="#1a3a1a" stroke-width="1.8" stroke-linecap="round"/>
-  <!-- Olive branch: main stem -->
-  <path d="M16 18 C16 18 18 10 20 8" stroke="#1a3a1a" stroke-width="1.8" stroke-linecap="round"/>
-  <!-- Leaves left -->
-  <ellipse cx="14" cy="22" rx="3.5" ry="1.8" fill="#1a3a1a" transform="rotate(-30 14 22)"/>
-  <ellipse cx="12" cy="16" rx="3.2" ry="1.6" fill="#2d6a2d" transform="rotate(-45 12 16)"/>
-  <!-- Leaves right -->
-  <ellipse cx="22" cy="20" rx="3.5" ry="1.8" fill="#1a3a1a" transform="rotate(30 22 20)"/>
-  <ellipse cx="21" cy="13" rx="3.2" ry="1.6" fill="#2d6a2d" transform="rotate(20 21 13)"/>
-  <!-- Olive fruit -->
-  <circle cx="20" cy="8.5" r="2.2" fill="#2d6a2d"/>
-  <circle cx="20" cy="8.5" r="1" fill="#1a3a1a"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <path fill="#FCDA06" d="
+    M50 52
+    C40 46 22 38 14 24
+    C8 14 16 4 26 10
+    C36 16 46 34 50 46
+    C54 34 64 16 74 10
+    C84 4 92 14 86 24
+    C78 38 60 46 50 52
+    C56 60 66 76 64 88
+    C62 96 54 98 50 90
+    C46 98 38 96 36 88
+    C34 76 44 60 50 52
+    Z
+  "/>
 </svg>

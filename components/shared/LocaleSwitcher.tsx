@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import { useLocale } from 'next-intl'
 import { Globe, ChevronDown, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -9,7 +8,6 @@ import { SUPPORTED_LOCALES, LOCALE_LABELS } from '@/lib/i18n/locales'
 import type { Locale } from '@/lib/i18n/locales'
 
 export function LocaleSwitcher({ className }: { className?: string }) {
-  const router = useRouter()
   const locale = useLocale() as Locale
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -23,13 +21,14 @@ export function LocaleSwitcher({ className }: { className?: string }) {
   }, [])
 
   async function switchLocale(next: Locale) {
+    if (next === locale) { setOpen(false); return }
     setOpen(false)
     await fetch('/api/locale', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ locale: next }),
     })
-    router.refresh()
+    window.location.reload()
   }
 
   return (

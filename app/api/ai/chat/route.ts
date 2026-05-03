@@ -3,6 +3,8 @@ import type { NextRequest } from 'next/server'
 import { mcpBridge } from '@/lib/ai/mcp-bridge'
 import { createClient } from '@/lib/supabase/server'
 
+export const maxDuration = 30
+
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient()

@@ -80,10 +80,11 @@ function LoginForm() {
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex flex-col items-center">
-            <span className="text-5xl">🫒</span>
-            <span className="font-display font-bold text-2xl mt-2 text-[var(--color-foreground)]">Valsamaki</span>
-            <span className="text-sm text-[var(--color-muted-foreground)] mt-0.5">Discover authentic Crete</span>
+          <Link href="/" className="inline-flex flex-col items-center gap-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo.svg" alt="valsamaki" className="w-14 h-14" />
+            <span className="font-display font-semibold text-2xl text-[var(--color-foreground)]">valsamaki</span>
+            <span className="text-sm text-[var(--color-muted-foreground)]">Discover authentic Crete</span>
           </Link>
         </div>
 

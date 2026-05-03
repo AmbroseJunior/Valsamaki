@@ -1,17 +1,17 @@
 export type { AIProvider } from '@/types/ai'
-export { DeepSeekProvider } from './deepseek'
 export { ClaudeProvider } from './claude'
+export { DeepSeekProvider } from './deepseek'
 export { GeminiProvider } from './gemini'
 
-import { DeepSeekProvider } from './deepseek'
 import { ClaudeProvider } from './claude'
+import { DeepSeekProvider } from './deepseek'
 import { GeminiProvider } from './gemini'
 import type { AIProvider } from '@/types/ai'
 
 const providers: AIProvider[] = [
-  new DeepSeekProvider(),
-  new ClaudeProvider(),
-  new GeminiProvider(),
+  new ClaudeProvider(),   // preferred: claude-haiku, fast + cheap
+  new DeepSeekProvider(), // fallback: deepseek-chat
+  new GeminiProvider(),   // fallback: gemini
 ]
 
 export function getAvailableProviders(): AIProvider[] {
@@ -23,9 +23,7 @@ export function getProvider(name: string): AIProvider | undefined {
 }
 
 export function getPrimaryProvider(): AIProvider {
-  const deepseek = providers.find((p) => p.name === 'deepseek')
-  if (deepseek?.isAvailable()) return deepseek
   const available = getAvailableProviders()
-  if (available.length === 0) throw new Error('No AI providers available')
+  if (available.length === 0) throw new Error('No AI providers configured. Add ANTHROPIC_API_KEY or DEEPSEEK_API_KEY to your environment variables.')
   return available[0]
 }

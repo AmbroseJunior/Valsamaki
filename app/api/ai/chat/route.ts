@@ -38,9 +38,19 @@ export async function POST(request: NextRequest) {
     })
 
     return NextResponse.json({ reply: result.output, provider: result.provider })
-  } catch {
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : ''
+
+    // No AI provider configured — return 200 with a helpful setup message
+    if (msg.includes('No AI providers configured') || msg.includes('API key not configured')) {
+      return NextResponse.json({
+        reply: '⚙️ Ask Valsamaki is not yet configured. To activate it, add `ANTHROPIC_API_KEY` (or `DEEPSEEK_API_KEY`) to your Vercel environment variables and redeploy.',
+        provider: 'none',
+      })
+    }
+
     return NextResponse.json(
-      { error: 'Internal server error', reply: 'I am temporarily unavailable. Please try again.' },
+      { reply: 'I am temporarily unavailable. Please try again in a moment.', error: msg },
       { status: 500 }
     )
   }

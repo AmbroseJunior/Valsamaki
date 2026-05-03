@@ -69,12 +69,13 @@ export function Navbar() {
         {/* Logo */}
         <Link
           href={isGuest ? '/' : '/dashboard'}
-          className="flex items-center gap-1.5 shrink-0"
+          className="flex items-center gap-2 shrink-0"
           onClick={() => setMenuOpen(false)}
         >
-          <span className="text-2xl">🫒</span>
-          <span className="font-display font-bold text-lg text-[var(--color-foreground)] hidden sm:block">
-            Valsamaki
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.svg" alt="valsamaki" className="w-8 h-8 md:w-9 md:h-9" />
+          <span className="font-display font-semibold text-xl text-[var(--color-foreground)] hidden sm:block" style={{ fontFamily: 'var(--font-display)' }}>
+            valsamaki
           </span>
         </Link>
 

@@ -29,9 +29,18 @@ export default function SettingsPage() {
         const data = await res.json() as { error?: string }
         throw new Error(data.error ?? 'Failed to delete account')
       }
+
+      // Sign out globally, clear all local Supabase storage, then hard-redirect
       const supabase = createClient()
-      await supabase.auth.signOut()
-      router.push('/?message=Account+deleted')
+      await supabase.auth.signOut({ scope: 'global' })
+
+      // Wipe any remaining Supabase keys from localStorage
+      Object.keys(localStorage).forEach((key) => {
+        if (key.startsWith('sb-')) localStorage.removeItem(key)
+      })
+
+      // Hard redirect — clears React/Next.js client cache entirely
+      window.location.href = '/login?message=Account+deleted+successfully'
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Something went wrong')
       setDeleting(false)

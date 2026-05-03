@@ -1,0 +1,105 @@
+{
+  "nav": {
+    "dashboard": "Главная",
+    "explore": "Исследовать",
+    "events": "Мероприятия",
+    "map": "Карта",
+    "chatbot": "ИИ-гид",
+    "business": "Мой бизнес",
+    "analytics": "Аналитика",
+    "advertise": "Реклама",
+    "signOut": "Выйти"
+  },
+  "auth": {
+    "welcomeBack": "С возвращением",
+    "signInSubtitle": "Войдите в свой аккаунт Valsamaki",
+    "signIn": "Войти",
+    "signUp": "Зарегистрироваться",
+    "email": "Эл. почта",
+    "password": "Пароль",
+    "confirmPassword": "Подтвердите пароль",
+    "fullName": "Полное имя",
+    "or": "или",
+    "continueWithGoogle": "Продолжить через Google",
+    "noAccount": "Нет аккаунта?",
+    "haveAccount": "Уже есть аккаунт?",
+    "signInFailed": "Ошибка входа. Попробуйте ещё раз.",
+    "createAccount": "Создать аккаунт",
+    "joinSubtitle": "Присоединяйтесь к сообществу Valsamaki",
+    "passwordMismatch": "Пароли не совпадают",
+    "registrationFailed": "Ошибка регистрации. Попробуйте ещё раз.",
+    "checkEmail": "Проверьте почту для подтверждения аккаунта."
+  },
+  "onboarding": {
+    "title": "Настройка профиля",
+    "next": "Далее",
+    "finish": "Завершить",
+    "skip": "Пропустить"
+  },
+  "dashboard": {
+    "greeting": "Привет, {name}!",
+    "weather": "Погода",
+    "trending": "Тренды",
+    "news": "Местные новости",
+    "noData": "Пока нечего показывать."
+  },
+  "explore": {
+    "title": "Исследуйте Крит",
+    "searchPlaceholder": "Поиск заведений, мест…",
+    "filters": "Фильтры",
+    "noResults": "Ничего не найдено.",
+    "distance": "{km} км"
+  },
+  "events": {
+    "title": "Мероприятия",
+    "upcoming": "Предстоящие",
+    "past": "Прошедшие",
+    "free": "Бесплатно",
+    "price": "€{amount}",
+    "register": "Зарегистрироваться",
+    "noEvents": "Мероприятия не найдены."
+  },
+  "map": {
+    "title": "Карта",
+    "locating": "Определение местоположения…",
+    "businesses": "Заведения",
+    "events": "Мероприятия"
+  },
+  "chatbot": {
+    "title": "ИИ-гид",
+    "placeholder": "Спросите о критской кухне, местных производителях…",
+    "send": "Отправить",
+    "voice": "Голосовой ввод",
+    "poweredBy": "Ask Valsamaki — ваш ИИ-гид по аутентичному Криту"
+  },
+  "business": {
+    "title": "Мой бизнес",
+    "name": "Название бизнеса",
+    "category": "Категория",
+    "description": "Описание",
+    "address": "Адрес",
+    "phone": "Телефон",
+    "website": "Сайт",
+    "save": "Сохранить",
+    "saved": "Сохранено!",
+    "saveFailed": "Ошибка сохранения."
+  },
+  "common": {
+    "loading": "Загрузка…",
+    "error": "Что-то пошло не так.",
+    "retry": "Повторить",
+    "back": "Назад",
+    "close": "Закрыть",
+    "save": "Сохранить",
+    "cancel": "Отмена",
+    "confirm": "Подтвердить",
+    "delete": "Удалить",
+    "edit": "Изменить",
+    "view": "Просмотреть",
+    "learnMore": "Узнать больше",
+    "offline": "Вы офлайн. Некоторые функции могут быть недоступны.",
+    "darkMode": "Тёмная тема",
+    "lightMode": "Светлая тема",
+    "language": "Язык"
+  }
+}

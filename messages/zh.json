@@ -1,0 +1,105 @@
+{
+  "nav": {
+    "dashboard": "首页",
+    "explore": "探索",
+    "events": "活动",
+    "map": "地图",
+    "chatbot": "AI导游",
+    "business": "我的商家",
+    "analytics": "数据分析",
+    "advertise": "广告推广",
+    "signOut": "退出登录"
+  },
+  "auth": {
+    "welcomeBack": "欢迎回来",
+    "signInSubtitle": "登录您的Valsamaki账户",
+    "signIn": "登录",
+    "signUp": "注册",
+    "email": "邮箱",
+    "password": "密码",
+    "confirmPassword": "确认密码",
+    "fullName": "姓名",
+    "or": "或",
+    "continueWithGoogle": "使用Google继续",
+    "noAccount": "没有账户？",
+    "haveAccount": "已有账户？",
+    "signInFailed": "登录失败，请重试。",
+    "createAccount": "创建账户",
+    "joinSubtitle": "加入Valsamaki社区",
+    "passwordMismatch": "密码不匹配",
+    "registrationFailed": "注册失败，请重试。",
+    "checkEmail": "请查看邮箱确认账户。"
+  },
+  "onboarding": {
+    "title": "设置您的档案",
+    "next": "下一步",
+    "finish": "完成",
+    "skip": "跳过"
+  },
+  "dashboard": {
+    "greeting": "你好，{name}！",
+    "weather": "天气",
+    "trending": "热门",
+    "news": "本地新闻",
+    "noData": "暂无内容。"
+  },
+  "explore": {
+    "title": "探索克里特岛",
+    "searchPlaceholder": "搜索商家、地点…",
+    "filters": "筛选",
+    "noResults": "没有找到结果。",
+    "distance": "{km} 公里外"
+  },
+  "events": {
+    "title": "活动",
+    "upcoming": "即将举行",
+    "past": "已结束",
+    "free": "免费",
+    "price": "€{amount}",
+    "register": "报名",
+    "noEvents": "未找到活动。"
+  },
+  "map": {
+    "title": "地图",
+    "locating": "定位中…",
+    "businesses": "商家",
+    "events": "活动"
+  },
+  "chatbot": {
+    "title": "AI导游",
+    "placeholder": "询问克里特美食、本地生产者…",
+    "send": "发送",
+    "voice": "语音输入",
+    "poweredBy": "Ask Valsamaki — 您的克里特岛AI导游"
+  },
+  "business": {
+    "title": "我的商家",
+    "name": "商家名称",
+    "category": "类别",
+    "description": "描述",
+    "address": "地址",
+    "phone": "电话",
+    "website": "网站",
+    "save": "保存",
+    "saved": "已保存！",
+    "saveFailed": "保存失败。"
+  },
+  "common": {
+    "loading": "加载中…",
+    "error": "出现错误。",
+    "retry": "重试",
+    "back": "返回",
+    "close": "关闭",
+    "save": "保存",
+    "cancel": "取消",
+    "confirm": "确认",
+    "delete": "删除",
+    "edit": "编辑",
+    "view": "查看",
+    "learnMore": "了解更多",
+    "offline": "您已离线，部分功能可能不可用。",
+    "darkMode": "深色模式",
+    "lightMode": "浅色模式",
+    "language": "语言"
+  }
+}

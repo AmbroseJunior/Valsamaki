@@ -1,0 +1,105 @@
+{
+  "nav": {
+    "dashboard": "Inicio",
+    "explore": "Explorar",
+    "events": "Eventos",
+    "map": "Mapa",
+    "chatbot": "Guía IA",
+    "business": "Mi Negocio",
+    "analytics": "Analíticas",
+    "advertise": "Publicidad",
+    "signOut": "Cerrar Sesión"
+  },
+  "auth": {
+    "welcomeBack": "Bienvenido de nuevo",
+    "signInSubtitle": "Inicia sesión en tu cuenta de Valsamaki",
+    "signIn": "Iniciar Sesión",
+    "signUp": "Registrarse",
+    "email": "Correo",
+    "password": "Contraseña",
+    "confirmPassword": "Confirmar contraseña",
+    "fullName": "Nombre completo",
+    "or": "o",
+    "continueWithGoogle": "Continuar con Google",
+    "noAccount": "¿No tienes cuenta?",
+    "haveAccount": "¿Ya tienes cuenta?",
+    "signInFailed": "Error al iniciar sesión. Inténtalo de nuevo.",
+    "createAccount": "Crear cuenta",
+    "joinSubtitle": "Únete a la comunidad Valsamaki",
+    "passwordMismatch": "Las contraseñas no coinciden",
+    "registrationFailed": "Error en el registro. Inténtalo de nuevo.",
+    "checkEmail": "Revisa tu correo para confirmar tu cuenta."
+  },
+  "onboarding": {
+    "title": "Configura tu perfil",
+    "next": "Siguiente",
+    "finish": "Finalizar",
+    "skip": "Omitir"
+  },
+  "dashboard": {
+    "greeting": "¡Hola, {name}!",
+    "weather": "Tiempo",
+    "trending": "Tendencias",
+    "news": "Noticias locales",
+    "noData": "Aún no hay nada que mostrar."
+  },
+  "explore": {
+    "title": "Explorar Creta",
+    "searchPlaceholder": "Buscar negocios, lugares…",
+    "filters": "Filtros",
+    "noResults": "Sin resultados.",
+    "distance": "A {km} km"
+  },
+  "events": {
+    "title": "Eventos",
+    "upcoming": "Próximos",
+    "past": "Pasados",
+    "free": "Gratis",
+    "price": "€{amount}",
+    "register": "Registrarse",
+    "noEvents": "No se encontraron eventos."
+  },
+  "map": {
+    "title": "Mapa",
+    "locating": "Localizando…",
+    "businesses": "Negocios",
+    "events": "Eventos"
+  },
+  "chatbot": {
+    "title": "Guía IA",
+    "placeholder": "Pregunta sobre cocina cretense, productores locales…",
+    "send": "Enviar",
+    "voice": "Entrada de voz",
+    "poweredBy": "Ask Valsamaki — Tu guía IA de la Creta auténtica"
+  },
+  "business": {
+    "title": "Mi Negocio",
+    "name": "Nombre del negocio",
+    "category": "Categoría",
+    "description": "Descripción",
+    "address": "Dirección",
+    "phone": "Teléfono",
+    "website": "Sitio web",
+    "save": "Guardar",
+    "saved": "¡Guardado!",
+    "saveFailed": "Error al guardar."
+  },
+  "common": {
+    "loading": "Cargando…",
+    "error": "Algo salió mal.",
+    "retry": "Reintentar",
+    "back": "Atrás",
+    "close": "Cerrar",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "view": "Ver",
+    "learnMore": "Saber más",
+    "offline": "Estás sin conexión. Algunas funciones pueden no estar disponibles.",
+    "darkMode": "Modo oscuro",
+    "lightMode": "Modo claro",
+    "language": "Idioma"
+  }
+}

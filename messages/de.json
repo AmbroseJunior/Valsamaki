@@ -1,0 +1,105 @@
+{
+  "nav": {
+    "dashboard": "Startseite",
+    "explore": "Entdecken",
+    "events": "Veranstaltungen",
+    "map": "Karte",
+    "chatbot": "KI-Guide",
+    "business": "Mein Betrieb",
+    "analytics": "Analysen",
+    "advertise": "Werbung",
+    "signOut": "Abmelden"
+  },
+  "auth": {
+    "welcomeBack": "Willkommen zurück",
+    "signInSubtitle": "Melden Sie sich bei Ihrem Valsamaki-Konto an",
+    "signIn": "Anmelden",
+    "signUp": "Registrieren",
+    "email": "E-Mail",
+    "password": "Passwort",
+    "confirmPassword": "Passwort bestätigen",
+    "fullName": "Vollständiger Name",
+    "or": "oder",
+    "continueWithGoogle": "Mit Google fortfahren",
+    "noAccount": "Kein Konto?",
+    "haveAccount": "Bereits ein Konto?",
+    "signInFailed": "Anmeldung fehlgeschlagen. Bitte versuchen Sie es erneut.",
+    "createAccount": "Konto erstellen",
+    "joinSubtitle": "Treten Sie der Valsamaki-Community bei",
+    "passwordMismatch": "Passwörter stimmen nicht überein",
+    "registrationFailed": "Registrierung fehlgeschlagen. Bitte versuchen Sie es erneut.",
+    "checkEmail": "Bitte überprüfen Sie Ihre E-Mail zur Kontobestätigung."
+  },
+  "onboarding": {
+    "title": "Profil einrichten",
+    "next": "Weiter",
+    "finish": "Fertig",
+    "skip": "Überspringen"
+  },
+  "dashboard": {
+    "greeting": "Hallo, {name}!",
+    "weather": "Wetter",
+    "trending": "Trends",
+    "news": "Lokale Nachrichten",
+    "noData": "Noch nichts zu zeigen."
+  },
+  "explore": {
+    "title": "Kreta entdecken",
+    "searchPlaceholder": "Betriebe, Orte suchen…",
+    "filters": "Filter",
+    "noResults": "Keine Ergebnisse gefunden.",
+    "distance": "{km} km entfernt"
+  },
+  "events": {
+    "title": "Veranstaltungen",
+    "upcoming": "Bevorstehend",
+    "past": "Vergangen",
+    "free": "Kostenlos",
+    "price": "€{amount}",
+    "register": "Anmelden",
+    "noEvents": "Keine Veranstaltungen gefunden."
+  },
+  "map": {
+    "title": "Karte",
+    "locating": "Standort wird ermittelt…",
+    "businesses": "Betriebe",
+    "events": "Veranstaltungen"
+  },
+  "chatbot": {
+    "title": "KI-Guide",
+    "placeholder": "Fragen Sie nach kretischer Küche, lokalen Erzeugern…",
+    "send": "Senden",
+    "voice": "Spracheingabe",
+    "poweredBy": "Ask Valsamaki — Ihr KI-Guide für authentisches Kreta"
+  },
+  "business": {
+    "title": "Mein Betrieb",
+    "name": "Betriebsname",
+    "category": "Kategorie",
+    "description": "Beschreibung",
+    "address": "Adresse",
+    "phone": "Telefon",
+    "website": "Website",
+    "save": "Speichern",
+    "saved": "Gespeichert!",
+    "saveFailed": "Speichern fehlgeschlagen."
+  },
+  "common": {
+    "loading": "Laden…",
+    "error": "Etwas ist schief gelaufen.",
+    "retry": "Erneut versuchen",
+    "back": "Zurück",
+    "close": "Schließen",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "confirm": "Bestätigen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "view": "Ansehen",
+    "learnMore": "Mehr erfahren",
+    "offline": "Sie sind offline. Einige Funktionen sind möglicherweise nicht verfügbar.",
+    "darkMode": "Dunkelmodus",
+    "lightMode": "Hellmodus",
+    "language": "Sprache"
+  }
+}

@@ -1,0 +1,105 @@
+{
+  "nav": {
+    "dashboard": "Accueil",
+    "explore": "Explorer",
+    "events": "Événements",
+    "map": "Carte",
+    "chatbot": "Guide IA",
+    "business": "Mon Commerce",
+    "analytics": "Statistiques",
+    "advertise": "Publicité",
+    "signOut": "Déconnexion"
+  },
+  "auth": {
+    "welcomeBack": "Bon retour",
+    "signInSubtitle": "Connectez-vous à votre compte Valsamaki",
+    "signIn": "Se connecter",
+    "signUp": "S'inscrire",
+    "email": "Email",
+    "password": "Mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "fullName": "Nom complet",
+    "or": "ou",
+    "continueWithGoogle": "Continuer avec Google",
+    "noAccount": "Pas de compte ?",
+    "haveAccount": "Vous avez déjà un compte ?",
+    "signInFailed": "Échec de la connexion. Veuillez réessayer.",
+    "createAccount": "Créer un compte",
+    "joinSubtitle": "Rejoignez la communauté Valsamaki",
+    "passwordMismatch": "Les mots de passe ne correspondent pas",
+    "registrationFailed": "Échec de l'inscription. Veuillez réessayer.",
+    "checkEmail": "Vérifiez votre email pour confirmer votre compte."
+  },
+  "onboarding": {
+    "title": "Configurer votre profil",
+    "next": "Suivant",
+    "finish": "Terminer",
+    "skip": "Passer"
+  },
+  "dashboard": {
+    "greeting": "Bonjour, {name} !",
+    "weather": "Météo",
+    "trending": "Tendances",
+    "news": "Actualités locales",
+    "noData": "Rien à afficher pour l'instant."
+  },
+  "explore": {
+    "title": "Explorer la Crète",
+    "searchPlaceholder": "Rechercher des commerces, lieux…",
+    "filters": "Filtres",
+    "noResults": "Aucun résultat.",
+    "distance": "À {km} km"
+  },
+  "events": {
+    "title": "Événements",
+    "upcoming": "À venir",
+    "past": "Passés",
+    "free": "Gratuit",
+    "price": "€{amount}",
+    "register": "S'inscrire",
+    "noEvents": "Aucun événement trouvé."
+  },
+  "map": {
+    "title": "Carte",
+    "locating": "Localisation…",
+    "businesses": "Commerces",
+    "events": "Événements"
+  },
+  "chatbot": {
+    "title": "Guide IA",
+    "placeholder": "Posez des questions sur la cuisine crétoise, les producteurs locaux…",
+    "send": "Envoyer",
+    "voice": "Saisie vocale",
+    "poweredBy": "Ask Valsamaki — Votre guide IA de la Crète authentique"
+  },
+  "business": {
+    "title": "Mon Commerce",
+    "name": "Nom du commerce",
+    "category": "Catégorie",
+    "description": "Description",
+    "address": "Adresse",
+    "phone": "Téléphone",
+    "website": "Site web",
+    "save": "Enregistrer",
+    "saved": "Enregistré !",
+    "saveFailed": "Échec de l'enregistrement."
+  },
+  "common": {
+    "loading": "Chargement…",
+    "error": "Une erreur s'est produite.",
+    "retry": "Réessayer",
+    "back": "Retour",
+    "close": "Fermer",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "view": "Voir",
+    "learnMore": "En savoir plus",
+    "offline": "Vous êtes hors ligne. Certaines fonctionnalités peuvent être indisponibles.",
+    "darkMode": "Mode sombre",
+    "lightMode": "Mode clair",
+    "language": "Langue"
+  }
+}

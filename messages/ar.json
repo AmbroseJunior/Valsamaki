@@ -1,0 +1,105 @@
+{
+  "nav": {
+    "dashboard": "الرئيسية",
+    "explore": "استكشف",
+    "events": "فعاليات",
+    "map": "الخريطة",
+    "chatbot": "دليل الذكاء الاصطناعي",
+    "business": "نشاطي التجاري",
+    "analytics": "التحليلات",
+    "advertise": "الإعلانات",
+    "signOut": "تسجيل الخروج"
+  },
+  "auth": {
+    "welcomeBack": "مرحباً بعودتك",
+    "signInSubtitle": "سجّل الدخول إلى حسابك في Valsamaki",
+    "signIn": "تسجيل الدخول",
+    "signUp": "إنشاء حساب",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "confirmPassword": "تأكيد كلمة المرور",
+    "fullName": "الاسم الكامل",
+    "or": "أو",
+    "continueWithGoogle": "المتابعة باستخدام Google",
+    "noAccount": "ليس لديك حساب؟",
+    "haveAccount": "لديك حساب بالفعل؟",
+    "signInFailed": "فشل تسجيل الدخول. يرجى المحاولة مرة أخرى.",
+    "createAccount": "إنشاء حساب",
+    "joinSubtitle": "انضم إلى مجتمع Valsamaki",
+    "passwordMismatch": "كلمتا المرور غير متطابقتين",
+    "registrationFailed": "فشل التسجيل. يرجى المحاولة مرة أخرى.",
+    "checkEmail": "تحقق من بريدك الإلكتروني لتأكيد الحساب."
+  },
+  "onboarding": {
+    "title": "إعداد ملفك الشخصي",
+    "next": "التالي",
+    "finish": "إنهاء",
+    "skip": "تخطي"
+  },
+  "dashboard": {
+    "greeting": "مرحباً، {name}!",
+    "weather": "الطقس",
+    "trending": "الرائج",
+    "news": "أخبار محلية",
+    "noData": "لا يوجد شيء لعرضه بعد."
+  },
+  "explore": {
+    "title": "استكشف كريت",
+    "searchPlaceholder": "ابحث عن أعمال تجارية، أماكن…",
+    "filters": "تصفية",
+    "noResults": "لا توجد نتائج.",
+    "distance": "{km} كم"
+  },
+  "events": {
+    "title": "فعاليات",
+    "upcoming": "القادمة",
+    "past": "السابقة",
+    "free": "مجاني",
+    "price": "€{amount}",
+    "register": "التسجيل",
+    "noEvents": "لم يتم العثور على فعاليات."
+  },
+  "map": {
+    "title": "الخريطة",
+    "locating": "تحديد الموقع…",
+    "businesses": "أعمال تجارية",
+    "events": "فعاليات"
+  },
+  "chatbot": {
+    "title": "دليل الذكاء الاصطناعي",
+    "placeholder": "اسأل عن المطبخ الكريتي، المنتجين المحليين…",
+    "send": "إرسال",
+    "voice": "إدخال صوتي",
+    "poweredBy": "Ask Valsamaki — دليلك الذكي لاستكشاف كريت الأصيلة"
+  },
+  "business": {
+    "title": "نشاطي التجاري",
+    "name": "اسم العمل التجاري",
+    "category": "الفئة",
+    "description": "الوصف",
+    "address": "العنوان",
+    "phone": "الهاتف",
+    "website": "الموقع الإلكتروني",
+    "save": "حفظ",
+    "saved": "تم الحفظ!",
+    "saveFailed": "فشل الحفظ."
+  },
+  "common": {
+    "loading": "جارٍ التحميل…",
+    "error": "حدث خطأ ما.",
+    "retry": "إعادة المحاولة",
+    "back": "رجوع",
+    "close": "إغلاق",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "confirm": "تأكيد",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "view": "عرض",
+    "learnMore": "معرفة المزيد",
+    "offline": "أنت غير متصل. بعض الميزات قد لا تكون متاحة.",
+    "darkMode": "الوضع الداكن",
+    "lightMode": "الوضع الفاتح",
+    "language": "اللغة"
+  }
+}

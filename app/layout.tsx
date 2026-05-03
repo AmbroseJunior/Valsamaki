@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter, Playfair_Display } from 'next/font/google'
+import { Nunito_Sans, Varela_Round } from 'next/font/google'
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages, getLocale } from 'next-intl/server'
 import { Providers } from './providers'
@@ -9,8 +9,18 @@ import { OfflineBanner } from '@/components/shared/OfflineBanner'
 import '@/styles/tokens.css'
 import './globals.css'
 
-const inter = Inter({ subsets: ['latin', 'greek'], variable: '--font-sans' })
-const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-display' })
+const nunitoSans = Nunito_Sans({
+  subsets: ['latin', 'latin-ext'],
+  variable: '--font-sans',
+  display: 'swap',
+  adjustFontFallback: false,
+})
+const varelaRound = Varela_Round({
+  subsets: ['latin'],
+  weight: '400',
+  variable: '--font-display',
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
   title: { default: 'Valsamaki — Crete', template: '%s | Valsamaki' },
@@ -23,7 +33,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#5C7A3E',
+  themeColor: '#FCDA06',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
@@ -35,7 +45,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const messages = await getMessages()
 
   return (
-    <html lang={locale} className={`${inter.variable} ${playfair.variable}`} suppressHydrationWarning>
+    <html lang={locale} className={`${nunitoSans.variable} ${varelaRound.variable}`} suppressHydrationWarning>
       <head />
       <body className="bg-[var(--color-background)] text-[var(--color-foreground)] font-sans antialiased">
         <NextIntlClientProvider locale={locale} messages={messages}>

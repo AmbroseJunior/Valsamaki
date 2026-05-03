@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,300;0,6..12,400;0,6..12,500;0,6..12,600;0,6..12,700;0,6..12,800;1,6..12,400&family=Varela+Round&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -16,22 +18,33 @@
     font-family: var(--font-sans);
     background-color: var(--color-background);
     color: var(--color-foreground);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
-    font-weight: 600;
+    font-weight: 700;
     line-height: var(--line-height-tight);
+    color: var(--color-foreground);
   }
 
   ::selection {
-    background-color: var(--color-primary);
-    color: var(--color-primary-foreground);
+    background-color: var(--highlight);
+    color: var(--highlight-foreground);
   }
 
   :focus-visible {
-    outline: 2px solid var(--color-ring);
+    outline: 2px solid var(--highlight);
     outline-offset: 2px;
+  }
+
+  img {
+    max-width: 100%;
+  }
+
+  button {
+    font-family: var(--font-sans);
   }
 }
 
@@ -49,6 +62,13 @@
     display: none;
   }
 
+  .line-clamp-1 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+  }
+
   .line-clamp-2 {
     overflow: hidden;
     display: -webkit-box;
@@ -56,7 +76,45 @@
     -webkit-line-clamp: 2;
   }
 
+  .line-clamp-3 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+  }
+
   .safe-pb {
     padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+
+  /* Yellow highlight button */
+  .btn-highlight {
+    background-color: var(--highlight);
+    color: var(--highlight-foreground);
+    font-weight: 600;
+    border-radius: var(--radius);
+    transition: background-color var(--transition-fast);
+  }
+  .btn-highlight:hover {
+    background-color: var(--highlight-dark);
+  }
+
+  /* Card hover lift */
+  .card-hover {
+    transition: transform var(--transition-base), box-shadow var(--transition-base);
+  }
+  .card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  /* Health benefit tag */
+  .tag-health {
+    background-color: var(--color-green-bg);
+    color: var(--color-green);
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.125rem 0.5rem;
+    border-radius: var(--radius-full);
   }
 }

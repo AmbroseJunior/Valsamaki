@@ -13,9 +13,9 @@ export default async function ChatbotPage() {
   return (
     <div className="max-w-3xl mx-auto h-[calc(100vh-var(--nav-height)-var(--bottom-nav-height))] md:h-[calc(100vh-var(--nav-height))] flex flex-col">
       <div className="px-4 py-4 border-b border-[var(--color-border)]">
-        <h1 className="font-display text-xl font-bold">Valsamaki AI</h1>
+        <h1 className="font-display text-xl font-bold">Ask Valsamaki 🫒</h1>
         <p className="text-xs text-[var(--color-muted-foreground)]">
-          Powered by DeepSeek · Grounded in local Cretan knowledge
+          Your AI guide to authentic Crete · Local knowledge, personalised for you
         </p>
       </div>
       <div className="flex-1 overflow-hidden">

@@ -1,8 +1,10 @@
 import { getRequestConfig } from 'next-intl/server'
 import { cookies } from 'next/headers'
+import { SUPPORTED_LOCALES } from '@/lib/i18n/locales'
+import type { Locale } from '@/lib/i18n/locales'
 
-const SUPPORTED_LOCALES = ['en', 'el'] as const
-export type Locale = (typeof SUPPORTED_LOCALES)[number]
+export type { Locale }
+export { SUPPORTED_LOCALES }
 
 function resolveLocale(raw: string | undefined): Locale {
   if (!raw) return 'el'

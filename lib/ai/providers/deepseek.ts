@@ -32,16 +32,16 @@ export class DeepSeekProvider implements AIProvider {
       ...messages.map((m) => ({ role: m.role, content: m.content })),
     ]
 
-    try {
-      const controller = new AbortController()
-      const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS)
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS)
 
+    try {
       const response = await this.client.chat.completions.create(
         {
           model: 'deepseek-chat',
           messages: openaiMessages,
           temperature: 0.7,
-          max_tokens: 1024,
+          max_tokens: 512,
         },
         { signal: controller.signal }
       )
@@ -49,8 +49,10 @@ export class DeepSeekProvider implements AIProvider {
       clearTimeout(timeout)
       return response.choices[0]?.message?.content ?? 'I could not generate a response.'
     } catch (err) {
+      clearTimeout(timeout)
       logger.error('DeepSeek chat error', err)
-      return 'I am temporarily unavailable. Please try again in a moment.'
+      const msg = err instanceof Error ? err.message : String(err)
+      throw new Error(`DeepSeek: ${msg}`)
     }
   }
 

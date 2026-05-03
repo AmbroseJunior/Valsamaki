@@ -51,9 +51,10 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    return NextResponse.json(
-      { reply: 'I am temporarily unavailable. Please try again in a moment.', error: msg },
-      { status: 500 }
-    )
+    // Surface real error in the reply so it's visible in the chat UI
+    return NextResponse.json({
+      reply: `⚠️ Error: ${msg || 'Unknown error'}`,
+      error: msg,
+    })
   }
 }

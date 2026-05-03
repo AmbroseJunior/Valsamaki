@@ -9,19 +9,21 @@ import { LocaleSwitcher } from './LocaleSwitcher'
 import { Search, Menu, X, User, LogOut, ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useState, useEffect, useRef } from 'react'
+import { useTranslations } from 'next-intl'
 
 const NAV_LINKS = [
-  { href: '/dashboard', label: 'Home' },
-  { href: '/explore', label: 'Explore' },
-  { href: '/map', label: 'Map' },
-  { href: '/events', label: 'Events' },
-  { href: '/chatbot', label: 'Ask Valsamaki' },
+  { href: '/dashboard', key: 'dashboard' },
+  { href: '/explore', key: 'explore' },
+  { href: '/map', key: 'map' },
+  { href: '/events', key: 'events' },
+  { href: '/chatbot', key: 'chatbot' },
 ]
 
 export function Navbar() {
   const pathname = usePathname()
   const { role } = useRole()
   const router = useRouter()
+  const t = useTranslations('nav')
   const [menuOpen, setMenuOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -82,7 +84,7 @@ export function Navbar() {
         {/* Desktop nav links */}
         {!isGuest && (
           <nav className="hidden md:flex items-center gap-1 ml-4">
-            {NAV_LINKS.map(({ href, label }) => {
+            {NAV_LINKS.map(({ href, key }) => {
               const active = pathname === href || (href !== '/dashboard' && pathname.startsWith(href))
               return (
                 <Link
@@ -95,7 +97,7 @@ export function Navbar() {
                       : 'text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)] hover:bg-[var(--color-muted)]'
                   )}
                 >
-                  {label}
+                  {t(key)}
                 </Link>
               )
             })}
@@ -109,7 +111,7 @@ export function Navbar() {
                     : 'text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)] hover:bg-[var(--color-muted)]'
                 )}
               >
-                My Business
+                {t('business')}
               </Link>
             )}
           </nav>
@@ -241,9 +243,9 @@ export function Navbar() {
               </>
             ) : (
               <>
-                {NAV_LINKS.map(({ href, label }) => (
+                {NAV_LINKS.map(({ href, key }) => (
                   <Link key={href} href={href} onClick={() => setMenuOpen(false)} className={cn('block px-3 py-2.5 text-sm font-semibold rounded-[var(--radius)] transition-colors', pathname.startsWith(href) ? 'bg-[var(--highlight)] text-[var(--highlight-foreground)]' : 'hover:bg-[var(--color-muted)]')}>
-                    {label}
+                    {t(key)}
                   </Link>
                 ))}
                 {isProducer && (
@@ -254,7 +256,7 @@ export function Navbar() {
                 )}
                 <div className="border-t border-[var(--color-border)] pt-2 mt-2">
                   <button onClick={() => { setMenuOpen(false); handleSignOut() }} className="flex items-center gap-2 w-full px-3 py-2.5 text-sm text-[var(--color-destructive)] rounded-[var(--radius)] hover:bg-[var(--color-muted)]">
-                    <LogOut className="h-4 w-4" /> Sign out
+                    <LogOut className="h-4 w-4" /> {t('signOut')}
                   </button>
                 </div>
               </>

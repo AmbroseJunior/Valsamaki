@@ -1,0 +1,105 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "explore": "Explore",
+    "events": "Events",
+    "map": "Map",
+    "chatbot": "AI Guide",
+    "business": "My Business",
+    "analytics": "Analytics",
+    "advertise": "Advertise",
+    "signOut": "Sign Out"
+  },
+  "auth": {
+    "welcomeBack": "Welcome back",
+    "signInSubtitle": "Sign in to your Valsamaki account",
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "fullName": "Full Name",
+    "or": "or",
+    "continueWithGoogle": "Continue with Google",
+    "noAccount": "No account?",
+    "haveAccount": "Already have an account?",
+    "signInFailed": "Sign in failed. Please try again.",
+    "createAccount": "Create your account",
+    "joinSubtitle": "Join the Valsamaki community",
+    "passwordMismatch": "Passwords do not match",
+    "registrationFailed": "Registration failed. Please try again.",
+    "checkEmail": "Check your email to confirm your account."
+  },
+  "onboarding": {
+    "title": "Set up your profile",
+    "next": "Next",
+    "finish": "Finish",
+    "skip": "Skip"
+  },
+  "dashboard": {
+    "greeting": "Hello, {name}!",
+    "weather": "Weather",
+    "trending": "Trending",
+    "news": "Local News",
+    "noData": "Nothing to show yet."
+  },
+  "explore": {
+    "title": "Explore Crete",
+    "searchPlaceholder": "Search businesses, places...",
+    "filters": "Filters",
+    "noResults": "No results found.",
+    "distance": "{km} km away"
+  },
+  "events": {
+    "title": "Events",
+    "upcoming": "Upcoming",
+    "past": "Past",
+    "free": "Free",
+    "price": "€{amount}",
+    "register": "Register",
+    "noEvents": "No events found."
+  },
+  "map": {
+    "title": "Map",
+    "locating": "Finding your location…",
+    "businesses": "Businesses",
+    "events": "Events"
+  },
+  "chatbot": {
+    "title": "AI Guide",
+    "placeholder": "Ask about Cretan cuisine, local producers, events…",
+    "send": "Send",
+    "voice": "Voice input",
+    "poweredBy": "Powered by DeepSeek AI"
+  },
+  "business": {
+    "title": "My Business",
+    "name": "Business Name",
+    "category": "Category",
+    "description": "Description",
+    "address": "Address",
+    "phone": "Phone",
+    "website": "Website",
+    "save": "Save",
+    "saved": "Saved!",
+    "saveFailed": "Failed to save."
+  },
+  "common": {
+    "loading": "Loading…",
+    "error": "Something went wrong.",
+    "retry": "Try again",
+    "back": "Back",
+    "close": "Close",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "learnMore": "Learn more",
+    "offline": "You are offline. Some features may be unavailable.",
+    "darkMode": "Dark mode",
+    "lightMode": "Light mode",
+    "language": "Language"
+  }
+}

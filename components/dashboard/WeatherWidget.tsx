@@ -1,4 +1,5 @@
 import { getWeather } from '@/lib/api/external'
+import Image from 'next/image'
 import { Cloud, Droplets, Wind } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 
@@ -23,7 +24,7 @@ export async function WeatherWidget({ lat = HERAKLION.lat, lng = HERAKLION.lng }
   return (
     <Card>
       <CardContent className="p-4 flex items-center gap-4">
-        <img
+        <Image
           src={`https://openweathermap.org/img/wn/${weather.icon}@2x.png`}
           alt={weather.description}
           width={56}

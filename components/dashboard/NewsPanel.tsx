@@ -1,4 +1,5 @@
 import { getCretanNews } from '@/lib/api/external'
+import Image from 'next/image'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { ExternalLink } from 'lucide-react'
@@ -28,9 +29,12 @@ export async function NewsPanel() {
                   className="flex gap-3 p-4 hover:bg-[var(--color-muted)] transition-colors group"
                 >
                   {article.image_url && (
-                    <img
+                    <Image
                       src={article.image_url}
                       alt=""
+                      width={64}
+                      height={64}
+                      unoptimized
                       className="w-16 h-16 rounded-[var(--radius)] object-cover shrink-0"
                     />
                   )}

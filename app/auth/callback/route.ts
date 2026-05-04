@@ -22,7 +22,20 @@ export async function GET(request: NextRequest) {
     const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code)
 
     if (!exchangeError) {
-      // Redirect to intended page — use absolute URL to stay on correct domain
+      // Ensure a profile row exists for OAuth sign-ins (Google, Facebook, etc.)
+      const { data: { user: authUser } } = await supabase.auth.getUser()
+      if (authUser) {
+        await supabase.from('profiles').upsert(
+          {
+            id: authUser.id,
+            name: authUser.user_metadata?.full_name ?? authUser.user_metadata?.name ?? null,
+            role: 'user',
+            language: 'en',
+          },
+          { onConflict: 'id', ignoreDuplicates: true }
+        )
+      }
+
       const redirectTo = next.startsWith('/') ? `${origin}${next}` : next
       return NextResponse.redirect(redirectTo)
     }

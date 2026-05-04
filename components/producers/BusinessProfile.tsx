@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -38,12 +39,14 @@ export function BusinessProfile({ business, isOwner, onEdit, onDelete }: Busines
         {business.images?.length > 0 && (
           <div className="flex gap-2 overflow-x-auto pb-2">
             {business.images.map((img, i) => (
-              <img
-                key={i}
-                src={img}
-                alt={`${business.name} ${i + 1}`}
-                className="h-32 w-48 object-cover rounded-[var(--radius)] shrink-0"
-              />
+              <div key={i} className="relative h-32 w-48 shrink-0 rounded-[var(--radius)] overflow-hidden">
+                <Image
+                  src={img}
+                  alt={`${business.name} ${i + 1}`}
+                  fill
+                  className="object-cover"
+                />
+              </div>
             ))}
           </div>
         )}

@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -17,11 +18,14 @@ export function EventCard({ event, onRsvp, compact = false }: EventCardProps) {
   return (
     <Card className="overflow-hidden hover:shadow-[var(--shadow-md)] transition-shadow">
       {event.images?.[0] && (
-        <img
-          src={event.images[0]}
-          alt={event.title}
-          className={compact ? 'w-full h-32 object-cover' : 'w-full h-48 object-cover'}
-        />
+        <div className={`relative w-full ${compact ? 'h-32' : 'h-48'}`}>
+          <Image
+            src={event.images[0]}
+            alt={event.title}
+            fill
+            className="object-cover"
+          />
+        </div>
       )}
       <CardContent className="p-4 space-y-3">
         <div className="flex items-start justify-between gap-2">

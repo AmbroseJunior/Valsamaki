@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { MapPin, Phone, Globe } from 'lucide-react'
@@ -12,11 +13,14 @@ export function ProducerCard({ business, distanceKm }: ProducerCardProps) {
   return (
     <Card className="overflow-hidden hover:shadow-[var(--shadow-md)] transition-shadow">
       {business.images?.[0] ? (
-        <img
-          src={business.images[0]}
-          alt={business.name}
-          className="w-full h-40 object-cover"
-        />
+        <div className="relative w-full h-40">
+          <Image
+            src={business.images[0]}
+            alt={business.name}
+            fill
+            className="object-cover"
+          />
+        </div>
       ) : (
         <div className="w-full h-40 bg-[var(--color-muted)] flex items-center justify-center">
           <span className="text-4xl">🫒</span>

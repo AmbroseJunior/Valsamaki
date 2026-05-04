@@ -1,8 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <!-- Leaf 1: upper-left -->
-  <path fill="#FCDA06" d="M50,52 C46,44 36,30 22,24 C14,20 10,28 16,34 C22,40 38,46 50,52Z"/>
-  <!-- Leaf 2: right -->
-  <path fill="#FCDA06" d="M50,52 C58,48 72,38 78,24 C82,16 74,12 68,18 C62,24 54,40 50,52Z"/>
-  <!-- Leaf 3: lower -->
-  <path fill="#FCDA06" d="M50,52 C50,62 48,78 38,86 C30,92 24,84 30,78 C36,72 46,62 50,52Z"/>
+  <!-- upper-left petal -->
+  <path fill="#FCDA06" d="M50,52 C42,40 26,22 16,14 C8,8 8,20 14,28 C20,36 40,46 50,52Z"/>
+  <!-- upper-right petal -->
+  <path fill="#FCDA06" d="M50,52 C62,46 80,32 86,22 C92,12 84,6 76,12 C68,18 58,42 50,52Z"/>
+  <!-- lower-right petal -->
+  <path fill="#FCDA06" d="M50,52 C60,62 76,76 84,84 C92,92 82,96 74,88 C66,80 56,64 50,52Z"/>
+  <!-- lower-left petal -->
+  <path fill="#FCDA06" d="M50,52 C40,62 22,76 14,84 C6,92 10,96 18,90 C26,84 42,64 50,52Z"/>
 </svg>

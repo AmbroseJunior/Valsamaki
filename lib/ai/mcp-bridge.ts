@@ -1,4 +1,4 @@
-import { getPrimaryProvider, getProvider } from './providers'
+import { getPrimaryProvider, getProvider, getAvailableProviders } from './providers'
 import { buildLocalContext } from './local-context'
 import { createClient } from '@/lib/supabase/server'
 import type { MCPRequest, MCPResponse, AIMessage } from '@/types/ai'
@@ -31,18 +31,36 @@ export async function mcpBridge(request: MCPRequest): Promise<MCPResponse> {
 
   let output: string
 
+  const messages: AIMessage[] = [
+    ...(mergedContext.conversationHistory ?? []),
+    { role: 'user', content: input },
+  ]
+
+  async function runWithFallback(fn: (p: typeof provider) => Promise<string>): Promise<string> {
+    const candidates = preferredProvider && preferredProvider !== 'auto'
+      ? [provider]
+      : getAvailableProviders()
+
+    let lastErr: unknown
+    for (const p of candidates) {
+      try {
+        return await fn(p)
+      } catch (err) {
+        logger.warn(`Provider ${p.name} failed, trying next`, err)
+        lastErr = err
+      }
+    }
+    throw lastErr ?? new Error('All AI providers failed')
+  }
+
   if (task === 'voice_setup') {
     const voicePrompt = `${CRETAN_ACCENT_PREAMBLE}\n\n${input}`
-    output = await provider.complete(voicePrompt, mergedContext)
+    output = await runWithFallback((p) => p.complete(voicePrompt, mergedContext))
   } else if (task === 'recommend') {
     const recPrompt = buildRecommendationPrompt(input, mergedContext)
-    output = await provider.complete(recPrompt, mergedContext)
+    output = await runWithFallback((p) => p.complete(recPrompt, mergedContext))
   } else {
-    const messages: AIMessage[] = [
-      ...(mergedContext.conversationHistory ?? []),
-      { role: 'user', content: input },
-    ]
-    output = await provider.chat(messages, mergedContext)
+    output = await runWithFallback((p) => p.chat(messages, mergedContext))
   }
 
   await saveMemory(userId, input, output)

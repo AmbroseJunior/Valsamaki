@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import dynamic from 'next/dynamic'
-import { Search, X, SlidersHorizontal, MapPin, Phone, Globe, Navigation } from 'lucide-react'
+import { Search, X, SlidersHorizontal, MapPin, Phone, Globe } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
 import { useLocation } from '@/hooks/useLocation'
@@ -28,10 +28,6 @@ const CATEGORY_FILTERS = [
 ]
 
 function BusinessPanel({ business, onClose }: { business: BusinessRow; onClose: () => void }) {
-  const mapsUrl = business.lat && business.lng
-    ? `https://www.google.com/maps/search/?api=1&query=${business.lat},${business.lng}`
-    : undefined
-
   return (
     <div className="bg-[var(--color-card)] rounded-[var(--radius-xl)] shadow-[var(--shadow-lg)] border border-[var(--color-border)] overflow-hidden">
       {/* Header */}
@@ -79,16 +75,28 @@ function BusinessPanel({ business, onClose }: { business: BusinessRow; onClose: 
           )}
         </div>
 
-        {mapsUrl && (
-          <a
-            href={mapsUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 w-full py-3 bg-[var(--highlight)] text-[var(--highlight-foreground)] font-bold rounded-[var(--radius-full)] hover:bg-[var(--highlight-dark)] transition-colors text-sm"
-          >
-            <Navigation className="h-4 w-4" />
-            Get Directions
-          </a>
+        {business.lat && business.lng && (
+          <div className="space-y-2">
+            <p className="text-xs font-semibold text-[var(--color-muted-foreground)] uppercase tracking-wide">Get there by</p>
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                { label: 'Walk', icon: '🚶', mode: 'walking' },
+                { label: 'Bus', icon: '🚌', mode: 'transit' },
+                { label: 'Taxi / Drive', icon: '🚕', mode: 'driving' },
+              ].map(({ label, icon, mode }) => (
+                <a
+                  key={mode}
+                  href={`https://www.google.com/maps/dir/?api=1&destination=${business.lat},${business.lng}&travelmode=${mode}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex flex-col items-center gap-1 py-2.5 rounded-[var(--radius-lg)] border border-[var(--color-border)] hover:border-[var(--highlight)] hover:bg-[var(--highlight)]/5 transition-colors text-center"
+                >
+                  <span className="text-xl">{icon}</span>
+                  <span className="text-[10px] font-semibold text-[var(--color-muted-foreground)]">{label}</span>
+                </a>
+              ))}
+            </div>
+          </div>
         )}
 
         <a
@@ -116,7 +124,10 @@ export default function MapPage() {
     queryFn: async (): Promise<BusinessRow[]> => {
       let q = supabase.from('businesses').select('*').eq('is_active', true).limit(100)
       if (category) q = q.eq('category', category)
-      if (search) q = q.ilike('name', `%${search}%`)
+      if (search.trim()) {
+        const s = search.trim()
+        q = q.or(`name.ilike.%${s}%,description.ilike.%${s}%,address.ilike.%${s}%,category.ilike.%${s}%`)
+      }
       const { data } = await q
       return (data ?? []) as BusinessRow[]
     },

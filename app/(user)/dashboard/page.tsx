@@ -3,8 +3,9 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { WeatherWidget } from '@/components/dashboard/WeatherWidget'
 import { NewsPanel } from '@/components/dashboard/NewsPanel'
-import { TrendingWidget } from '@/components/dashboard/TrendingWidget'
+import { PersonalizedSection } from '@/components/dashboard/PersonalizedSection'
 import { PageLoader } from '@/components/shared/LoadingSpinner'
+import type { UserPreferences } from '@/types/app'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = { title: 'Dashboard' }
@@ -22,28 +23,33 @@ export default async function DashboardPage() {
 
   const lat = profile?.location_lat ?? 35.3387
   const lng = profile?.location_lng ?? 25.1442
+  const preferences = (profile?.preferences ?? null) as UserPreferences | null
+  const firstName = profile?.name ? profile.name.split(' ')[0] : null
+
+  const greetingContext = preferences?.reason_for_visit === 'tourist'
+    ? 'Discover authentic Crete — personalised for you'
+    : preferences?.reason_for_visit === 'local'
+    ? 'Your local guide to the best of Crete'
+    : preferences?.reason_for_visit === 'researcher'
+    ? 'Explore Cretan food culture, producers & traditions'
+    : 'Personalised for your location and preferences'
 
   return (
     <div className="max-w-[var(--max-content-width)] mx-auto px-4 py-6 space-y-6">
       <div>
         <h1 className="font-display text-2xl font-bold">
-          {profile?.name ? `Welcome back, ${profile.name.split(' ')[0]}` : 'Your Dashboard'}
+          {firstName ? `Welcome back, ${firstName}` : 'Your Dashboard'}
         </h1>
-        <p className="text-sm text-[var(--color-muted-foreground)] mt-1">
-          Personalised for your location and preferences
-        </p>
+        <p className="text-sm text-[var(--color-muted-foreground)] mt-1">{greetingContext}</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Suspense fallback={<PageLoader />}>
-          <WeatherWidget lat={lat} lng={lng} />
-        </Suspense>
-        <div className="md:col-span-2">
-          <Suspense fallback={<PageLoader />}>
-            <TrendingWidget />
-          </Suspense>
-        </div>
-      </div>
+      <Suspense fallback={<PageLoader />}>
+        <WeatherWidget lat={lat} lng={lng} />
+      </Suspense>
+
+      <Suspense fallback={<PageLoader />}>
+        <PersonalizedSection preferences={preferences} />
+      </Suspense>
 
       <Suspense fallback={<PageLoader />}>
         <NewsPanel />

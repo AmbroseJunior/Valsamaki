@@ -1,12 +1,21 @@
 import OpenAI from 'openai'
 import type { AIProvider, AIMessage, AIContext } from '@/types/ai'
 import { logger } from '@/lib/logger'
+import { buildCretanKnowledgeBlock } from '@/lib/ai/cretan-knowledge'
 
 const TIMEOUT_MS = 8_000
-const CRETAN_SYSTEM_PREAMBLE = `You are Valsamaki, an AI assistant specializing in Crete, Greece.
-You have deep knowledge of Cretan cuisine, the Mediterranean diet, local producers, events,
-and places. Always prioritize information from the provided local context before using your
-general training knowledge. Respond helpfully, warmly, and concisely.`
+
+const STRICT_GROUNDING_RULES = `
+## STRICT RESPONSE RULES
+1. Health and nutrition claims: ONLY assert facts that appear in the CRETAN FOOD KNOWLEDGE BASE below. Always state the evidence level (in vitro, animal, small RCT, or large RCT/meta-analysis).
+2. If asked about a health topic not covered in the knowledge base, say: "I don't have verified scientific data on that specific question — I'd recommend consulting a nutritionist or checking peer-reviewed sources."
+3. Never invent study names, DOIs, dosages, or health outcomes. If you are uncertain, say so.
+4. For local places, businesses, and events: ONLY recommend entities listed in the Local Context below. If nothing matches, say "I don't have that information for your area right now."
+5. Be warm and helpful, but accuracy comes before enthusiasm. Never hallucinate.
+`
+
+const CRETAN_SYSTEM_PREAMBLE = `You are Valsamaki, an AI guide to authentic Crete. You specialize in Cretan cuisine, the Mediterranean diet, local producers, health science, events, and places.
+${STRICT_GROUNDING_RULES}`
 
 export class DeepSeekProvider implements AIProvider {
   name = 'deepseek'
@@ -63,19 +72,26 @@ export class DeepSeekProvider implements AIProvider {
   private buildSystemMessage(context: AIContext): string {
     const parts: string[] = [CRETAN_SYSTEM_PREAMBLE]
 
+    // Always inject the verified food/health knowledge base
+    try {
+      parts.push(`\n${buildCretanKnowledgeBlock()}`)
+    } catch (err) {
+      logger.warn('Could not load Cretan knowledge block', err)
+    }
+
     if (context.nearbyBusinesses?.length) {
       parts.push(
-        `\n## Nearby Businesses\n${JSON.stringify(context.nearbyBusinesses, null, 2)}`
+        `\n## Local Context — Nearby Businesses\n${JSON.stringify(context.nearbyBusinesses, null, 2)}`
       )
     }
     if (context.nearbyEvents?.length) {
       parts.push(
-        `\n## Upcoming Events Nearby\n${JSON.stringify(context.nearbyEvents, null, 2)}`
+        `\n## Local Context — Upcoming Events\n${JSON.stringify(context.nearbyEvents, null, 2)}`
       )
     }
     if (context.knowledgeNodes?.length) {
       parts.push(
-        `\n## Mediterranean Diet Knowledge\n${context.knowledgeNodes
+        `\n## Additional Knowledge Graph Nodes\n${context.knowledgeNodes
           .map((n) => `- ${n.label}: ${n.description}`)
           .join('\n')}`
       )

@@ -73,7 +73,8 @@ export async function getCretanNews(): Promise<NewsArticle[]> {
   }
 
   try {
-    const url = `https://newsapi.org/v2/everything?q=Crete+Greece&language=en&sortBy=publishedAt&pageSize=10&apiKey=${NEWS_KEY}`
+    const q = encodeURIComponent('(Crete OR Cretan) AND (food OR "olive oil" OR wine OR cuisine OR producer OR agriculture OR culture OR festival OR tradition OR Mediterranean OR organic)')
+    const url = `https://newsapi.org/v2/everything?q=${q}&language=en&sortBy=relevancy&pageSize=20&apiKey=${NEWS_KEY}`
     const res = await fetch(url, { next: { revalidate: 3600 } })
     if (!res.ok) throw new Error(`News API ${res.status}`)
 

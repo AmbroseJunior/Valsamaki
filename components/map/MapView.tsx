@@ -3,7 +3,6 @@
 import dynamic from 'next/dynamic'
 import { PageLoader } from '@/components/shared/LoadingSpinner'
 
-// Leaflet must only render client-side
 const MapInner = dynamic(() => import('./MapInner'), {
   ssr: false,
   loading: () => <PageLoader />,
@@ -14,6 +13,7 @@ interface MapViewProps {
   lng?: number
   zoom?: number
   markers?: MapMarker[]
+  flyTo?: { lat: number; lng: number; zoom?: number }
   onMarkerClick?: (id: string) => void
   className?: string
 }

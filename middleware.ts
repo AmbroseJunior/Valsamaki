@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from 'next/server'
 import { updateSession } from '@/lib/supabase/middleware'
 
-const PUBLIC_ROUTES = ['/', '/login', '/register']
+const PUBLIC_ROUTES = ['/', '/login', '/register', '/auth']
 const PRODUCER_ROUTES = ['/business', '/advertise', '/analytics']
 const ADMIN_ROUTES = ['/admin']
 

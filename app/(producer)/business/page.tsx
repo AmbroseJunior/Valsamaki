@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
+import { cn } from '@/lib/utils'
 import { RoleGate } from '@/components/shared/RoleGate'
 import { BusinessProfile } from '@/components/producers/BusinessProfile'
 import { Button } from '@/components/ui/button'
@@ -11,7 +12,7 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { PageLoader } from '@/components/shared/LoadingSpinner'
 import { useRole } from '@/hooks/useRole'
-import { Plus } from 'lucide-react'
+import { Plus, Clock, CheckCircle2 } from 'lucide-react'
 import type { BusinessRow } from '@/types/database'
 
 function BusinessManager() {
@@ -44,7 +45,7 @@ function BusinessManager() {
         website: form.website || null,
         images: [],
         tags: [],
-        is_active: true,
+        is_active: false, // requires admin approval before appearing on map
       })
       if (error) throw error
     },
@@ -94,12 +95,24 @@ function BusinessManager() {
       )}
 
       {businesses?.map((biz) => (
-        <BusinessProfile
-          key={biz.id}
-          business={biz}
-          isOwner
-          onDelete={() => deleteMutation.mutate(biz.id)}
-        />
+        <div key={biz.id} className="space-y-1.5">
+          <div className={cn(
+            'flex items-center gap-1.5 text-xs font-semibold px-2 py-1 rounded-full w-fit',
+            biz.is_active
+              ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+              : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
+          )}>
+            {biz.is_active
+              ? <><CheckCircle2 className="h-3 w-3" /> Approved — visible on map</>
+              : <><Clock className="h-3 w-3" /> Pending approval</>
+            }
+          </div>
+          <BusinessProfile
+            business={biz}
+            isOwner
+            onDelete={() => deleteMutation.mutate(biz.id)}
+          />
+        </div>
       ))}
 
       {businesses?.length === 0 && !creating && (

@@ -3,36 +3,38 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useRole } from '@/hooks/useRole'
+import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
 import { Home, Map, Compass, Calendar, MessageSquare, User } from 'lucide-react'
-
-const GUEST_LINKS = [
-  { href: '/', label: 'Home', icon: Home },
-  { href: '/map', label: 'Map', icon: Map },
-]
-
-const USER_LINKS = [
-  { href: '/dashboard', label: 'Home', icon: Home },
-  { href: '/map', label: 'Map', icon: Map },
-  { href: '/explore', label: 'Explore', icon: Compass },
-  { href: '/events', label: 'Events', icon: Calendar },
-  { href: '/chatbot', label: 'AI Chat', icon: MessageSquare },
-]
-
-const PRODUCER_EXTRA = { href: '/business', label: 'Business', icon: User }
 
 export function BottomNav() {
   const pathname = usePathname()
   const { role } = useRole()
+  const t = useTranslations('nav')
 
   const isGuest = role === 'guest'
   const isProducer = role === 'producer' || role === 'admin'
 
+  const guestLinks = [
+    { href: '/', label: t('home'), icon: Home },
+    { href: '/map', label: t('map'), icon: Map },
+  ]
+
+  const userLinks = [
+    { href: '/dashboard', label: t('home'), icon: Home },
+    { href: '/map', label: t('map'), icon: Map },
+    { href: '/explore', label: t('explore'), icon: Compass },
+    { href: '/events', label: t('events'), icon: Calendar },
+    { href: '/chatbot', label: t('aiChat'), icon: MessageSquare },
+  ]
+
+  const producerExtra = { href: '/business', label: t('business'), icon: User }
+
   const links = isGuest
-    ? GUEST_LINKS
+    ? guestLinks
     : isProducer
-      ? [...USER_LINKS.slice(0, 4), PRODUCER_EXTRA]
-      : USER_LINKS
+      ? [...userLinks.slice(0, 4), producerExtra]
+      : userLinks
 
   return (
     <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[var(--color-card)] border-t border-[var(--color-border)] z-[var(--z-sticky)]" style={{ height: 'calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px))', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>

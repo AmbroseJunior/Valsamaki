@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { getTranslations } from 'next-intl/server'
 import { EXPERIENCES, getFeaturedExperiences } from '@/lib/data/experiences'
 import type { UserPreferences } from '@/types/app'
 import type { ExperienceCategory } from '@/types/experience'
@@ -38,20 +39,23 @@ const DIET_NOTE: Record<string, string> = {
   gluten_free: 'gluten-free',
 }
 
+const INTEREST_LABELS: Record<string, string> = {
+  local_food: 'local food', olive_oil: 'olive oil', hiking: 'hiking',
+  history: 'history', wellness: 'wellness', wine: 'wine',
+}
+
 function getRecommendedExperiences(prefs: UserPreferences | null) {
   if (!prefs?.interests?.length) return getFeaturedExperiences().slice(0, 4)
 
   const catsSet = new Set(prefs.interests.flatMap((i) => INTEREST_EXP_CATS[i] ?? []))
   let matches = EXPERIENCES.filter((e) => catsSet.has(e.category as ExperienceCategory))
 
-  // Sort active experiences first/last based on activity level
   if (prefs.activity_level === 'high') {
     matches = [...matches.filter((e) => e.category === 'active'), ...matches.filter((e) => e.category !== 'active')]
   } else if (prefs.activity_level === 'low') {
     matches = [...matches.filter((e) => e.category !== 'active'), ...matches.filter((e) => e.category === 'active')]
   }
 
-  // Fill with featured if not enough matches
   if (matches.length < 4) {
     const seen = new Set(matches.map((e) => e.id))
     const extras = getFeaturedExperiences().filter((e) => !seen.has(e.id))
@@ -71,27 +75,25 @@ function getBizCategories(prefs: UserPreferences | null): string[] {
   return Array.from(new Set(prefs.interests.map((i) => INTEREST_BIZ_CATS[i]).filter(Boolean) as string[]))
 }
 
-function buildContextLabel(prefs: UserPreferences | null): string {
-  if (!prefs?.interests?.length) return 'Popular experiences across Crete'
-  const parts: string[] = []
-  const pretty: Record<string, string> = {
-    local_food: 'local food', olive_oil: 'olive oil', hiking: 'hiking',
-    history: 'history', wellness: 'wellness', wine: 'wine',
-  }
-  const top = prefs.interests.slice(0, 2).map((i) => pretty[i] ?? i)
-  parts.push(`Based on your interest in ${top.join(' & ')}`)
-  if (prefs.dietary_preference && DIET_NOTE[prefs.dietary_preference]) {
-    parts.push(`${DIET_NOTE[prefs.dietary_preference]} options highlighted`)
-  }
-  return parts.join(' · ')
-}
-
 export async function PersonalizedSection({ preferences }: { preferences: UserPreferences | null }) {
   const supabase = await createClient()
+  const t = await getTranslations('dashboard')
+
   const recExps = getRecommendedExperiences(preferences)
   const eventCats = getEventCategories(preferences)
   const bizCats = getBizCategories(preferences)
   const hasPrefs = !!preferences?.interests?.length
+
+  const contextLabel = hasPrefs
+    ? (() => {
+        const top = preferences!.interests!.slice(0, 2).map((i) => INTEREST_LABELS[i] ?? i)
+        const parts = [`Based on your interest in ${top.join(' & ')}`]
+        if (preferences?.dietary_preference && DIET_NOTE[preferences.dietary_preference]) {
+          parts.push(`${DIET_NOTE[preferences.dietary_preference]} options highlighted`)
+        }
+        return parts.join(' · ')
+      })()
+    : t('popularExperiences')
 
   const [eventsResult, bizResult] = await Promise.all([
     eventCats.length
@@ -151,17 +153,17 @@ export async function PersonalizedSection({ preferences }: { preferences: UserPr
           <div>
             <h2 className="font-display font-bold text-lg flex items-center gap-2">
               <Sparkles className="h-4 w-4 text-[var(--highlight)]" />
-              {hasPrefs ? 'For You' : 'Featured Experiences'}
+              {hasPrefs ? t('forYou') : t('featuredExperiences')}
             </h2>
             <p className="text-xs text-[var(--color-muted-foreground)] mt-0.5">
-              {buildContextLabel(preferences)}
+              {contextLabel}
             </p>
           </div>
           <Link
             href="/explore"
             className="text-xs font-semibold text-[var(--highlight)] hover:underline flex items-center gap-1"
           >
-            See all <ArrowRight className="h-3 w-3" />
+            {t('seeAll')} <ArrowRight className="h-3 w-3" />
           </Link>
         </div>
 
@@ -209,10 +211,10 @@ export async function PersonalizedSection({ preferences }: { preferences: UserPr
           <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--color-border)]">
             <h2 className="font-semibold text-sm flex items-center gap-2">
               <Calendar className="h-4 w-4 text-[var(--highlight)]" />
-              {hasPrefs ? "Events You'll Love" : 'Upcoming Events'}
+              {hasPrefs ? t('eventsYoullLove') : t('upcomingEvents')}
             </h2>
             <Link href="/events" className="text-xs font-semibold text-[var(--highlight)] hover:underline flex items-center gap-1">
-              All <ArrowRight className="h-3 w-3" />
+              {t('seeAll')} <ArrowRight className="h-3 w-3" />
             </Link>
           </div>
 
@@ -232,7 +234,7 @@ export async function PersonalizedSection({ preferences }: { preferences: UserPr
                       </p>
                       {evt.price !== null && (
                         <span className="inline-block mt-1 text-[10px] font-bold bg-[var(--highlight)]/10 text-[var(--highlight)] px-1.5 py-0.5 rounded-full">
-                          {evt.price === 0 ? 'Free' : `€${evt.price}`}
+                          {evt.price === 0 ? t('free') : `€${evt.price}`}
                         </span>
                       )}
                     </div>
@@ -243,9 +245,9 @@ export async function PersonalizedSection({ preferences }: { preferences: UserPr
           ) : (
             <div className="px-5 py-8 text-center">
               <span className="text-2xl">🗓️</span>
-              <p className="text-sm text-[var(--color-muted-foreground)] mt-2">No upcoming events yet.</p>
+              <p className="text-sm text-[var(--color-muted-foreground)] mt-2">{t('noEvents')}</p>
               <Link href="/events" className="mt-2 block text-xs text-[var(--highlight)] font-semibold hover:underline">
-                Browse all events
+                {t('browseEvents')}
               </Link>
             </div>
           )}
@@ -256,10 +258,10 @@ export async function PersonalizedSection({ preferences }: { preferences: UserPr
           <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--color-border)]">
             <h2 className="font-semibold text-sm flex items-center gap-2">
               <Utensils className="h-4 w-4 text-[var(--highlight)]" />
-              Local Producers
+              {t('localProducers')}
             </h2>
             <Link href="/map" className="text-xs font-semibold text-[var(--highlight)] hover:underline flex items-center gap-1">
-              View map <ArrowRight className="h-3 w-3" />
+              {t('viewMap')} <ArrowRight className="h-3 w-3" />
             </Link>
           </div>
 
@@ -285,9 +287,9 @@ export async function PersonalizedSection({ preferences }: { preferences: UserPr
           ) : (
             <div className="px-5 py-8 text-center">
               <span className="text-2xl">🏪</span>
-              <p className="text-sm text-[var(--color-muted-foreground)] mt-2">No producers listed yet.</p>
+              <p className="text-sm text-[var(--color-muted-foreground)] mt-2">{t('noProducers')}</p>
               <Link href="/explore" className="mt-2 block text-xs text-[var(--highlight)] font-semibold hover:underline">
-                Explore experiences
+                {t('exploreExperiences')}
               </Link>
             </div>
           )}

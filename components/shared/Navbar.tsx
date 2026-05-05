@@ -129,7 +129,7 @@ export function Navbar() {
                 ref={searchRef}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search Crete…"
+                placeholder={t('searchPlaceholder')}
                 className="w-full pl-9 pr-4 py-2 rounded-[var(--radius-full)] border border-[var(--color-border)] bg-[var(--color-muted)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--highlight)] text-[var(--color-foreground)]"
               />
             </div>
@@ -147,7 +147,7 @@ export function Navbar() {
             className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-[var(--radius-full)] border border-[var(--color-border)] bg-[var(--color-muted)] text-sm text-[var(--color-muted-foreground)] hover:border-[var(--highlight)] transition-colors"
           >
             <Search className="h-4 w-4" />
-            <span className="hidden md:block">Search Crete…</span>
+            <span className="hidden md:block">{t('searchPlaceholder')}</span>
             <span className="hidden md:flex items-center gap-0.5 ml-2 bg-[var(--highlight)] text-[var(--highlight-foreground)] text-xs font-bold px-2 py-0.5 rounded-[var(--radius-full)]">
               🔍
             </span>
@@ -165,13 +165,13 @@ export function Navbar() {
                 href="/login"
                 className="hidden sm:block text-sm font-semibold text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)] px-3 py-2 transition-colors"
               >
-                Sign in
+                {t('signIn')}
               </Link>
               <Link
                 href="/register"
                 className="text-sm font-bold bg-[var(--highlight)] text-[var(--highlight-foreground)] px-4 py-2 rounded-[var(--radius-full)] hover:bg-[var(--highlight-dark)] transition-colors"
               >
-                Get Started
+                {t('getStarted')}
               </Link>
             </>
           ) : (
@@ -187,15 +187,15 @@ export function Navbar() {
               {menuOpen && (
                 <div className="absolute right-0 top-full mt-1 w-44 bg-[var(--color-card)] border border-[var(--color-border)] rounded-[var(--radius-lg)] shadow-[var(--shadow-lg)] py-1 z-[var(--z-dropdown)]">
                   <Link href="/dashboard" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-[var(--color-muted)] transition-colors" onClick={() => setMenuOpen(false)}>
-                    Dashboard
+                    {t('dashboard')}
                   </Link>
                   <Link href="/settings" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-[var(--color-muted)] transition-colors" onClick={() => setMenuOpen(false)}>
-                    Settings
+                    {t('settings')}
                   </Link>
                   {isProducer && (
                     <>
-                      <Link href="/business" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-[var(--color-muted)] transition-colors" onClick={() => setMenuOpen(false)}>My Business</Link>
-                      <Link href="/analytics" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-[var(--color-muted)] transition-colors" onClick={() => setMenuOpen(false)}>Analytics</Link>
+                      <Link href="/business" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-[var(--color-muted)] transition-colors" onClick={() => setMenuOpen(false)}>{t('business')}</Link>
+                      <Link href="/analytics" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-[var(--color-muted)] transition-colors" onClick={() => setMenuOpen(false)}>{t('analytics')}</Link>
                     </>
                   )}
                   <div className="border-t border-[var(--color-border)] my-1" />
@@ -204,7 +204,7 @@ export function Navbar() {
                     className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-[var(--color-destructive)] hover:bg-[var(--color-muted)] transition-colors"
                   >
                     <LogOut className="h-4 w-4" />
-                    Sign out
+                    {t('signOut')}
                   </button>
                 </div>
               )}
@@ -231,15 +231,15 @@ export function Navbar() {
               <input
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search Crete…"
+                placeholder={t('searchPlaceholder')}
                 className="w-full pl-9 pr-4 py-2.5 rounded-[var(--radius)] border border-[var(--color-border)] bg-[var(--color-muted)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--highlight)] text-[var(--color-foreground)]"
               />
             </form>
 
             {isGuest ? (
               <>
-                <Link href="/login" onClick={() => setMenuOpen(false)} className="block px-3 py-2.5 text-sm font-semibold rounded-[var(--radius)] hover:bg-[var(--color-muted)]">Sign In</Link>
-                <Link href="/register" onClick={() => setMenuOpen(false)} className="block px-3 py-2.5 text-sm font-bold bg-[var(--highlight)] text-[var(--highlight-foreground)] rounded-[var(--radius)] text-center">Get Started</Link>
+                <Link href="/login" onClick={() => setMenuOpen(false)} className="block px-3 py-2.5 text-sm font-semibold rounded-[var(--radius)] hover:bg-[var(--color-muted)]">{t('signIn')}</Link>
+                <Link href="/register" onClick={() => setMenuOpen(false)} className="block px-3 py-2.5 text-sm font-bold bg-[var(--highlight)] text-[var(--highlight-foreground)] rounded-[var(--radius)] text-center">{t('getStarted')}</Link>
               </>
             ) : (
               <>
@@ -250,8 +250,8 @@ export function Navbar() {
                 ))}
                 {isProducer && (
                   <>
-                    <Link href="/business" onClick={() => setMenuOpen(false)} className="block px-3 py-2.5 text-sm font-semibold rounded-[var(--radius)] hover:bg-[var(--color-muted)]">My Business</Link>
-                    <Link href="/advertise" onClick={() => setMenuOpen(false)} className="block px-3 py-2.5 text-sm font-semibold rounded-[var(--radius)] hover:bg-[var(--color-muted)]">Advertise</Link>
+                    <Link href="/business" onClick={() => setMenuOpen(false)} className="block px-3 py-2.5 text-sm font-semibold rounded-[var(--radius)] hover:bg-[var(--color-muted)]">{t('business')}</Link>
+                    <Link href="/advertise" onClick={() => setMenuOpen(false)} className="block px-3 py-2.5 text-sm font-semibold rounded-[var(--radius)] hover:bg-[var(--color-muted)]">{t('advertise')}</Link>
                   </>
                 )}
                 <div className="border-t border-[var(--color-border)] pt-2 mt-2">

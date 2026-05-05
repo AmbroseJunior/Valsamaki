@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
+import { validateUrl, validatePhone } from '@/lib/security'
 import { RoleGate } from '@/components/shared/RoleGate'
 import { BusinessProfile } from '@/components/producers/BusinessProfile'
 import { Button } from '@/components/ui/button'
@@ -19,6 +20,7 @@ function BusinessManager() {
   const { userId } = useRole()
   const [creating, setCreating] = useState(false)
   const [form, setForm] = useState({ name: '', description: '', category: '', address: '', phone: '', website: '' })
+  const [formError, setFormError] = useState('')
   const supabase = createClient()
   const queryClient = useQueryClient()
 
@@ -35,14 +37,28 @@ function BusinessManager() {
   const createMutation = useMutation({
     mutationFn: async () => {
       if (!userId) throw new Error('Not authenticated')
+
+      // OWASP A03 — validate all fields before sending to DB
+      if (!form.name.trim() || form.name.length > 100) throw new Error('Name must be 1–100 characters')
+      if (form.description.length > 1000) throw new Error('Description must be under 1000 characters')
+      if (!form.category.trim()) throw new Error('Category is required')
+      if (form.address.length > 200) throw new Error('Address must be under 200 characters')
+
+      const phone = form.phone ? validatePhone(form.phone) : null
+      if (form.phone && !phone) throw new Error('Invalid phone number format')
+
+      // OWASP A10 — reject javascript: / data: / non-http(s) URLs
+      const website = form.website ? validateUrl(form.website) : null
+      if (form.website && !website) throw new Error('Website must be a valid https:// URL')
+
       const { error } = await supabase.from('businesses').insert({
         owner_id: userId,
-        name: form.name,
-        description: form.description,
-        category: form.category,
-        address: form.address || null,
-        phone: form.phone || null,
-        website: form.website || null,
+        name: form.name.trim().slice(0, 100),
+        description: form.description.trim().slice(0, 1000) || null,
+        category: form.category.trim(),
+        address: form.address.trim().slice(0, 200) || null,
+        phone: phone ?? null,
+        website: website ?? null,
         images: [],
         tags: [],
         is_active: false, // requires admin approval before appearing on map
@@ -52,7 +68,11 @@ function BusinessManager() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['my-businesses'] })
       setCreating(false)
+      setFormError('')
       setForm({ name: '', description: '', category: '', address: '', phone: '', website: '' })
+    },
+    onError: (err: unknown) => {
+      setFormError(err instanceof Error ? err.message : 'Failed to create listing')
     },
   })
 
@@ -84,11 +104,14 @@ function BusinessManager() {
                 <Input value={form[field]} onChange={(e) => setForm((p) => ({ ...p, [field]: e.target.value }))} placeholder={field} />
               </div>
             ))}
+            {formError && (
+              <p className="text-xs text-[var(--color-destructive)]">{formError}</p>
+            )}
             <div className="flex gap-2">
               <Button onClick={() => createMutation.mutate()} disabled={!form.name || !form.category || createMutation.isPending}>
                 {createMutation.isPending ? 'Saving…' : 'Create Listing'}
               </Button>
-              <Button variant="ghost" onClick={() => setCreating(false)}>Cancel</Button>
+              <Button variant="ghost" onClick={() => { setCreating(false); setFormError('') }}>Cancel</Button>
             </div>
           </CardContent>
         </Card>

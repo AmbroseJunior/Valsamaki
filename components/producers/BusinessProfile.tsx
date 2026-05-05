@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import { validateUrl } from '@/lib/security'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -66,8 +67,8 @@ export function BusinessProfile({ business, isOwner, onEdit, onDelete }: Busines
               <Phone className="h-4 w-4 text-[var(--color-primary)] shrink-0" /> {business.phone}
             </a>
           )}
-          {business.website && (
-            <a href={business.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-[var(--color-primary)]">
+          {business.website && validateUrl(business.website) && (
+            <a href={validateUrl(business.website)!} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-[var(--color-primary)]">
               <Globe className="h-4 w-4 text-[var(--color-primary)] shrink-0" /> {business.website}
             </a>
           )}

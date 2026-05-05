@@ -1,15 +1,17 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { safeRedirectPath } from '@/lib/security'
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
   const error = searchParams.get('error')
   const errorDescription = searchParams.get('error_description')
-  const next = searchParams.get('next') ?? '/dashboard'
 
-  // OAuth error from provider
+  // OWASP A01 — validate next is a safe relative path before using it
+  const next = safeRedirectPath(searchParams.get('next'), '/dashboard')
+
   if (error) {
     const msg = errorDescription ?? error
     return NextResponse.redirect(
@@ -36,8 +38,7 @@ export async function GET(request: NextRequest) {
         )
       }
 
-      const redirectTo = next.startsWith('/') ? `${origin}${next}` : next
-      return NextResponse.redirect(redirectTo)
+      return NextResponse.redirect(`${origin}${next}`)
     }
 
     return NextResponse.redirect(

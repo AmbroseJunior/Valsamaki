@@ -9,6 +9,7 @@ import { useLocation } from '@/hooks/useLocation'
 import { useRole } from '@/hooks/useRole'
 import { cn } from '@/lib/utils'
 import { formatDate, formatCurrency } from '@/lib/utils'
+import { validateUrl } from '@/lib/security'
 import type { BusinessRow, EventRow } from '@/types/database'
 import type { MapMarker } from '@/components/map/MapView'
 
@@ -52,10 +53,10 @@ function BusinessPanel({ business, onClose }: { business: BusinessRow; onClose: 
               <a href={`tel:${business.phone}`} className="hover:text-[var(--color-foreground)] transition-colors">{business.phone}</a>
             </div>
           )}
-          {business.website && (
+          {business.website && validateUrl(business.website) && (
             <div className="flex items-center gap-2 text-sm text-[var(--color-muted-foreground)]">
               <Globe className="h-4 w-4 shrink-0 text-[var(--highlight)]" />
-              <a href={business.website} target="_blank" rel="noopener noreferrer" className="hover:text-[var(--color-foreground)] transition-colors truncate">
+              <a href={validateUrl(business.website)!} target="_blank" rel="noopener noreferrer" className="hover:text-[var(--color-foreground)] transition-colors truncate">
                 {business.website.replace(/^https?:\/\//, '')}
               </a>
             </div>
@@ -172,7 +173,8 @@ export default function MapPage() {
   const { coords } = useLocation(userId)
   const supabase = createClient()
 
-  const s = search.trim()
+  // OWASP A03 — cap search length before it reaches the DB query
+  const s = search.trim().slice(0, 100)
 
   const { data: businesses = [] } = useQuery({
     queryKey: ['businesses-map', s],

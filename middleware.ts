@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server'
 import { updateSession } from '@/lib/supabase/middleware'
+import { applySecurityHeaders } from '@/lib/security'
 
 const PUBLIC_ROUTES = ['/', '/login', '/register', '/auth']
 const PRODUCER_ROUTES = ['/business', '/advertise', '/analytics']
@@ -8,6 +9,9 @@ const ADMIN_ROUTES = ['/admin']
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const { response, user, role } = await updateSession(request)
+
+  // OWASP A05 — apply security headers to every response
+  applySecurityHeaders(response.headers)
 
   const isPublicRoute = PUBLIC_ROUTES.some((r) => pathname === r || pathname.startsWith(`${r}/`))
   const isAuthRoute = pathname.startsWith('/login') || pathname.startsWith('/register')
@@ -18,6 +22,7 @@ export async function middleware(request: NextRequest) {
 
   if (!isPublicRoute && !user) {
     const loginUrl = new URL('/login', request.url)
+    // OWASP A01 — only pass relative paths as next param, never external URLs
     loginUrl.searchParams.set('next', pathname)
     return NextResponse.redirect(loginUrl)
   }

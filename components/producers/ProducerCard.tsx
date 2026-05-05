@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import { validateUrl } from '@/lib/security'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { MapPin, Phone, Globe } from 'lucide-react'
@@ -54,8 +55,8 @@ export function ProducerCard({ business, distanceKm }: ProducerCardProps) {
               <Phone className="h-3.5 w-3.5 shrink-0" /> {business.phone}
             </a>
           )}
-          {business.website && (
-            <a href={business.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 hover:text-[var(--color-primary)] truncate">
+          {business.website && validateUrl(business.website) && (
+            <a href={validateUrl(business.website)!} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 hover:text-[var(--color-primary)] truncate">
               <Globe className="h-3.5 w-3.5 shrink-0" /> {business.website.replace(/^https?:\/\//, '')}
             </a>
           )}

@@ -1,4 +1,5 @@
 import { logger } from '@/lib/logger'
+import { validateLatLng } from '@/lib/security'
 import type { WeatherData, AirQualityData, NewsArticle } from '@/types/app'
 
 const WEATHER_KEY = process.env.OPENWEATHERMAP_API_KEY
@@ -10,8 +11,12 @@ export async function getWeather(lat: number, lng: number): Promise<WeatherData 
     return mockWeather()
   }
 
+  // OWASP A10 — validate coords before embedding in external API URL
+  const coords = validateLatLng(lat, lng)
+  if (!coords) return mockWeather()
+
   try {
-    const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lng}&appid=${WEATHER_KEY}&units=metric`
+    const url = `https://api.openweathermap.org/data/2.5/weather?lat=${coords.lat}&lon=${coords.lng}&appid=${WEATHER_KEY}&units=metric`
     const res = await fetch(url, { next: { revalidate: 1800 } })
     if (!res.ok) throw new Error(`Weather API ${res.status}`)
 
@@ -32,8 +37,11 @@ export async function getWeather(lat: number, lng: number): Promise<WeatherData 
 }
 
 export async function getAirQuality(lat: number, lng: number): Promise<AirQualityData | null> {
+  const coords = validateLatLng(lat, lng)
+  if (!coords) return null
+
   try {
-    const url = `https://api.openaq.org/v3/locations?coordinates=${lat},${lng}&radius=25000&limit=1&order_by=distance`
+    const url = `https://api.openaq.org/v3/locations?coordinates=${coords.lat},${coords.lng}&radius=25000&limit=1&order_by=distance`
     const res = await fetch(url, { next: { revalidate: 3600 } })
     if (!res.ok) throw new Error(`OpenAQ API ${res.status}`)
 

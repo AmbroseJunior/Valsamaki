@@ -8,6 +8,15 @@ import { LoadingSpinner } from '@/components/shared/LoadingSpinner'
 import { cn } from '@/lib/utils'
 import { Eye, EyeOff } from 'lucide-react'
 
+// OWASP A01 — client-side safe redirect (mirrors server-side safeRedirectPath)
+function safeNext(raw: string | null): string {
+  if (!raw) return '/dashboard'
+  const decoded = decodeURIComponent(raw)
+  if (!decoded.startsWith('/') || decoded.startsWith('//') || decoded.startsWith('/\\')) return '/dashboard'
+  if (/javascript:/i.test(decoded) || /data:/i.test(decoded)) return '/dashboard'
+  return decoded
+}
+
 function LoginForm() {
   const searchParams = useSearchParams()
   const initialTab = searchParams.get('tab') === 'register' ? 'register' : 'login'
@@ -20,7 +29,7 @@ function LoginForm() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const router = useRouter()
-  const next = searchParams.get('next') ?? '/dashboard'
+  const next = safeNext(searchParams.get('next'))
   const message = searchParams.get('message')
 
   const supabase = createClient()

@@ -35,7 +35,7 @@ export async function TrendingWidget() {
         {events && events.length > 0 && (
           <div>
             <p className="text-xs font-semibold text-[var(--color-muted-foreground)] uppercase tracking-wide mb-2 flex items-center gap-1">
-              <Calendar className="h-3 w-3" /> Upcoming Events
+              <Calendar className="h-3 w-3" /> Upcoming Experiences
             </p>
             <div className="space-y-2">
               {events.map((evt) => (

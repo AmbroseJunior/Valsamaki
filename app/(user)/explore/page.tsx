@@ -7,7 +7,10 @@ import { FilterBar } from '@/components/shared/FilterBar'
 import { ExperienceCard } from '@/components/explore/ExperienceCard'
 import { ExperienceModal } from '@/components/explore/ExperienceModal'
 import { EXPERIENCES } from '@/lib/data/experiences'
+import { SCRAPED_EXPERIENCES } from '@/lib/data/scrapedExperiences'
 import type { Experience, ExperienceCategory } from '@/types/experience'
+
+const ALL_EXPERIENCES: Experience[] = [...EXPERIENCES, ...SCRAPED_EXPERIENCES]
 import { Sparkles, Search, X, SlidersHorizontal } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -100,7 +103,7 @@ export default function ExplorePage() {
   const [showFilters, setShowFilters] = useState(false)
 
   const filtered = useMemo(
-    () => filterAndSort(EXPERIENCES, activeCategory, query, priceFilter, distanceFilter, sortKey),
+    () => filterAndSort(ALL_EXPERIENCES, activeCategory, query, priceFilter, distanceFilter, sortKey),
     [activeCategory, query, priceFilter, distanceFilter, sortKey]
   )
 

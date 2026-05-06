@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import dynamic from 'next/dynamic'
-import { Search, X, MapPin, Phone, Globe, Calendar, Ticket } from 'lucide-react'
+import { Search, X, MapPin, Phone, Globe, Calendar, Ticket, Star, ExternalLink } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslations } from 'next-intl'
 import { createClient } from '@/lib/supabase/client'
@@ -15,13 +15,20 @@ import type { BusinessRow, EventRow } from '@/types/database'
 import type { MapMarker, RouteTarget, RouteInfo } from '@/components/map/MapView'
 import { FARMERS_MARKETS } from '@/lib/data/farmersMarkets'
 import type { FarmersMarket } from '@/lib/data/farmersMarkets'
+import { EXPERIENCES } from '@/lib/data/experiences'
+import { SCRAPED_EXPERIENCES } from '@/lib/data/scrapedExperiences'
+import type { Experience } from '@/types/experience'
+import { SCRAPED_PLACES, searchPlaces } from '@/lib/data/scrapedPlaces'
+import type { CretePlace } from '@/lib/data/scrapedPlaces'
+
+const ALL_EXPERIENCES: Experience[] = [...EXPERIENCES, ...SCRAPED_EXPERIENCES]
 
 const MapView = dynamic(
   () => import('@/components/map/MapView').then((m) => m.MapView),
   { ssr: false, loading: () => <div className="w-full h-full bg-[var(--color-muted)] animate-pulse rounded-[var(--radius)]" /> }
 )
 
-type TabType = 'all' | 'businesses' | 'events' | 'producers' | 'markets'
+type TabType = 'all' | 'businesses' | 'events' | 'producers' | 'markets' | 'experiences' | 'places'
 type RouteMode = 'walking' | 'transit' | 'driving'
 
 type BusinessWithOwner = BusinessRow & {
@@ -389,6 +396,182 @@ function FarmersMarketPanel({
   )
 }
 
+function ExperiencePanel({
+  experience,
+  onClose,
+  routeProps,
+}: {
+  experience: Experience
+  onClose: () => void
+  routeProps: RoutePanelProps
+}) {
+  const t = useTranslations('map')
+  return (
+    <div className="bg-[var(--color-card)] rounded-[var(--radius-xl)] shadow-[var(--shadow-lg)] border border-[var(--color-border)] overflow-hidden">
+      <div className="relative bg-gradient-to-br from-amber-500 to-orange-600 p-4">
+        <button onClick={onClose} className="absolute top-3 right-3 p-1.5 rounded-full bg-black/20 hover:bg-black/30 transition-colors">
+          <X className="h-4 w-4 text-white" />
+        </button>
+        <div className="pr-8">
+          <h3 className="font-display font-bold text-lg text-white leading-snug">{experience.title}</h3>
+          <span className="text-[0.65rem] font-bold uppercase tracking-wide bg-black/20 text-white px-2 py-0.5 rounded-full mt-1 inline-block">
+            ✨ {experience.category.replace(/_/g, ' ')}
+          </span>
+        </div>
+      </div>
+      <div className="p-4 space-y-3">
+        {experience.shortDescription && (
+          <p className="text-sm text-[var(--color-foreground)] leading-relaxed line-clamp-3">{experience.shortDescription}</p>
+        )}
+        <div className="space-y-1.5">
+          <div className="flex items-start gap-2 text-sm text-[var(--color-muted-foreground)]">
+            <MapPin className="h-4 w-4 shrink-0 mt-0.5 text-amber-500" />
+            <span>{experience.location}</span>
+          </div>
+          {experience.hours && (
+            <div className="flex items-center gap-2 text-sm text-[var(--color-muted-foreground)]">
+              <Calendar className="h-4 w-4 shrink-0 text-amber-500" />
+              <span>{experience.hours}</span>
+            </div>
+          )}
+          {experience.price && (
+            <div className="flex items-center gap-2 text-sm font-semibold">
+              <Ticket className="h-4 w-4 shrink-0 text-amber-500" />
+              <span>{experience.price}</span>
+            </div>
+          )}
+          <div className="flex items-center gap-1.5">
+            <Star className="h-3.5 w-3.5 fill-amber-400 stroke-amber-400" />
+            <span className="text-xs font-bold text-amber-600">{experience.rating}</span>
+            <span className="text-xs text-[var(--color-muted-foreground)]">({experience.reviewCount} reviews)</span>
+          </div>
+        </div>
+
+        <DirectionButtons {...routeProps} />
+
+        <div className="flex flex-col gap-2">
+          <a
+            href={`/chatbot?q=${encodeURIComponent('Tell me about ' + experience.title)}`}
+            className="flex items-center justify-center gap-2 w-full py-2.5 border-2 border-[var(--color-border)] text-[var(--color-foreground)] font-bold rounded-[var(--radius-full)] hover:border-amber-500 transition-colors text-sm"
+          >
+            💬 {t('askAboutPlace')}
+          </a>
+          {experience.externalBookingUrl && (
+            <a
+              href={experience.externalBookingUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 w-full py-2.5 bg-amber-500 text-white font-bold rounded-[var(--radius-full)] hover:bg-amber-600 transition-colors text-sm"
+            >
+              <ExternalLink className="h-3.5 w-3.5" />
+              Book via {experience.source?.name ?? 'Operator'}
+            </a>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+const PLACE_CATEGORY_ICONS: Record<string, string> = {
+  archaeological: '🏛️',
+  beach: '🏖️',
+  gorge: '🏔️',
+  cave: '🦇',
+  museum: '🖼️',
+  nature: '🌿',
+}
+
+function PlacePanel({
+  place,
+  onClose,
+  routeProps,
+}: {
+  place: CretePlace
+  onClose: () => void
+  routeProps: RoutePanelProps
+}) {
+  const t = useTranslations('map')
+  const icon = PLACE_CATEGORY_ICONS[place.category] ?? '📍'
+
+  return (
+    <div className="bg-[var(--color-card)] rounded-[var(--radius-xl)] shadow-[var(--shadow-lg)] border border-[var(--color-border)] overflow-hidden">
+      {/* Header image */}
+      <div
+        className="relative h-28 bg-cover bg-center"
+        style={{ backgroundImage: `url(${place.image})` }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-black/10" />
+        <button onClick={onClose} className="absolute top-3 right-3 p-1.5 rounded-full bg-black/30 hover:bg-black/50 transition-colors">
+          <X className="h-4 w-4 text-white" />
+        </button>
+        <div className="absolute bottom-3 left-4 pr-10">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-xl leading-none">{icon}</span>
+            <span className="text-[0.6rem] font-bold uppercase tracking-widest bg-white/20 text-white px-2 py-0.5 rounded-full">
+              {place.category.replace(/_/g, ' ')} · {place.region}
+            </span>
+          </div>
+          <h3 className="font-display font-bold text-base text-white leading-snug">{place.title}</h3>
+          <p className="text-[0.65rem] text-white/80 leading-tight">{place.subtitle}</p>
+        </div>
+      </div>
+
+      <div className="p-4 space-y-3">
+        <p className="text-xs text-[var(--color-foreground)] leading-relaxed line-clamp-3">{place.description}</p>
+
+        {/* Highlights */}
+        <div className="flex flex-wrap gap-1.5">
+          {place.highlights.map((h) => (
+            <span key={h} className="text-[0.65rem] font-semibold px-2 py-1 rounded-full bg-[var(--color-muted)] border border-[var(--color-border)] text-[var(--color-foreground)]">
+              {h}
+            </span>
+          ))}
+        </div>
+
+        <div className="space-y-1.5">
+          <div className="flex items-start gap-2 text-sm text-[var(--color-muted-foreground)]">
+            <MapPin className="h-4 w-4 shrink-0 mt-0.5 text-[var(--highlight)]" />
+            <span className="text-xs">{place.location}</span>
+          </div>
+          {place.hours && (
+            <div className="flex items-center gap-2 text-xs text-[var(--color-muted-foreground)]">
+              <Calendar className="h-3.5 w-3.5 shrink-0 text-[var(--highlight)]" />
+              <span>{place.hours}</span>
+            </div>
+          )}
+          {place.price && (
+            <div className="flex items-center gap-2 text-xs font-semibold">
+              <Ticket className="h-3.5 w-3.5 shrink-0 text-[var(--highlight)]" />
+              <span>{place.price}</span>
+            </div>
+          )}
+        </div>
+
+        <DirectionButtons {...routeProps} />
+
+        <div className="flex flex-col gap-2">
+          <a
+            href={`/chatbot?q=${encodeURIComponent('Tell me about ' + place.title + ' in Crete')}`}
+            className="flex items-center justify-center gap-2 w-full py-2.5 border-2 border-[var(--color-border)] text-[var(--color-foreground)] font-bold rounded-[var(--radius-full)] hover:border-[var(--highlight)] transition-colors text-sm"
+          >
+            💬 {t('askAboutPlace')}
+          </a>
+          <a
+            href={place.source.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-2 w-full py-2 text-xs text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)] transition-colors"
+          >
+            <ExternalLink className="h-3 w-3" />
+            More info on {place.source.name}
+          </a>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 export default function MapPage() {
@@ -398,6 +581,8 @@ export default function MapPage() {
   const [selectedBizId, setSelectedBizId] = useState<string | null>(null)
   const [selectedEvtId, setSelectedEvtId] = useState<string | null>(null)
   const [selectedMarketId, setSelectedMarketId] = useState<string | null>(null)
+  const [selectedExpId, setSelectedExpId] = useState<string | null>(null)
+  const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null)
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [activeRouteMode, setActiveRouteMode] = useState<RouteMode | null>(null)
   const [routeInfo, setRouteInfo] = useState<RouteInfo | null>(null)
@@ -450,6 +635,20 @@ export default function MapPage() {
     )
   }, [s])
 
+  const filteredExperiences = useMemo(() => {
+    if (!s) return ALL_EXPERIENCES
+    const term = s.toLowerCase()
+    return ALL_EXPERIENCES.filter(
+      (e) =>
+        e.title.toLowerCase().includes(term) ||
+        e.location.toLowerCase().includes(term) ||
+        e.tags.some((t) => t.toLowerCase().includes(term)) ||
+        (e.shortDescription ?? '').toLowerCase().includes(term)
+    )
+  }, [s])
+
+  const filteredPlaces = useMemo(() => searchPlaces(s), [s])
+
   const producers = useMemo(
     () => rawBusinesses.filter((b) => b.profiles?.role === 'producer'),
     [rawBusinesses]
@@ -468,42 +667,50 @@ export default function MapPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [selectedMarketId, s]
   )
+  const selectedExp = useMemo(
+    () => (selectedExpId ? (ALL_EXPERIENCES.find((e) => e.id === selectedExpId) ?? null) : null),
+    [selectedExpId]
+  )
+  const selectedPlace = useMemo(
+    () => (selectedPlaceId ? (SCRAPED_PLACES.find((p) => p.id === selectedPlaceId) ?? null) : null),
+    [selectedPlaceId]
+  )
 
-  const hasSelection = selectedBiz !== null || selectedEvt !== null || selectedMarket !== null
+  const hasSelection = selectedBiz !== null || selectedEvt !== null || selectedMarket !== null || selectedExp !== null || selectedPlace !== null
 
   function clearSelection() {
     setSelectedBizId(null)
     setSelectedEvtId(null)
     setSelectedMarketId(null)
+    setSelectedExpId(null)
+    setSelectedPlaceId(null)
     setActiveRouteMode(null)
     setRouteInfo(null)
   }
 
   function selectBiz(biz: BusinessWithOwner) {
-    setSelectedBizId(biz.id)
-    setSelectedEvtId(null)
-    setSelectedMarketId(null)
-    setActiveRouteMode(null)
-    setRouteInfo(null)
-    setSidebarOpen(true)
+    setSelectedBizId(biz.id); setSelectedEvtId(null); setSelectedMarketId(null); setSelectedExpId(null); setSelectedPlaceId(null)
+    setActiveRouteMode(null); setRouteInfo(null); setSidebarOpen(true)
   }
 
   function selectEvt(evt: EventRow) {
-    setSelectedEvtId(evt.id)
-    setSelectedBizId(null)
-    setSelectedMarketId(null)
-    setActiveRouteMode(null)
-    setRouteInfo(null)
-    setSidebarOpen(true)
+    setSelectedEvtId(evt.id); setSelectedBizId(null); setSelectedMarketId(null); setSelectedExpId(null); setSelectedPlaceId(null)
+    setActiveRouteMode(null); setRouteInfo(null); setSidebarOpen(true)
   }
 
   function selectMarket(mkt: FarmersMarket) {
-    setSelectedMarketId(mkt.id)
-    setSelectedBizId(null)
-    setSelectedEvtId(null)
-    setActiveRouteMode(null)
-    setRouteInfo(null)
-    setSidebarOpen(true)
+    setSelectedMarketId(mkt.id); setSelectedBizId(null); setSelectedEvtId(null); setSelectedExpId(null); setSelectedPlaceId(null)
+    setActiveRouteMode(null); setRouteInfo(null); setSidebarOpen(true)
+  }
+
+  function selectExp(exp: Experience) {
+    setSelectedExpId(exp.id); setSelectedBizId(null); setSelectedEvtId(null); setSelectedMarketId(null); setSelectedPlaceId(null)
+    setActiveRouteMode(null); setRouteInfo(null); setSidebarOpen(true)
+  }
+
+  function selectPlace(place: CretePlace) {
+    setSelectedPlaceId(place.id); setSelectedBizId(null); setSelectedEvtId(null); setSelectedMarketId(null); setSelectedExpId(null)
+    setActiveRouteMode(null); setRouteInfo(null); setSidebarOpen(true)
   }
 
   // Compute the active route target from selection + chosen mode
@@ -518,8 +725,14 @@ export default function MapPage() {
     if (selectedMarket) {
       return { lat: selectedMarket.lat, lng: selectedMarket.lng, mode: activeRouteMode }
     }
+    if (selectedExp) {
+      return { lat: selectedExp.coordinates.lat, lng: selectedExp.coordinates.lng, mode: activeRouteMode }
+    }
+    if (selectedPlace) {
+      return { lat: selectedPlace.coordinates.lat, lng: selectedPlace.coordinates.lng, mode: activeRouteMode }
+    }
     return undefined
-  }, [activeRouteMode, selectedBiz, selectedEvt, selectedMarket])
+  }, [activeRouteMode, selectedBiz, selectedEvt, selectedMarket, selectedExp, selectedPlace])
 
   const routeProps: RoutePanelProps = {
     activeRouteMode,
@@ -528,7 +741,9 @@ export default function MapPage() {
     hasCoords: !!(
       (selectedBiz?.lat && selectedBiz?.lng) ||
       (selectedEvt?.lat && selectedEvt?.lng) ||
-      selectedMarket
+      selectedMarket ||
+      selectedExp ||
+      selectedPlace
     ),
   }
 
@@ -548,17 +763,23 @@ export default function MapPage() {
       .map((e) => ({ id: `e:${e.id}`, lat: e.lat!, lng: e.lng!, type: 'event' as const, label: e.title, category: e.category }))
     const mMarkers: MapMarker[] = (tab === 'all' || tab === 'markets' ? filteredMarkets : [])
       .map((m) => ({ id: `m:${m.id}`, lat: m.lat, lng: m.lng, type: 'farmers_market' as const, label: m.nameEn }))
-    return [...bMarkers, ...eMarkers, ...mMarkers]
-  }, [rawBusinesses, events, filteredMarkets, tab])
+    const xMarkers: MapMarker[] = (tab === 'all' || tab === 'experiences' ? filteredExperiences : [])
+      .map((x) => ({ id: `x:${x.id}`, lat: x.coordinates.lat, lng: x.coordinates.lng, type: 'experience' as const, label: x.title }))
+    const pMarkers: MapMarker[] = (tab === 'all' || tab === 'places' ? filteredPlaces : [])
+      .map((p) => ({ id: `p:${p.id}`, lat: p.coordinates.lat, lng: p.coordinates.lng, type: 'place' as const, label: p.title }))
+    return [...bMarkers, ...eMarkers, ...mMarkers, ...xMarkers, ...pMarkers]
+  }, [rawBusinesses, events, filteredMarkets, filteredExperiences, filteredPlaces, tab])
 
   const flyTo = useMemo<{ lat: number; lng: number; zoom?: number } | undefined>(() => {
     const item = selectedBiz ?? selectedEvt
     if (!item?.lat || !item?.lng) {
       if (selectedMarket) return { lat: selectedMarket.lat, lng: selectedMarket.lng, zoom: 16 }
+      if (selectedExp) return { lat: selectedExp.coordinates.lat, lng: selectedExp.coordinates.lng, zoom: 15 }
+      if (selectedPlace) return { lat: selectedPlace.coordinates.lat, lng: selectedPlace.coordinates.lng, zoom: 15 }
       return undefined
     }
     return { lat: item.lat, lng: item.lng, zoom: 16 }
-  }, [selectedBiz, selectedEvt, selectedMarket])
+  }, [selectedBiz, selectedEvt, selectedMarket, selectedExp, selectedPlace])
 
   function handleMarkerClick(markerId: string) {
     if (markerId.startsWith('b:')) {
@@ -570,21 +791,31 @@ export default function MapPage() {
     } else if (markerId.startsWith('m:')) {
       const mkt = filteredMarkets.find((m) => m.id === markerId.slice(2))
       if (mkt) selectMarket(mkt)
+    } else if (markerId.startsWith('x:')) {
+      const exp = ALL_EXPERIENCES.find((e) => e.id === markerId.slice(2))
+      if (exp) selectExp(exp)
+    } else if (markerId.startsWith('p:')) {
+      const place = SCRAPED_PLACES.find((p) => p.id === markerId.slice(2))
+      if (place) selectPlace(place)
     }
   }
 
-  const visibleBusinesses = tab === 'events' || tab === 'producers' || tab === 'markets' ? [] : rawBusinesses
-  const visibleEvents = tab === 'businesses' || tab === 'producers' || tab === 'markets' ? [] : events
+  const visibleBusinesses = tab === 'events' || tab === 'producers' || tab === 'markets' || tab === 'experiences' || tab === 'places' ? [] : rawBusinesses
+  const visibleEvents = tab === 'businesses' || tab === 'producers' || tab === 'markets' || tab === 'experiences' || tab === 'places' ? [] : events
   const visibleProducers = tab === 'producers' ? producers : []
   const visibleFarmersMarkets = tab === 'all' || tab === 'markets' ? filteredMarkets : []
-  const totalCount = visibleBusinesses.length + visibleEvents.length + visibleProducers.length + visibleFarmersMarkets.length
+  const visibleExperiences = tab === 'all' || tab === 'experiences' ? filteredExperiences : []
+  const visiblePlaces = tab === 'all' || tab === 'places' ? filteredPlaces : []
+  const totalCount = visibleBusinesses.length + visibleEvents.length + visibleProducers.length + visibleFarmersMarkets.length + visibleExperiences.length + visiblePlaces.length
 
   const TABS = [
-    { key: 'all' as const,        label: `🌿 ${t('all')}` },
-    { key: 'businesses' as const, label: `🏪 ${t('places')}` },
-    { key: 'events' as const,     label: `🎉 ${t('events')}` },
-    { key: 'producers' as const,  label: `🫒 ${t('producers')}` },
-    { key: 'markets' as const,    label: `🌿 ${t('farmersMarkets')}` },
+    { key: 'all' as const,         label: `🌿 ${t('all')}` },
+    { key: 'businesses' as const,  label: `🏪 ${t('places')}` },
+    { key: 'places' as const,      label: `🏛️ Sights` },
+    { key: 'events' as const,      label: `🎉 ${t('events')}` },
+    { key: 'experiences' as const, label: `✨ Experiences` },
+    { key: 'producers' as const,   label: `🫒 ${t('producers')}` },
+    { key: 'markets' as const,     label: `🌿 ${t('farmersMarkets')}` },
   ]
 
   const userOrigin = coords?.lat && coords?.lng ? { lat: coords.lat, lng: coords.lng } : undefined
@@ -614,7 +845,7 @@ export default function MapPage() {
               </button>
             )}
           </div>
-          <div className="grid grid-cols-3 gap-1 sm:grid-cols-5">
+          <div className="grid grid-cols-4 gap-1 sm:grid-cols-7">
             {TABS.map(({ key, label }) => (
               <button
                 key={key}
@@ -652,6 +883,8 @@ export default function MapPage() {
               )}
               {selectedEvt && <EventPanel event={selectedEvt} onClose={clearSelection} routeProps={routeProps} />}
               {selectedMarket && <FarmersMarketPanel market={selectedMarket} onClose={clearSelection} routeProps={routeProps} />}
+              {selectedExp && <ExperiencePanel experience={selectedExp} onClose={clearSelection} routeProps={routeProps} />}
+              {selectedPlace && <PlacePanel place={selectedPlace} onClose={clearSelection} routeProps={routeProps} />}
             </div>
           ) : (
             <>
@@ -780,6 +1013,64 @@ export default function MapPage() {
                   </button>
                 ))}
 
+                {/* Tourist Sights (incrediblecrete.gr) */}
+                {visiblePlaces.map((place) => (
+                  <button
+                    key={place.id}
+                    onClick={() => selectPlace(place)}
+                    className={cn(
+                      'w-full text-left px-4 py-3.5 hover:bg-[var(--color-muted)] transition-colors',
+                      selectedPlaceId === place.id && 'bg-[var(--highlight)]/10 border-l-2 border-[var(--highlight)]'
+                    )}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div
+                        className="shrink-0 w-9 h-9 rounded-[var(--radius)] bg-cover bg-center flex items-end justify-end p-0.5 overflow-hidden"
+                        style={{ backgroundImage: `url(${place.image})` }}
+                      >
+                        <span className="text-base leading-none drop-shadow">{PLACE_CATEGORY_ICONS[place.category] ?? '📍'}</span>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-sm text-[var(--color-foreground)] truncate">{place.title}</p>
+                        <p className="text-[0.65rem] text-[var(--color-muted-foreground)] truncate">{place.subtitle}</p>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                          <span className="text-[0.6rem] font-bold uppercase tracking-wide text-[var(--color-muted-foreground)] bg-[var(--color-muted)] px-1.5 py-0.5 rounded-full border border-[var(--color-border)]">
+                            {place.region}
+                          </span>
+                          {place.price && <span className="text-[0.6rem] text-[var(--color-muted-foreground)]">{place.price}</span>}
+                        </div>
+                      </div>
+                    </div>
+                  </button>
+                ))}
+
+                {/* Experiences */}
+                {visibleExperiences.map((exp) => (
+                  <button
+                    key={exp.id}
+                    onClick={() => selectExp(exp)}
+                    className={cn(
+                      'w-full text-left px-4 py-3.5 hover:bg-[var(--color-muted)] transition-colors',
+                      selectedExpId === exp.id && 'bg-amber-50 dark:bg-amber-900/20 border-l-2 border-amber-500'
+                    )}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="shrink-0 w-9 h-9 rounded-[var(--radius)] bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-sm">✨</div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-sm text-[var(--color-foreground)] truncate">{exp.title}</p>
+                        <span className="text-xs text-[var(--color-muted-foreground)] truncate flex items-center gap-0.5 mt-0.5">
+                          <MapPin className="h-3 w-3 shrink-0" />{exp.location}
+                        </span>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                          <Star className="h-3 w-3 fill-amber-400 stroke-amber-400 shrink-0" />
+                          <span className="text-[0.65rem] font-bold text-amber-600">{exp.rating}</span>
+                          {exp.price && <span className="text-[0.65rem] text-[var(--color-muted-foreground)]">· {exp.price}</span>}
+                        </div>
+                      </div>
+                    </div>
+                  </button>
+                ))}
+
                 {totalCount === 0 && (
                   <div className="py-16 text-center">
                     <span className="text-3xl">🗺️</span>
@@ -829,6 +1120,8 @@ export default function MapPage() {
             )}
             {selectedEvt && <EventPanel event={selectedEvt} onClose={clearSelection} routeProps={routeProps} />}
             {selectedMarket && <FarmersMarketPanel market={selectedMarket} onClose={clearSelection} routeProps={routeProps} />}
+            {selectedExp && <ExperiencePanel experience={selectedExp} onClose={clearSelection} routeProps={routeProps} />}
+            {selectedPlace && <PlacePanel place={selectedPlace} onClose={clearSelection} routeProps={routeProps} />}
           </div>
         )}
       </div>

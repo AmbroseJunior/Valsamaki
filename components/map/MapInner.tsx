@@ -14,6 +14,8 @@ const MARKER_ICONS: Record<string, string> = {
   user: '📍',
   producer: '🫒',
   farmers_market: '🌿',
+  experience: '✨',
+  place: '🏛️',
 }
 
 interface MapInnerProps {

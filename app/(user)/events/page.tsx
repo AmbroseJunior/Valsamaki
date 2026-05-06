@@ -3,7 +3,7 @@ import { EventFeed } from '@/components/events/EventFeed'
 import { getTranslations } from 'next-intl/server'
 import type { Metadata } from 'next'
 
-export const metadata: Metadata = { title: 'Events' }
+export const metadata: Metadata = { title: 'Experiences' }
 
 export default async function EventsPage() {
   const t = await getTranslations('events')

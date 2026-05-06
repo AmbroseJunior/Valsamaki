@@ -16,6 +16,8 @@ export interface Experience {
   coordinates: { lat: number; lng: number }
   isFeatured?: boolean
   isNew?: boolean
+  source?: { name: string; url: string }   // external operator (scraped)
+  externalBookingUrl?: string
 }
 
 export type ExperienceCategory =

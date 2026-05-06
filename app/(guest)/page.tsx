@@ -166,7 +166,7 @@ export default function GuestHomePage() {
           <div className="flex justify-center gap-4 mt-2">
             <Link href="/info" className="hover:text-[var(--color-foreground)] transition-colors">Mediterranean Diet</Link>
             <Link href="/map" className="hover:text-[var(--color-foreground)] transition-colors">Map</Link>
-            <Link href="/events" className="hover:text-[var(--color-foreground)] transition-colors">Events</Link>
+            <Link href="/events" className="hover:text-[var(--color-foreground)] transition-colors">Experiences</Link>
           </div>
         </footer>
       </div>

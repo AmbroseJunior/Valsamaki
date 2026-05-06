@@ -203,6 +203,51 @@ export async function PersonalizedSection({ preferences }: { preferences: UserPr
         </div>
       </section>
 
+      {/* Quick Access: Map + Local Products — Figma design */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {/* Map View Card */}
+        <Link
+          href="/map"
+          className="relative overflow-hidden flex flex-col justify-between p-6 bg-gradient-to-br from-[var(--highlight)] to-amber-400 rounded-[var(--radius-2xl)] hover:shadow-xl transition-all group min-h-[160px]"
+        >
+          <div className="absolute inset-0 opacity-10 text-5xl select-none pointer-events-none">
+            <div className="absolute top-5 right-14">📍</div>
+            <div className="absolute top-1/2 left-8">🗺️</div>
+            <div className="absolute bottom-6 right-6">🧭</div>
+            <div className="absolute bottom-4 left-1/3">📌</div>
+          </div>
+          <div className="relative z-10">
+            <div className="inline-flex p-2.5 bg-white/90 backdrop-blur-sm rounded-[var(--radius-xl)] mb-3 group-hover:scale-110 transition-transform">
+              <MapPin className="h-6 w-6 text-amber-500" />
+            </div>
+            <h3 className="font-display font-bold text-xl text-gray-900 mb-1">Map View</h3>
+            <p className="text-sm text-gray-800 font-medium">Find experiences near you</p>
+          </div>
+        </Link>
+
+        {/* Local Products Card */}
+        <Link
+          href="/products"
+          className="relative overflow-hidden flex flex-col justify-between p-6 bg-gradient-to-br from-green-500 to-emerald-600 rounded-[var(--radius-2xl)] hover:shadow-xl transition-all group min-h-[160px]"
+        >
+          <div className="absolute inset-0 opacity-10 text-4xl select-none pointer-events-none">
+            <div className="absolute top-3 right-3 rotate-12">🫒</div>
+            <div className="absolute top-10 left-5 -rotate-6">🍯</div>
+            <div className="absolute bottom-6 right-6 rotate-6">🌿</div>
+            <div className="absolute bottom-9 left-10 -rotate-12">🧀</div>
+            <div className="absolute top-1/2 right-1/3 rotate-45">🍇</div>
+            <div className="absolute top-1/3 left-1/4 -rotate-12">🥬</div>
+          </div>
+          <div className="relative z-10">
+            <div className="inline-flex p-2.5 bg-white/90 backdrop-blur-sm rounded-[var(--radius-xl)] mb-3 group-hover:scale-110 transition-transform">
+              <span className="text-xl leading-none">🌱</span>
+            </div>
+            <h3 className="font-display font-bold text-xl text-white mb-1">Local Products</h3>
+            <p className="text-sm text-white/90 font-medium">Discover their natural properties and health benefits</p>
+          </div>
+        </Link>
+      </div>
+
       {/* Events + Local Producers */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Events */}

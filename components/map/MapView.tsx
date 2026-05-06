@@ -8,14 +8,15 @@ const MapInner = dynamic(() => import('./MapInner'), {
   loading: () => <PageLoader />,
 })
 
-interface MapViewProps {
-  lat?: number
-  lng?: number
-  zoom?: number
-  markers?: MapMarker[]
-  flyTo?: { lat: number; lng: number; zoom?: number }
-  onMarkerClick?: (id: string) => void
-  className?: string
+export interface RouteTarget {
+  lat: number
+  lng: number
+  mode: 'walking' | 'driving' | 'transit'
+}
+
+export interface RouteInfo {
+  distance: string
+  duration: string
 }
 
 export interface MapMarker {
@@ -25,6 +26,19 @@ export interface MapMarker {
   type: 'business' | 'event' | 'user' | 'producer' | 'farmers_market'
   label: string
   category?: string
+}
+
+interface MapViewProps {
+  lat?: number
+  lng?: number
+  zoom?: number
+  markers?: MapMarker[]
+  flyTo?: { lat: number; lng: number; zoom?: number }
+  onMarkerClick?: (id: string) => void
+  className?: string
+  routeTarget?: RouteTarget
+  userOrigin?: { lat: number; lng: number }
+  onRouteInfo?: (info: RouteInfo | null) => void
 }
 
 export function MapView(props: MapViewProps) {

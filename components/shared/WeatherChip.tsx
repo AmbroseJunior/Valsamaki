@@ -32,7 +32,7 @@ export function WeatherChip() {
   const iconUrl = `https://openweathermap.org/img/wn/${weather.icon}.png`
 
   return (
-    <div className="fixed top-[calc(var(--nav-height)+8px)] right-3 z-40 hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--color-card)] border border-[var(--color-border)] shadow-[var(--shadow-md)] text-sm select-none">
+    <div className="fixed top-[calc(var(--nav-height)+8px)] right-3 z-40 flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-[var(--color-card)] border border-[var(--color-border)] shadow-[var(--shadow-md)] text-sm select-none">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={iconUrl} alt={weather.description} width={24} height={24} className="-my-1" />
       <span className="font-bold text-[var(--color-foreground)]">{weather.temp}°C</span>

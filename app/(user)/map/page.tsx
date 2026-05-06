@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils'
 import { formatDate, formatCurrency } from '@/lib/utils'
 import { validateUrl } from '@/lib/security'
 import type { BusinessRow, EventRow } from '@/types/database'
-import type { MapMarker } from '@/components/map/MapView'
+import type { MapMarker, RouteTarget, RouteInfo } from '@/components/map/MapView'
 import { FARMERS_MARKETS } from '@/lib/data/farmersMarkets'
 import type { FarmersMarket } from '@/lib/data/farmersMarkets'
 
@@ -22,41 +22,89 @@ const MapView = dynamic(
 )
 
 type TabType = 'all' | 'businesses' | 'events' | 'producers' | 'markets'
+type RouteMode = 'walking' | 'transit' | 'driving'
 
 type BusinessWithOwner = BusinessRow & {
   profiles?: { role: string; name: string | null } | null
 }
 
-// ── Directions helper ─────────────────────────────────────────────────────────
-// Falls back to address-based Google Maps search when lat/lng are absent.
-function directionsUrl(
-  lat: number | null | undefined,
-  lng: number | null | undefined,
-  address: string | null | undefined,
-  mode: string
-): string | null {
-  if (lat && lng) {
-    return `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=${mode}`
-  }
-  if (address) {
-    return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${address}, Crete, Greece`)}&travelmode=${mode}`
-  }
-  return null
+// ── Shared direction panel props ──────────────────────────────────────────────
+
+interface RoutePanelProps {
+  activeRouteMode: RouteMode | null
+  onRouteMode: (mode: RouteMode | null) => void
+  routeInfo: RouteInfo | null
+  hasCoords: boolean
 }
 
-// ── Detail panels ────────────────────────────────────────────────────────────
-
-function BusinessPanel({ business, isProducer = false, onClose }: { business: BusinessWithOwner; isProducer?: boolean; onClose: () => void }) {
+function DirectionButtons({ activeRouteMode, onRouteMode, routeInfo, hasCoords }: RoutePanelProps) {
   const t = useTranslations('map')
-  const headerBg = isProducer ? 'bg-[var(--color-primary)]' : 'bg-[var(--highlight)]'
-  const headerText = 'text-[var(--highlight-foreground)]'
-
-  const directionModes = [
+  const modes: { label: string; icon: string; mode: RouteMode }[] = [
     { label: t('walk'), icon: '🚶', mode: 'walking' },
     { label: t('bus'), icon: '🚌', mode: 'transit' },
     { label: t('drive'), icon: '🚕', mode: 'driving' },
   ]
-  const hasDirections = business.lat || business.lng || business.address
+  return (
+    <div className="space-y-2">
+      <p className="text-xs font-semibold text-[var(--color-muted-foreground)] uppercase tracking-wide">
+        {t('getDirections')}
+      </p>
+      <div className="grid grid-cols-3 gap-2">
+        {modes.map(({ label, icon, mode }) => (
+          <button
+            key={mode}
+            onClick={() => onRouteMode(activeRouteMode === mode ? null : mode)}
+            disabled={!hasCoords}
+            className={cn(
+              'flex flex-col items-center gap-1 py-2.5 rounded-[var(--radius-lg)] border transition-colors text-center',
+              activeRouteMode === mode
+                ? 'border-[var(--highlight)] bg-[var(--highlight)] text-[var(--highlight-foreground)]'
+                : 'border-[var(--color-border)] hover:border-[var(--highlight)] hover:bg-[var(--highlight)]/5',
+              !hasCoords && 'opacity-40 cursor-not-allowed'
+            )}
+          >
+            <span className="text-xl">{icon}</span>
+            <span className="text-[10px] font-semibold">{label}</span>
+          </button>
+        ))}
+      </div>
+
+      {routeInfo && activeRouteMode && (
+        <div className="flex items-center justify-between bg-[var(--color-muted)] rounded-[var(--radius-lg)] px-3 py-2 mt-1">
+          <div>
+            <p className="text-sm font-bold text-[var(--color-foreground)]">{routeInfo.duration}</p>
+            <p className="text-xs text-[var(--color-muted-foreground)]">{routeInfo.distance}</p>
+          </div>
+          <span className="text-2xl">
+            {activeRouteMode === 'walking' ? '🚶' : activeRouteMode === 'transit' ? '🚌' : '🚕'}
+          </span>
+        </div>
+      )}
+
+      {!hasCoords && (
+        <p className="text-[10px] text-[var(--color-muted-foreground)] text-center italic">
+          No map coordinates — directions unavailable
+        </p>
+      )}
+    </div>
+  )
+}
+
+// ── Detail panels ─────────────────────────────────────────────────────────────
+
+function BusinessPanel({
+  business,
+  isProducer = false,
+  onClose,
+  routeProps,
+}: {
+  business: BusinessWithOwner
+  isProducer?: boolean
+  onClose: () => void
+  routeProps: RoutePanelProps
+}) {
+  const t = useTranslations('map')
+  const headerBg = isProducer ? 'bg-[var(--color-primary)]' : 'bg-[var(--highlight)]'
 
   return (
     <div className="bg-[var(--color-card)] rounded-[var(--radius-xl)] shadow-[var(--shadow-lg)] border border-[var(--color-border)] overflow-hidden">
@@ -65,8 +113,8 @@ function BusinessPanel({ business, isProducer = false, onClose }: { business: Bu
           <X className="h-4 w-4 text-white" />
         </button>
         <div className="pr-8">
-          <h3 className={`font-display font-bold text-lg ${headerText} leading-snug`}>{business.name}</h3>
-          <span className={`text-[0.65rem] font-bold uppercase tracking-wide bg-black/20 ${headerText} px-2 py-0.5 rounded-full mt-1 inline-block`}>
+          <h3 className="font-display font-bold text-lg text-white leading-snug">{business.name}</h3>
+          <span className="text-[0.65rem] font-bold uppercase tracking-wide bg-black/20 text-white px-2 py-0.5 rounded-full mt-1 inline-block">
             {isProducer ? `🫒 ${t('producer')}` : (business.category?.replace(/_/g, ' ') ?? 'Business')}
           </span>
         </div>
@@ -98,29 +146,7 @@ function BusinessPanel({ business, isProducer = false, onClose }: { business: Bu
           )}
         </div>
 
-        {hasDirections && (
-          <div className="space-y-2">
-            <p className="text-xs font-semibold text-[var(--color-muted-foreground)] uppercase tracking-wide">{t('getDirections')}</p>
-            <div className="grid grid-cols-3 gap-2">
-              {directionModes.map(({ label, icon, mode }) => {
-                const url = directionsUrl(business.lat, business.lng, business.address, mode)
-                if (!url) return null
-                return (
-                  <a
-                    key={mode}
-                    href={url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex flex-col items-center gap-1 py-2.5 rounded-[var(--radius-lg)] border border-[var(--color-border)] hover:border-[var(--highlight)] hover:bg-[var(--highlight)]/5 transition-colors text-center"
-                  >
-                    <span className="text-xl">{icon}</span>
-                    <span className="text-[10px] font-semibold text-[var(--color-muted-foreground)]">{label}</span>
-                  </a>
-                )
-              })}
-            </div>
-          </div>
-        )}
+        <DirectionButtons {...routeProps} />
 
         <a
           href={`/chatbot?q=${encodeURIComponent('Tell me about ' + business.name)}`}
@@ -133,15 +159,16 @@ function BusinessPanel({ business, isProducer = false, onClose }: { business: Bu
   )
 }
 
-function EventPanel({ event, onClose }: { event: EventRow; onClose: () => void }) {
+function EventPanel({
+  event,
+  onClose,
+  routeProps,
+}: {
+  event: EventRow
+  onClose: () => void
+  routeProps: RoutePanelProps
+}) {
   const t = useTranslations('map')
-  const hasDirections = event.lat || event.lng || event.address
-
-  const directionModes = [
-    { label: t('walk'), icon: '🚶', mode: 'walking' },
-    { label: t('bus'), icon: '🚌', mode: 'transit' },
-    { label: t('drive'), icon: '🚕', mode: 'driving' },
-  ]
 
   return (
     <div className="bg-[var(--color-card)] rounded-[var(--radius-xl)] shadow-[var(--shadow-lg)] border border-[var(--color-border)] overflow-hidden">
@@ -177,26 +204,7 @@ function EventPanel({ event, onClose }: { event: EventRow; onClose: () => void }
           </div>
         </div>
 
-        {hasDirections && (
-          <div className="grid grid-cols-3 gap-2">
-            {directionModes.map(({ label, icon, mode }) => {
-              const url = directionsUrl(event.lat, event.lng, event.address, mode)
-              if (!url) return null
-              return (
-                <a
-                  key={mode}
-                  href={url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex flex-col items-center gap-1 py-2.5 rounded-[var(--radius-lg)] border border-[var(--color-border)] hover:border-[var(--color-primary)] hover:bg-[var(--color-primary)]/5 transition-colors text-center"
-                >
-                  <span className="text-xl">{icon}</span>
-                  <span className="text-[10px] font-semibold text-[var(--color-muted-foreground)]">{label}</span>
-                </a>
-              )
-            })}
-          </div>
-        )}
+        <DirectionButtons {...routeProps} />
 
         <a
           href={`/chatbot?q=${encodeURIComponent('Tell me about the event: ' + event.title)}`}
@@ -209,13 +217,16 @@ function EventPanel({ event, onClose }: { event: EventRow; onClose: () => void }
   )
 }
 
-function FarmersMarketPanel({ market, onClose }: { market: FarmersMarket; onClose: () => void }) {
+function FarmersMarketPanel({
+  market,
+  onClose,
+  routeProps,
+}: {
+  market: FarmersMarket
+  onClose: () => void
+  routeProps: RoutePanelProps
+}) {
   const t = useTranslations('map')
-  const directionModes = [
-    { label: t('walk'), icon: '🚶', mode: 'walking' },
-    { label: t('bus'), icon: '🚌', mode: 'transit' },
-    { label: t('drive'), icon: '🚕', mode: 'driving' },
-  ]
   return (
     <div className="bg-[var(--color-card)] rounded-[var(--radius-xl)] shadow-[var(--shadow-lg)] border border-[var(--color-border)] overflow-hidden">
       <div className="relative bg-green-700 p-4">
@@ -240,26 +251,14 @@ function FarmersMarketPanel({ market, onClose }: { market: FarmersMarket; onClos
             <span>{market.hours}</span>
           </div>
         </div>
-        <div className="grid grid-cols-3 gap-2">
-          {directionModes.map(({ label, icon, mode }) => (
-            <a
-              key={mode}
-              href={`https://www.google.com/maps/dir/?api=1&destination=${market.lat},${market.lng}&travelmode=${mode}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex flex-col items-center gap-1 py-2.5 rounded-[var(--radius-lg)] border border-[var(--color-border)] hover:border-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors text-center"
-            >
-              <span className="text-xl">{icon}</span>
-              <span className="text-[10px] font-semibold text-[var(--color-muted-foreground)]">{label}</span>
-            </a>
-          ))}
-        </div>
+
+        <DirectionButtons {...routeProps} />
       </div>
     </div>
   )
 }
 
-// ── Main page ────────────────────────────────────────────────────────────────
+// ── Main page ─────────────────────────────────────────────────────────────────
 
 export default function MapPage() {
   const t = useTranslations('map')
@@ -269,13 +268,14 @@ export default function MapPage() {
   const [selectedEvtId, setSelectedEvtId] = useState<string | null>(null)
   const [selectedMarketId, setSelectedMarketId] = useState<string | null>(null)
   const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [activeRouteMode, setActiveRouteMode] = useState<RouteMode | null>(null)
+  const [routeInfo, setRouteInfo] = useState<RouteInfo | null>(null)
   const { userId } = useRole()
   const { coords } = useLocation(userId)
   const supabase = createClient()
 
   const s = search.trim().slice(0, 100)
 
-  // Join profiles to identify producer-owned businesses
   const { data: rawBusinesses = [] } = useQuery({
     queryKey: ['businesses-map', s],
     queryFn: async (): Promise<BusinessWithOwner[]> => {
@@ -306,7 +306,6 @@ export default function MapPage() {
     },
   })
 
-  // Farmers markets — filter static list by search term
   const filteredMarkets = useMemo(() => {
     if (!s) return FARMERS_MARKETS
     const term = s.toLowerCase()
@@ -320,7 +319,6 @@ export default function MapPage() {
     )
   }, [s])
 
-  // Producers = businesses whose owner has role 'producer'
   const producers = useMemo(
     () => rawBusinesses.filter((b) => b.profiles?.role === 'producer'),
     [rawBusinesses]
@@ -346,18 +344,61 @@ export default function MapPage() {
     setSelectedBizId(null)
     setSelectedEvtId(null)
     setSelectedMarketId(null)
+    setActiveRouteMode(null)
+    setRouteInfo(null)
   }
 
   function selectBiz(biz: BusinessWithOwner) {
     setSelectedBizId(biz.id)
     setSelectedEvtId(null)
+    setSelectedMarketId(null)
+    setActiveRouteMode(null)
+    setRouteInfo(null)
     setSidebarOpen(true)
   }
 
   function selectEvt(evt: EventRow) {
     setSelectedEvtId(evt.id)
     setSelectedBizId(null)
+    setSelectedMarketId(null)
+    setActiveRouteMode(null)
+    setRouteInfo(null)
     setSidebarOpen(true)
+  }
+
+  function selectMarket(mkt: FarmersMarket) {
+    setSelectedMarketId(mkt.id)
+    setSelectedBizId(null)
+    setSelectedEvtId(null)
+    setActiveRouteMode(null)
+    setRouteInfo(null)
+    setSidebarOpen(true)
+  }
+
+  // Compute the active route target from selection + chosen mode
+  const routeTarget = useMemo<RouteTarget | undefined>(() => {
+    if (!activeRouteMode) return undefined
+    if (selectedBiz?.lat && selectedBiz?.lng) {
+      return { lat: selectedBiz.lat, lng: selectedBiz.lng, mode: activeRouteMode }
+    }
+    if (selectedEvt?.lat && selectedEvt?.lng) {
+      return { lat: selectedEvt.lat, lng: selectedEvt.lng, mode: activeRouteMode }
+    }
+    if (selectedMarket) {
+      return { lat: selectedMarket.lat, lng: selectedMarket.lng, mode: activeRouteMode }
+    }
+    return undefined
+  }, [activeRouteMode, selectedBiz, selectedEvt, selectedMarket])
+
+  const routeProps: RoutePanelProps = {
+    activeRouteMode,
+    onRouteMode: (mode) => setActiveRouteMode(mode),
+    routeInfo,
+    hasCoords: !!(
+      (selectedBiz?.lat && selectedBiz?.lng) ||
+      (selectedEvt?.lat && selectedEvt?.lng) ||
+      selectedMarket
+    ),
   }
 
   const markers: MapMarker[] = useMemo(() => {
@@ -381,9 +422,12 @@ export default function MapPage() {
 
   const flyTo = useMemo<{ lat: number; lng: number; zoom?: number } | undefined>(() => {
     const item = selectedBiz ?? selectedEvt
-    if (!item?.lat || !item?.lng) return undefined
+    if (!item?.lat || !item?.lng) {
+      if (selectedMarket) return { lat: selectedMarket.lat, lng: selectedMarket.lng, zoom: 16 }
+      return undefined
+    }
     return { lat: item.lat, lng: item.lng, zoom: 16 }
-  }, [selectedBiz, selectedEvt])
+  }, [selectedBiz, selectedEvt, selectedMarket])
 
   function handleMarkerClick(markerId: string) {
     if (markerId.startsWith('b:')) {
@@ -394,7 +438,7 @@ export default function MapPage() {
       if (evt) selectEvt(evt)
     } else if (markerId.startsWith('m:')) {
       const mkt = filteredMarkets.find((m) => m.id === markerId.slice(2))
-      if (mkt) { setSelectedMarketId(mkt.id); setSelectedBizId(null); setSelectedEvtId(null); setSidebarOpen(true) }
+      if (mkt) selectMarket(mkt)
     }
   }
 
@@ -411,6 +455,8 @@ export default function MapPage() {
     { key: 'producers' as const,  label: `🫒 ${t('producers')}` },
     { key: 'markets' as const,    label: `🌿 ${t('farmersMarkets')}` },
   ]
+
+  const userOrigin = coords?.lat && coords?.lng ? { lat: coords.lat, lng: coords.lng } : undefined
 
   return (
     <div className="flex flex-col md:flex-row" style={{ height: 'calc(100dvh - var(--nav-height) - var(--bottom-nav-height))' }}>
@@ -470,10 +516,11 @@ export default function MapPage() {
                   business={selectedBiz}
                   isProducer={selectedBiz.profiles?.role === 'producer'}
                   onClose={clearSelection}
+                  routeProps={routeProps}
                 />
               )}
-              {selectedEvt && <EventPanel event={selectedEvt} onClose={clearSelection} />}
-              {selectedMarket && <FarmersMarketPanel market={selectedMarket} onClose={clearSelection} />}
+              {selectedEvt && <EventPanel event={selectedEvt} onClose={clearSelection} routeProps={routeProps} />}
+              {selectedMarket && <FarmersMarketPanel market={selectedMarket} onClose={clearSelection} routeProps={routeProps} />}
             </div>
           ) : (
             <>
@@ -581,7 +628,7 @@ export default function MapPage() {
                 {visibleFarmersMarkets.map((mkt) => (
                   <button
                     key={mkt.id}
-                    onClick={() => { setSelectedMarketId(mkt.id); setSelectedBizId(null); setSelectedEvtId(null); setSidebarOpen(true) }}
+                    onClick={() => selectMarket(mkt)}
                     className={cn(
                       'w-full text-left px-4 py-3.5 hover:bg-[var(--color-muted)] transition-colors',
                       selectedMarketId === mkt.id && 'bg-green-50 dark:bg-green-900/20 border-l-2 border-green-600'
@@ -633,6 +680,9 @@ export default function MapPage() {
           markers={markers}
           flyTo={flyTo}
           onMarkerClick={handleMarkerClick}
+          routeTarget={routeTarget}
+          userOrigin={userOrigin}
+          onRouteInfo={setRouteInfo}
           className="w-full h-full rounded-none"
         />
 
@@ -643,10 +693,11 @@ export default function MapPage() {
                 business={selectedBiz}
                 isProducer={selectedBiz.profiles?.role === 'producer'}
                 onClose={clearSelection}
+                routeProps={routeProps}
               />
             )}
-            {selectedEvt && <EventPanel event={selectedEvt} onClose={clearSelection} />}
-            {selectedMarket && <FarmersMarketPanel market={selectedMarket} onClose={clearSelection} />}
+            {selectedEvt && <EventPanel event={selectedEvt} onClose={clearSelection} routeProps={routeProps} />}
+            {selectedMarket && <FarmersMarketPanel market={selectedMarket} onClose={clearSelection} routeProps={routeProps} />}
           </div>
         )}
       </div>

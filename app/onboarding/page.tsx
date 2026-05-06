@@ -10,74 +10,76 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner'
 import type { UserPreferences } from '@/types/app'
 import { motion, AnimatePresence } from 'framer-motion'
-
-const STEPS = [
-  {
-    key: 'reason_for_visit',
-    title: 'Why are you here?',
-    description: 'Help us personalise your experience',
-    options: [
-      { value: 'tourist', label: '🗺️ Tourist exploring Crete' },
-      { value: 'local', label: '🏘️ Local resident' },
-      { value: 'business', label: '🤝 Business / Producer' },
-      { value: 'researcher', label: '🔬 Researcher / Academic' },
-    ],
-  },
-  {
-    key: 'interests',
-    title: 'What interests you most?',
-    description: 'Select all that apply',
-    multi: true,
-    options: [
-      { value: 'food', label: '🍽️ Local food & cuisine' },
-      { value: 'olive_oil', label: '🫒 Olive oil & producers' },
-      { value: 'hiking', label: '🥾 Hiking & outdoor' },
-      { value: 'history', label: '🏛️ History & archaeology' },
-      { value: 'wellness', label: '💆 Wellness & health' },
-      { value: 'wine', label: '🍷 Wine & vineyards' },
-    ],
-  },
-  {
-    key: 'dietary_preference',
-    title: 'Dietary preference',
-    description: 'We use this to tailor food recommendations',
-    options: [
-      { value: 'omnivore', label: '🥩 Omnivore' },
-      { value: 'vegetarian', label: '🥗 Vegetarian' },
-      { value: 'vegan', label: '🌱 Vegan' },
-      { value: 'pescatarian', label: '🐟 Pescatarian' },
-      { value: 'gluten_free', label: '🌾 Gluten-free' },
-    ],
-  },
-  {
-    key: 'activity_level',
-    title: 'Activity level',
-    description: 'How active are you while visiting?',
-    options: [
-      { value: 'low', label: '🛋️ Relaxed — cafés and beaches' },
-      { value: 'moderate', label: '🚶 Moderate — some hiking & walks' },
-      { value: 'high', label: '🏃 Active — daily outdoor adventures' },
-    ],
-  },
-  {
-    key: 'travel_radius_km',
-    title: 'How far will you travel?',
-    description: 'Maximum distance for recommendations',
-    options: [
-      { value: 5, label: '📍 5 km — walking distance' },
-      { value: 20, label: '🚗 20 km — short drive' },
-      { value: 50, label: '🛣️ 50 km — day trip' },
-      { value: 150, label: '🗺️ All of Crete' },
-    ],
-  },
-]
+import { useTranslations } from 'next-intl'
 
 export default function OnboardingPage() {
+  const t = useTranslations('onboarding')
   const [step, setStep] = useState(0)
   const [answers, setAnswers] = useState<Partial<UserPreferences>>({})
   const [saving, setSaving] = useState(false)
   const { userId } = useRole()
   const router = useRouter()
+
+  const STEPS = [
+    {
+      key: 'reason_for_visit',
+      title: t('reasonForVisit.title'),
+      description: t('reasonForVisit.description'),
+      options: [
+        { value: 'tourist', label: t('reasonForVisit.tourist') },
+        { value: 'local', label: t('reasonForVisit.local') },
+        { value: 'business', label: t('reasonForVisit.business') },
+        { value: 'researcher', label: t('reasonForVisit.researcher') },
+      ],
+    },
+    {
+      key: 'interests',
+      title: t('interests.title'),
+      description: t('interests.description'),
+      multi: true,
+      options: [
+        { value: 'food', label: t('interests.food') },
+        { value: 'olive_oil', label: t('interests.olive_oil') },
+        { value: 'hiking', label: t('interests.hiking') },
+        { value: 'history', label: t('interests.history') },
+        { value: 'wellness', label: t('interests.wellness') },
+        { value: 'wine', label: t('interests.wine') },
+      ],
+    },
+    {
+      key: 'dietary_preference',
+      title: t('dietaryPreference.title'),
+      description: t('dietaryPreference.description'),
+      options: [
+        { value: 'omnivore', label: t('dietaryPreference.omnivore') },
+        { value: 'vegetarian', label: t('dietaryPreference.vegetarian') },
+        { value: 'vegan', label: t('dietaryPreference.vegan') },
+        { value: 'pescatarian', label: t('dietaryPreference.pescatarian') },
+        { value: 'gluten_free', label: t('dietaryPreference.gluten_free') },
+      ],
+    },
+    {
+      key: 'activity_level',
+      title: t('activityLevel.title'),
+      description: t('activityLevel.description'),
+      options: [
+        { value: 'low', label: t('activityLevel.low') },
+        { value: 'moderate', label: t('activityLevel.moderate') },
+        { value: 'high', label: t('activityLevel.high') },
+      ],
+    },
+    {
+      key: 'travel_radius_km',
+      title: t('travelRadius.title'),
+      description: t('travelRadius.description'),
+      options: [
+        { value: 5, label: t('travelRadius.km5') },
+        { value: 20, label: t('travelRadius.km20') },
+        { value: 50, label: t('travelRadius.km50') },
+        { value: 150, label: t('travelRadius.kmAll') },
+      ],
+    },
+  ]
 
   const current = STEPS[step]
 
@@ -135,7 +137,7 @@ export default function OnboardingPage() {
           >
             <Card>
               <CardHeader>
-                <p className="text-sm text-[var(--color-muted-foreground)]">Step {step + 1} of {STEPS.length}</p>
+                <p className="text-sm text-[var(--color-muted-foreground)]">{t('stepOf', { step: step + 1, total: STEPS.length })}</p>
                 <CardTitle className="text-xl">{current.title}</CardTitle>
                 <CardDescription>{current.description}</CardDescription>
               </CardHeader>
@@ -157,15 +159,15 @@ export default function OnboardingPage() {
 
         <div className="flex justify-between">
           <Button variant="ghost" onClick={() => setStep((s) => s - 1)} disabled={step === 0}>
-            Back
+            {t('back')}
           </Button>
           {step < STEPS.length - 1 ? (
             <Button onClick={() => setStep((s) => s + 1)} disabled={!canAdvance}>
-              Next
+              {t('next')}
             </Button>
           ) : (
             <Button onClick={finish} disabled={!canAdvance || saving}>
-              {saving ? <LoadingSpinner size="sm" /> : 'Explore Crete'}
+              {saving ? <LoadingSpinner size="sm" /> : t('exploreCrete')}
             </Button>
           )}
         </div>

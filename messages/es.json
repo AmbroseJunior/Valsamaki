@@ -50,7 +50,52 @@
     "title": "Configura tu perfil",
     "next": "Siguiente",
     "finish": "Finalizar",
-    "skip": "Omitir"
+    "skip": "Omitir",
+    "back": "Atrás",
+    "stepOf": "Paso {step} de {total}",
+    "exploreCrete": "Explorar Creta",
+    "reasonForVisit": {
+      "title": "¿Por qué estás aquí?",
+      "description": "Ayúdanos a personalizar tu experiencia",
+      "tourist": "🗺️ Turista explorando Creta",
+      "local": "🏘️ Residente local",
+      "business": "🤝 Empresa / Productor",
+      "researcher": "🔬 Investigador / Académico"
+    },
+    "interests": {
+      "title": "¿Qué te interesa más?",
+      "description": "Selecciona todo lo que aplique",
+      "food": "🍽️ Gastronomía local",
+      "olive_oil": "🫒 Aceite de oliva y productores",
+      "hiking": "🥾 Senderismo y aire libre",
+      "history": "🏛️ Historia y arqueología",
+      "wellness": "💆 Bienestar y salud",
+      "wine": "🍷 Vino y viñedos"
+    },
+    "dietaryPreference": {
+      "title": "Preferencia dietética",
+      "description": "Usamos esto para personalizar tus recomendaciones gastronómicas",
+      "omnivore": "🥩 Omnívoro",
+      "vegetarian": "🥗 Vegetariano",
+      "vegan": "🌱 Vegano",
+      "pescatarian": "🐟 Pescetariano",
+      "gluten_free": "🌾 Sin gluten"
+    },
+    "activityLevel": {
+      "title": "Nivel de actividad",
+      "description": "¿Qué tan activo eres durante tu visita?",
+      "low": "🛋️ Relajado — cafés y playas",
+      "moderate": "🚶 Moderado — algo de senderismo",
+      "high": "🏃 Activo — aventuras al aire libre"
+    },
+    "travelRadius": {
+      "title": "¿Hasta dónde viajarás?",
+      "description": "Distancia máxima para recomendaciones",
+      "km5": "📍 5 km — caminando",
+      "km20": "🚗 20 km — viaje corto",
+      "km50": "🛣️ 50 km — excursión de un día",
+      "kmAll": "🗺️ Toda Creta"
+    }
   },
   "dashboard": {
     "greeting": "¡Hola, {name}!",

@@ -50,7 +50,52 @@
     "title": "Configura il profilo",
     "next": "Avanti",
     "finish": "Fine",
-    "skip": "Salta"
+    "skip": "Salta",
+    "back": "Indietro",
+    "stepOf": "Passo {step} di {total}",
+    "exploreCrete": "Esplora Creta",
+    "reasonForVisit": {
+      "title": "Perché sei qui?",
+      "description": "Aiutaci a personalizzare la tua esperienza",
+      "tourist": "🗺️ Turista in Creta",
+      "local": "🏘️ Residente locale",
+      "business": "🤝 Azienda / Produttore",
+      "researcher": "🔬 Ricercatore / Accademico"
+    },
+    "interests": {
+      "title": "Cosa ti interessa di più?",
+      "description": "Seleziona tutto ciò che si applica",
+      "food": "🍽️ Gastronomia locale",
+      "olive_oil": "🫒 Olio d'oliva e produttori",
+      "hiking": "🥾 Escursionismo e outdoor",
+      "history": "🏛️ Storia e archeologia",
+      "wellness": "💆 Benessere e salute",
+      "wine": "🍷 Vino e vigneti"
+    },
+    "dietaryPreference": {
+      "title": "Preferenza alimentare",
+      "description": "Lo usiamo per personalizzare i consigli gastronomici",
+      "omnivore": "🥩 Onnivoro",
+      "vegetarian": "🥗 Vegetariano",
+      "vegan": "🌱 Vegano",
+      "pescatarian": "🐟 Pescetariano",
+      "gluten_free": "🌾 Senza glutine"
+    },
+    "activityLevel": {
+      "title": "Livello di attività",
+      "description": "Quanto sei attivo durante la visita?",
+      "low": "🛋️ Rilassato — caffè e spiagge",
+      "moderate": "🚶 Moderato — qualche escursione",
+      "high": "🏃 Attivo — avventure quotidiane"
+    },
+    "travelRadius": {
+      "title": "Quanto lontano viaggerai?",
+      "description": "Distanza massima per i consigli",
+      "km5": "📍 5 km — a piedi",
+      "km20": "🚗 20 km — breve tragitto",
+      "km50": "🛣️ 50 km — gita di un giorno",
+      "kmAll": "🗺️ Tutta Creta"
+    }
   },
   "dashboard": {
     "greeting": "Ciao, {name}!",

@@ -50,7 +50,52 @@
     "title": "Configurer votre profil",
     "next": "Suivant",
     "finish": "Terminer",
-    "skip": "Passer"
+    "skip": "Passer",
+    "back": "Retour",
+    "stepOf": "Étape {step} sur {total}",
+    "exploreCrete": "Explorer la Crète",
+    "reasonForVisit": {
+      "title": "Pourquoi êtes-vous ici ?",
+      "description": "Aidez-nous à personnaliser votre expérience",
+      "tourist": "🗺️ Touriste explorant la Crète",
+      "local": "🏘️ Résident local",
+      "business": "🤝 Entreprise / Producteur",
+      "researcher": "🔬 Chercheur / Universitaire"
+    },
+    "interests": {
+      "title": "Qu'est-ce qui vous intéresse le plus ?",
+      "description": "Sélectionnez tout ce qui s'applique",
+      "food": "🍽️ Gastronomie locale",
+      "olive_oil": "🫒 Huile d'olive et producteurs",
+      "hiking": "🥾 Randonnée et plein air",
+      "history": "🏛️ Histoire et archéologie",
+      "wellness": "💆 Bien-être et santé",
+      "wine": "🍷 Vin et vignobles"
+    },
+    "dietaryPreference": {
+      "title": "Préférence alimentaire",
+      "description": "Nous utilisons cela pour personnaliser vos recommandations culinaires",
+      "omnivore": "🥩 Omnivore",
+      "vegetarian": "🥗 Végétarien",
+      "vegan": "🌱 Végétalien",
+      "pescatarian": "🐟 Pescatarien",
+      "gluten_free": "🌾 Sans gluten"
+    },
+    "activityLevel": {
+      "title": "Niveau d'activité",
+      "description": "Combien êtes-vous actif lors de votre visite ?",
+      "low": "🛋️ Détendu — cafés et plages",
+      "moderate": "🚶 Modéré — quelques randonnées",
+      "high": "🏃 Actif — aventures quotidiennes"
+    },
+    "travelRadius": {
+      "title": "Jusqu'où voyagerez-vous ?",
+      "description": "Distance maximale pour les recommandations",
+      "km5": "📍 5 km — à pied",
+      "km20": "🚗 20 km — courte route",
+      "km50": "🛣️ 50 km — excursion d'une journée",
+      "kmAll": "🗺️ Toute la Crète"
+    }
   },
   "dashboard": {
     "greeting": "Bonjour, {name} !",

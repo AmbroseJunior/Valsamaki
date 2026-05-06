@@ -50,7 +50,52 @@
     "title": "设置您的档案",
     "next": "下一步",
     "finish": "完成",
-    "skip": "跳过"
+    "skip": "跳过",
+    "back": "返回",
+    "stepOf": "第 {step} 步，共 {total} 步",
+    "exploreCrete": "探索克里特岛",
+    "reasonForVisit": {
+      "title": "您来这里的目的是？",
+      "description": "帮助我们个性化您的体验",
+      "tourist": "🗺️ 克里特岛旅游",
+      "local": "🏘️ 本地居民",
+      "business": "🤝 企业 / 生产商",
+      "researcher": "🔬 研究者 / 学者"
+    },
+    "interests": {
+      "title": "您最感兴趣的是？",
+      "description": "选择所有适用项",
+      "food": "🍽️ 本地美食",
+      "olive_oil": "🫒 橄榄油与生产商",
+      "hiking": "🥾 徒步与户外活动",
+      "history": "🏛️ 历史与考古",
+      "wellness": "💆 健康与养生",
+      "wine": "🍷 葡萄酒与酒庄"
+    },
+    "dietaryPreference": {
+      "title": "饮食偏好",
+      "description": "我们用此来定制美食推荐",
+      "omnivore": "🥩 杂食者",
+      "vegetarian": "🥗 素食者",
+      "vegan": "🌱 纯素食者",
+      "pescatarian": "🐟 海鲜素食者",
+      "gluten_free": "🌾 无麸质"
+    },
+    "activityLevel": {
+      "title": "活动水平",
+      "description": "您在旅行时有多活跃？",
+      "low": "🛋️ 悠闲 — 咖啡馆和海滩",
+      "moderate": "🚶 适中 — 偶尔徒步",
+      "high": "🏃 活跃 — 每天户外探险"
+    },
+    "travelRadius": {
+      "title": "您愿意走多远？",
+      "description": "推荐的最大距离",
+      "km5": "📍 5 公里 — 步行距离",
+      "km20": "🚗 20 公里 — 短途车程",
+      "km50": "🛣️ 50 公里 — 一日游",
+      "kmAll": "🗺️ 整个克里特岛"
+    }
   },
   "dashboard": {
     "greeting": "你好，{name}！",

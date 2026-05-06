@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useMemo } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { FilterBar } from '@/components/shared/FilterBar'
@@ -8,33 +8,85 @@ import { ExperienceCard } from '@/components/explore/ExperienceCard'
 import { ExperienceModal } from '@/components/explore/ExperienceModal'
 import { EXPERIENCES } from '@/lib/data/experiences'
 import type { Experience, ExperienceCategory } from '@/types/experience'
-import type { NewsArticle } from '@/types/app'
-import { Sparkles, Search, X, Newspaper, ExternalLink } from 'lucide-react'
-import Image from 'next/image'
+import { Sparkles, Search, X, SlidersHorizontal } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
-function searchExperiences(items: Experience[], category: ExperienceCategory, q: string): Experience[] {
-  const list = category === 'all' ? items : items.filter((e) => e.category === category)
-  if (!q.trim()) return list
-  const term = q.toLowerCase().trim()
-  return list.filter((e) =>
-    e.title.toLowerCase().includes(term) ||
-    e.location.toLowerCase().includes(term) ||
-    e.description.toLowerCase().includes(term) ||
-    e.shortDescription.toLowerCase().includes(term) ||
-    e.tags.some((t) => t.toLowerCase().includes(term)) ||
-    e.healthBenefits.some((h) => h.toLowerCase().includes(term))
-  )
+type PriceFilter = 'all' | 'free' | 'under30' | 'under60'
+type DistanceFilter = 'all' | '5' | '10' | '25'
+type SortKey = 'default' | 'price_asc' | 'distance' | 'rating'
+
+function parsePrice(p?: string): number | null {
+  if (!p) return null
+  if (p.toLowerCase().includes('free')) return 0
+  const m = p.match(/€(\d+)/)
+  return m ? parseInt(m[1]) : null
 }
 
-function filterNews(articles: NewsArticle[], q: string): NewsArticle[] {
-  if (!q.trim()) return []
-  const term = q.toLowerCase().trim()
-  return articles.filter((a) =>
-    a.title.toLowerCase().includes(term) ||
-    a.description.toLowerCase().includes(term) ||
-    a.source.toLowerCase().includes(term)
-  )
+function filterAndSort(
+  items: Experience[],
+  category: ExperienceCategory,
+  query: string,
+  price: PriceFilter,
+  distance: DistanceFilter,
+  sort: SortKey,
+): Experience[] {
+  let list = category === 'all' ? items : items.filter((e) => e.category === category)
+
+  if (query.trim()) {
+    const term = query.toLowerCase().trim()
+    list = list.filter((e) =>
+      e.title.toLowerCase().includes(term) ||
+      e.location.toLowerCase().includes(term) ||
+      e.description.toLowerCase().includes(term) ||
+      e.shortDescription.toLowerCase().includes(term) ||
+      e.tags.some((t) => t.toLowerCase().includes(term)) ||
+      e.healthBenefits.some((h) => h.toLowerCase().includes(term))
+    )
+  }
+
+  if (price !== 'all') {
+    list = list.filter((e) => {
+      const p = parsePrice(e.price)
+      if (price === 'free') return p === 0
+      if (price === 'under30') return p !== null && p < 30
+      if (price === 'under60') return p !== null && p < 60
+      return true
+    })
+  }
+
+  if (distance !== 'all') {
+    const maxKm = parseInt(distance)
+    list = list.filter((e) => e.distance == null || e.distance <= maxKm)
+  }
+
+  return [...list].sort((a, b) => {
+    if (sort === 'price_asc') return (parsePrice(a.price) ?? 999) - (parsePrice(b.price) ?? 999)
+    if (sort === 'distance') return (a.distance ?? 999) - (b.distance ?? 999)
+    if (sort === 'rating') return b.rating - a.rating
+    return 0
+  })
 }
+
+const PRICE_OPTIONS: { value: PriceFilter; label: string }[] = [
+  { value: 'all', label: 'Any price' },
+  { value: 'free', label: 'Free' },
+  { value: 'under30', label: 'Under €30' },
+  { value: 'under60', label: 'Under €60' },
+]
+
+const DISTANCE_OPTIONS: { value: DistanceFilter; label: string }[] = [
+  { value: 'all', label: 'Any distance' },
+  { value: '5', label: '≤ 5 km' },
+  { value: '10', label: '≤ 10 km' },
+  { value: '25', label: '≤ 25 km' },
+]
+
+const SORT_OPTIONS: { value: SortKey; label: string }[] = [
+  { value: 'default', label: 'Default' },
+  { value: 'rating', label: 'Top rated' },
+  { value: 'price_asc', label: 'Price ↑' },
+  { value: 'distance', label: 'Nearest' },
+]
 
 export default function ExplorePage() {
   const params = useSearchParams()
@@ -42,20 +94,17 @@ export default function ExplorePage() {
   const [activeCategory, setActiveCategory] = useState<ExperienceCategory>('all')
   const [query, setQuery] = useState(params.get('q') ?? '')
   const [selectedExp, setSelectedExp] = useState<Experience | null>(null)
-  const [allNews, setAllNews] = useState<NewsArticle[]>([])
-  const fetchedRef = useRef(false)
+  const [priceFilter, setPriceFilter] = useState<PriceFilter>('all')
+  const [distanceFilter, setDistanceFilter] = useState<DistanceFilter>('all')
+  const [sortKey, setSortKey] = useState<SortKey>('default')
+  const [showFilters, setShowFilters] = useState(false)
 
-  useEffect(() => {
-    if (fetchedRef.current) return
-    fetchedRef.current = true
-    fetch('/api/news')
-      .then((r) => r.ok ? r.json() : [])
-      .then(setAllNews)
-      .catch(() => {})
-  }, [])
+  const filtered = useMemo(
+    () => filterAndSort(EXPERIENCES, activeCategory, query, priceFilter, distanceFilter, sortKey),
+    [activeCategory, query, priceFilter, distanceFilter, sortKey]
+  )
 
-  const filtered = searchExperiences(EXPERIENCES, activeCategory, query)
-  const newsResults = filterNews(allNews, query)
+  const hasActiveFilters = priceFilter !== 'all' || distanceFilter !== 'all' || sortKey !== 'default'
 
   const countLabel = query.trim()
     ? `${filtered.length === 1 ? t('result') : t('results')} ${t('forLabel')} "${query}"`
@@ -68,7 +117,8 @@ export default function ExplorePage() {
       <FilterBar active={activeCategory} onChange={setActiveCategory} />
 
       <div style={{ paddingTop: 'var(--filter-bar-height)' }} className="max-w-[var(--max-content-width)] mx-auto px-4 py-6">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-6">
+        {/* Header row */}
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
           <div className="flex items-center gap-2 flex-1">
             <Sparkles className="h-5 w-5 text-[var(--highlight)] shrink-0" />
             <div>
@@ -79,33 +129,122 @@ export default function ExplorePage() {
             </div>
           </div>
 
-          <div className="relative sm:w-64">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--color-muted-foreground)]" />
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder={t('searchExperiences')}
-              className="w-full pl-9 pr-9 py-2.5 rounded-[var(--radius-full)] border border-[var(--color-border)] bg-[var(--color-input)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--highlight)] transition-shadow"
-            />
-            {query && (
-              <button onClick={() => setQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2">
-                <X className="h-4 w-4 text-[var(--color-muted-foreground)]" />
-              </button>
-            )}
+          <div className="flex items-center gap-2">
+            {/* Filter toggle */}
+            <button
+              onClick={() => setShowFilters((v) => !v)}
+              className={cn(
+                'flex items-center gap-1.5 px-3 py-2 rounded-[var(--radius-full)] border text-sm font-semibold transition-colors',
+                hasActiveFilters
+                  ? 'bg-[var(--highlight)] text-[var(--highlight-foreground)] border-[var(--highlight)]'
+                  : 'border-[var(--color-border)] bg-[var(--color-muted)] text-[var(--color-muted-foreground)] hover:border-[var(--highlight)]'
+              )}
+            >
+              <SlidersHorizontal className="h-4 w-4" />
+              {t('filters')}
+              {hasActiveFilters && <span className="ml-0.5 text-xs opacity-80">•</span>}
+            </button>
+
+            {/* Search */}
+            <div className="relative sm:w-56">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--color-muted-foreground)]" />
+              <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder={t('searchExperiences')}
+                className="w-full pl-9 pr-9 py-2 rounded-[var(--radius-full)] border border-[var(--color-border)] bg-[var(--color-input)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--highlight)] transition-shadow"
+              />
+              {query && (
+                <button onClick={() => setQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2">
+                  <X className="h-4 w-4 text-[var(--color-muted-foreground)]" />
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Experience results */}
-        {filtered.length > 0 && (
+        {/* Filter panel */}
+        {showFilters && (
+          <div className="mb-4 p-4 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-card)] flex flex-wrap gap-6">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wider text-[var(--color-muted-foreground)] mb-2">Price</p>
+              <div className="flex flex-wrap gap-1.5">
+                {PRICE_OPTIONS.map(({ value, label }) => (
+                  <button
+                    key={value}
+                    onClick={() => setPriceFilter(value)}
+                    className={cn(
+                      'px-3 py-1 rounded-full text-xs font-semibold border transition-colors',
+                      priceFilter === value
+                        ? 'bg-[var(--highlight)] text-[var(--highlight-foreground)] border-[var(--highlight)]'
+                        : 'border-[var(--color-border)] text-[var(--color-muted-foreground)] hover:border-[var(--highlight)]'
+                    )}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wider text-[var(--color-muted-foreground)] mb-2">Distance</p>
+              <div className="flex flex-wrap gap-1.5">
+                {DISTANCE_OPTIONS.map(({ value, label }) => (
+                  <button
+                    key={value}
+                    onClick={() => setDistanceFilter(value)}
+                    className={cn(
+                      'px-3 py-1 rounded-full text-xs font-semibold border transition-colors',
+                      distanceFilter === value
+                        ? 'bg-[var(--highlight)] text-[var(--highlight-foreground)] border-[var(--highlight)]'
+                        : 'border-[var(--color-border)] text-[var(--color-muted-foreground)] hover:border-[var(--highlight)]'
+                    )}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wider text-[var(--color-muted-foreground)] mb-2">Sort by</p>
+              <div className="flex flex-wrap gap-1.5">
+                {SORT_OPTIONS.map(({ value, label }) => (
+                  <button
+                    key={value}
+                    onClick={() => setSortKey(value)}
+                    className={cn(
+                      'px-3 py-1 rounded-full text-xs font-semibold border transition-colors',
+                      sortKey === value
+                        ? 'bg-[var(--highlight)] text-[var(--highlight-foreground)] border-[var(--highlight)]'
+                        : 'border-[var(--color-border)] text-[var(--color-muted-foreground)] hover:border-[var(--highlight)]'
+                    )}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {hasActiveFilters && (
+              <button
+                onClick={() => { setPriceFilter('all'); setDistanceFilter('all'); setSortKey('default') }}
+                className="self-end text-xs font-semibold text-[var(--color-destructive)] hover:underline"
+              >
+                Clear filters
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Results */}
+        {filtered.length > 0 ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {filtered.map((exp) => (
               <ExperienceCard key={exp.id} experience={exp} onClick={setSelectedExp} />
             ))}
           </div>
-        )}
-
-        {/* No experience results */}
-        {filtered.length === 0 && newsResults.length === 0 && (
+        ) : (
           <div className="text-center py-20 text-[var(--color-muted-foreground)]">
             <span className="text-4xl">🔍</span>
             <p className="mt-3 font-semibold">
@@ -114,9 +253,9 @@ export default function ExplorePage() {
             <p className="text-sm mt-1">
               {query ? t('tryDifferent') : t('moreSoon')}
             </p>
-            {query && (
+            {(query || hasActiveFilters) && (
               <button
-                onClick={() => setQuery('')}
+                onClick={() => { setQuery(''); setPriceFilter('all'); setDistanceFilter('all'); setSortKey('default') }}
                 className="mt-3 text-sm text-[var(--highlight)] font-semibold hover:underline"
               >
                 {t('clearSearch')}
@@ -124,76 +263,9 @@ export default function ExplorePage() {
             )}
           </div>
         )}
-
-        {/* News results — shown whenever search matches articles */}
-        {newsResults.length > 0 && (
-          <section className={filtered.length > 0 ? 'mt-10' : 'mt-2'}>
-            <div className="flex items-center gap-2 mb-4">
-              <Newspaper className="h-5 w-5 text-[var(--highlight)]" />
-              <h2 className="font-display font-bold text-lg">
-                News — {newsResults.length} {newsResults.length === 1 ? 'article' : 'articles'} for &ldquo;{query}&rdquo;
-              </h2>
-            </div>
-            <div className="flex flex-col gap-3">
-              {newsResults.map((article) => (
-                <NewsResultCard key={article.id} article={article} />
-              ))}
-            </div>
-          </section>
-        )}
       </div>
 
       <ExperienceModal experience={selectedExp} onClose={() => setSelectedExp(null)} />
     </>
-  )
-}
-
-function NewsResultCard({ article }: { article: NewsArticle }) {
-  return (
-    <a
-      href={article.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="flex gap-4 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-card)] p-3 hover:shadow-[var(--shadow-md)] transition-shadow group"
-    >
-      {/* Thumbnail */}
-      <div className="relative w-24 h-20 shrink-0 rounded-[var(--radius-lg)] overflow-hidden bg-[var(--color-muted)]">
-        {article.image_url ? (
-          <Image
-            src={article.image_url}
-            alt={article.title}
-            fill
-            unoptimized
-            className="object-cover group-hover:scale-105 transition-transform duration-300"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-2xl">🫒</div>
-        )}
-      </div>
-
-      {/* Text */}
-      <div className="flex flex-col flex-1 min-w-0 justify-center">
-        <div className="flex items-center gap-2 mb-1">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--highlight)]">
-            {article.source}
-          </span>
-          {article.published_at && (
-            <span className="text-[10px] text-[var(--color-muted-foreground)]">
-              {new Date(article.published_at).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}
-            </span>
-          )}
-        </div>
-        <h3 className="font-semibold text-sm leading-snug line-clamp-2 mb-1">
-          {article.title}
-        </h3>
-        {article.description && (
-          <p className="text-xs text-[var(--color-muted-foreground)] line-clamp-1">
-            {article.description}
-          </p>
-        )}
-      </div>
-
-      <ExternalLink className="h-4 w-4 shrink-0 text-[var(--color-muted-foreground)] self-center group-hover:text-[var(--highlight)] transition-colors" />
-    </a>
   )
 }

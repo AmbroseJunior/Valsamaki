@@ -2,8 +2,6 @@ import { Suspense } from 'react'
 import { createClient } from '@/lib/supabase/server'
 import { getTranslations } from 'next-intl/server'
 import { redirect } from 'next/navigation'
-import { WeatherWidget } from '@/components/dashboard/WeatherWidget'
-import { NewsPanel } from '@/components/dashboard/NewsPanel'
 import { PersonalizedSection } from '@/components/dashboard/PersonalizedSection'
 import { PageLoader } from '@/components/shared/LoadingSpinner'
 import type { UserPreferences } from '@/types/app'
@@ -24,8 +22,6 @@ export default async function DashboardPage() {
 
   const t = await getTranslations('dashboard')
 
-  const lat = profile?.location_lat ?? 35.3387
-  const lng = profile?.location_lng ?? 25.1442
   const preferences = (profile?.preferences ?? null) as UserPreferences | null
   const firstName = profile?.name ? profile.name.split(' ')[0] : null
 
@@ -47,15 +43,7 @@ export default async function DashboardPage() {
       </div>
 
       <Suspense fallback={<PageLoader />}>
-        <WeatherWidget lat={lat} lng={lng} />
-      </Suspense>
-
-      <Suspense fallback={<PageLoader />}>
         <PersonalizedSection preferences={preferences} />
-      </Suspense>
-
-      <Suspense fallback={<PageLoader />}>
-        <NewsPanel />
       </Suspense>
 
       <footer className="text-center text-xs text-[var(--color-muted-foreground)] pt-4 border-t border-[var(--color-border)]">

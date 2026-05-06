@@ -3,6 +3,7 @@
     "dashboard": "Accueil",
     "explore": "Explorer",
     "events": "Événements",
+    "experiences": "Expériences",
     "map": "Carte",
     "chatbot": "Guide IA",
     "business": "Mon Commerce",
@@ -123,9 +124,6 @@
     "contextLocal": "Votre guide local du meilleur de la Crète",
     "contextResearcher": "Explorez la cuisine crétoise, les producteurs & traditions",
     "contextDefault": "Personnalisé pour votre emplacement et préférences",
-    "newsTitle": "Dernières nouvelles de Crète",
-    "noNews": "Aucune actualité disponible.",
-    "readMore": "Explorer dans l'appli",
     "weatherUnavailable": "Météo indisponible",
     "feels": "ressenti"
   },
@@ -147,8 +145,8 @@
     "forLabel": "pour"
   },
   "events": {
-    "title": "Événements",
-    "nearYou": "Événements près de vous",
+    "title": "Expériences",
+    "nearYou": "Expériences près de vous",
     "subtitle": "Découvrez des festivals, marchés, dégustations et plus en Crète",
     "upcoming": "À venir",
     "past": "Passés",
@@ -181,7 +179,9 @@
     "freeEntry": "Entrée gratuite",
     "noMapPin": "Pas encore de repère",
     "producers": "Producteurs",
-    "producer": "Producteur"
+    "producer": "Producteur",
+    "farmersMarkets": "Marchés Fermiers",
+    "farmersMarket": "Marché Fermier"
   },
   "chatbot": {
     "title": "Guide IA",

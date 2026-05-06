@@ -13,6 +13,7 @@ const MARKER_ICONS: Record<string, string> = {
   event: '🎉',
   user: '📍',
   producer: '🫒',
+  farmers_market: '🌿',
 }
 
 interface MapInnerProps {

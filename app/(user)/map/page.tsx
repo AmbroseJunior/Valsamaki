@@ -13,13 +13,15 @@ import { formatDate, formatCurrency } from '@/lib/utils'
 import { validateUrl } from '@/lib/security'
 import type { BusinessRow, EventRow } from '@/types/database'
 import type { MapMarker } from '@/components/map/MapView'
+import { FARMERS_MARKETS } from '@/lib/data/farmersMarkets'
+import type { FarmersMarket } from '@/lib/data/farmersMarkets'
 
 const MapView = dynamic(
   () => import('@/components/map/MapView').then((m) => m.MapView),
   { ssr: false, loading: () => <div className="w-full h-full bg-[var(--color-muted)] animate-pulse rounded-[var(--radius)]" /> }
 )
 
-type TabType = 'all' | 'businesses' | 'events' | 'producers'
+type TabType = 'all' | 'businesses' | 'events' | 'producers' | 'markets'
 
 type BusinessWithOwner = BusinessRow & {
   profiles?: { role: string; name: string | null } | null
@@ -207,6 +209,56 @@ function EventPanel({ event, onClose }: { event: EventRow; onClose: () => void }
   )
 }
 
+function FarmersMarketPanel({ market, onClose }: { market: FarmersMarket; onClose: () => void }) {
+  const t = useTranslations('map')
+  const directionModes = [
+    { label: t('walk'), icon: '🚶', mode: 'walking' },
+    { label: t('bus'), icon: '🚌', mode: 'transit' },
+    { label: t('drive'), icon: '🚕', mode: 'driving' },
+  ]
+  return (
+    <div className="bg-[var(--color-card)] rounded-[var(--radius-xl)] shadow-[var(--shadow-lg)] border border-[var(--color-border)] overflow-hidden">
+      <div className="relative bg-green-700 p-4">
+        <button onClick={onClose} className="absolute top-3 right-3 p-1.5 rounded-full bg-black/20 hover:bg-black/30 transition-colors">
+          <X className="h-4 w-4 text-white" />
+        </button>
+        <div className="pr-8">
+          <h3 className="font-display font-bold text-lg text-white leading-snug">{market.nameEn}</h3>
+          <span className="text-[0.65rem] font-bold uppercase tracking-wide bg-black/20 text-white px-2 py-0.5 rounded-full mt-1 inline-block">
+            🌿 {t('farmersMarket')}
+          </span>
+        </div>
+      </div>
+      <div className="p-4 space-y-3">
+        <div className="space-y-2 text-sm text-[var(--color-muted-foreground)]">
+          <div className="flex items-start gap-2">
+            <MapPin className="h-4 w-4 shrink-0 mt-0.5 text-green-600" />
+            <span>{market.streets}<br /><span className="text-xs">{market.area}</span></span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Calendar className="h-4 w-4 shrink-0 text-green-600" />
+            <span>{market.hours}</span>
+          </div>
+        </div>
+        <div className="grid grid-cols-3 gap-2">
+          {directionModes.map(({ label, icon, mode }) => (
+            <a
+              key={mode}
+              href={`https://www.google.com/maps/dir/?api=1&destination=${market.lat},${market.lng}&travelmode=${mode}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex flex-col items-center gap-1 py-2.5 rounded-[var(--radius-lg)] border border-[var(--color-border)] hover:border-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors text-center"
+            >
+              <span className="text-xl">{icon}</span>
+              <span className="text-[10px] font-semibold text-[var(--color-muted-foreground)]">{label}</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ── Main page ────────────────────────────────────────────────────────────────
 
 export default function MapPage() {
@@ -215,6 +267,7 @@ export default function MapPage() {
   const [tab, setTab] = useState<TabType>('all')
   const [selectedBizId, setSelectedBizId] = useState<string | null>(null)
   const [selectedEvtId, setSelectedEvtId] = useState<string | null>(null)
+  const [selectedMarketId, setSelectedMarketId] = useState<string | null>(null)
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const { userId } = useRole()
   const { coords } = useLocation(userId)
@@ -253,6 +306,20 @@ export default function MapPage() {
     },
   })
 
+  // Farmers markets — filter static list by search term
+  const filteredMarkets = useMemo(() => {
+    if (!s) return FARMERS_MARKETS
+    const term = s.toLowerCase()
+    return FARMERS_MARKETS.filter(
+      (m) =>
+        m.nameEn.toLowerCase().includes(term) ||
+        m.name.toLowerCase().includes(term) ||
+        m.area.toLowerCase().includes(term) ||
+        m.streets.toLowerCase().includes(term) ||
+        m.day.toLowerCase().includes(term)
+    )
+  }, [s])
+
   // Producers = businesses whose owner has role 'producer'
   const producers = useMemo(
     () => rawBusinesses.filter((b) => b.profiles?.role === 'producer'),
@@ -267,12 +334,18 @@ export default function MapPage() {
     () => (selectedEvtId ? (events.find((e) => e.id === selectedEvtId) ?? null) : null),
     [selectedEvtId, events]
   )
+  const selectedMarket = useMemo(
+    () => (selectedMarketId ? (filteredMarkets.find((m) => m.id === selectedMarketId) ?? null) : null),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [selectedMarketId, s]
+  )
 
-  const hasSelection = selectedBiz !== null || selectedEvt !== null
+  const hasSelection = selectedBiz !== null || selectedEvt !== null || selectedMarket !== null
 
   function clearSelection() {
     setSelectedBizId(null)
     setSelectedEvtId(null)
+    setSelectedMarketId(null)
   }
 
   function selectBiz(biz: BusinessWithOwner) {
@@ -301,8 +374,10 @@ export default function MapPage() {
     const eMarkers: MapMarker[] = events
       .filter((e) => e.lat && e.lng)
       .map((e) => ({ id: `e:${e.id}`, lat: e.lat!, lng: e.lng!, type: 'event' as const, label: e.title, category: e.category }))
-    return [...bMarkers, ...eMarkers]
-  }, [rawBusinesses, events])
+    const mMarkers: MapMarker[] = (tab === 'all' || tab === 'markets' ? filteredMarkets : [])
+      .map((m) => ({ id: `m:${m.id}`, lat: m.lat, lng: m.lng, type: 'farmers_market' as const, label: m.nameEn }))
+    return [...bMarkers, ...eMarkers, ...mMarkers]
+  }, [rawBusinesses, events, filteredMarkets, tab])
 
   const flyTo = useMemo<{ lat: number; lng: number; zoom?: number } | undefined>(() => {
     const item = selectedBiz ?? selectedEvt
@@ -317,19 +392,24 @@ export default function MapPage() {
     } else if (markerId.startsWith('e:')) {
       const evt = events.find((e) => e.id === markerId.slice(2))
       if (evt) selectEvt(evt)
+    } else if (markerId.startsWith('m:')) {
+      const mkt = filteredMarkets.find((m) => m.id === markerId.slice(2))
+      if (mkt) { setSelectedMarketId(mkt.id); setSelectedBizId(null); setSelectedEvtId(null); setSidebarOpen(true) }
     }
   }
 
-  const visibleBusinesses = tab === 'events' || tab === 'producers' ? [] : rawBusinesses
-  const visibleEvents = tab === 'businesses' || tab === 'producers' ? [] : events
+  const visibleBusinesses = tab === 'events' || tab === 'producers' || tab === 'markets' ? [] : rawBusinesses
+  const visibleEvents = tab === 'businesses' || tab === 'producers' || tab === 'markets' ? [] : events
   const visibleProducers = tab === 'producers' ? producers : []
-  const totalCount = visibleBusinesses.length + visibleEvents.length + visibleProducers.length
+  const visibleFarmersMarkets = tab === 'all' || tab === 'markets' ? filteredMarkets : []
+  const totalCount = visibleBusinesses.length + visibleEvents.length + visibleProducers.length + visibleFarmersMarkets.length
 
   const TABS = [
     { key: 'all' as const,        label: `🌿 ${t('all')}` },
     { key: 'businesses' as const, label: `🏪 ${t('places')}` },
     { key: 'events' as const,     label: `🎉 ${t('events')}` },
     { key: 'producers' as const,  label: `🫒 ${t('producers')}` },
+    { key: 'markets' as const,    label: `🌿 ${t('farmersMarkets')}` },
   ]
 
   return (
@@ -357,8 +437,7 @@ export default function MapPage() {
               </button>
             )}
           </div>
-          {/* 2×2 tab grid to fit 4 tabs */}
-          <div className="grid grid-cols-2 gap-1">
+          <div className="grid grid-cols-3 gap-1 sm:grid-cols-5">
             {TABS.map(({ key, label }) => (
               <button
                 key={key}
@@ -394,6 +473,7 @@ export default function MapPage() {
                 />
               )}
               {selectedEvt && <EventPanel event={selectedEvt} onClose={clearSelection} />}
+              {selectedMarket && <FarmersMarketPanel market={selectedMarket} onClose={clearSelection} />}
             </div>
           ) : (
             <>
@@ -497,6 +577,31 @@ export default function MapPage() {
                   </button>
                 ))}
 
+                {/* Farmers Markets */}
+                {visibleFarmersMarkets.map((mkt) => (
+                  <button
+                    key={mkt.id}
+                    onClick={() => { setSelectedMarketId(mkt.id); setSelectedBizId(null); setSelectedEvtId(null); setSidebarOpen(true) }}
+                    className={cn(
+                      'w-full text-left px-4 py-3.5 hover:bg-[var(--color-muted)] transition-colors',
+                      selectedMarketId === mkt.id && 'bg-green-50 dark:bg-green-900/20 border-l-2 border-green-600'
+                    )}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="shrink-0 w-9 h-9 rounded-[var(--radius)] bg-green-100 dark:bg-green-900/40 flex items-center justify-center text-sm">🌿</div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-sm text-[var(--color-foreground)] truncate">{mkt.nameEn}</p>
+                        <span className="text-xs text-[var(--color-muted-foreground)] flex items-center gap-0.5 mt-0.5">
+                          <Calendar className="h-3 w-3 shrink-0" />{mkt.hours}
+                        </span>
+                        <span className="text-xs text-[var(--color-muted-foreground)] truncate flex items-center gap-0.5 mt-0.5">
+                          <MapPin className="h-3 w-3 shrink-0" />{mkt.area}
+                        </span>
+                      </div>
+                    </div>
+                  </button>
+                ))}
+
                 {totalCount === 0 && (
                   <div className="py-16 text-center">
                     <span className="text-3xl">🗺️</span>
@@ -541,6 +646,7 @@ export default function MapPage() {
               />
             )}
             {selectedEvt && <EventPanel event={selectedEvt} onClose={clearSelection} />}
+            {selectedMarket && <FarmersMarketPanel market={selectedMarket} onClose={clearSelection} />}
           </div>
         )}
       </div>

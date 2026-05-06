@@ -11,9 +11,9 @@ const INTEREST_EXP_CATS: Record<string, ExperienceCategory[]> = {
   local_food:  ['food_tour', 'market'],
   olive_oil:   ['organic'],
   hiking:      ['active'],
-  history:     ['cultural'],
+  history:     ['active', 'market'],
   wellness:    ['wellness'],
-  wine:        ['winery'],
+  wine:        ['organic'],
 }
 
 const INTEREST_BIZ_CATS: Record<string, string> = {
@@ -136,8 +136,7 @@ export async function PersonalizedSection({ preferences }: { preferences: UserPr
   }>
 
   const categoryEmoji: Record<string, string> = {
-    food_tour: '🍽️', market: '🛒', organic: '🫒', active: '🥾',
-    cultural: '🏛️', wellness: '💆', winery: '🍷',
+    food_tour: '🍽️', market: '🛒', organic: '🫒', active: '🥾', wellness: '💆',
   }
 
   const bizEmoji: Record<string, string> = {

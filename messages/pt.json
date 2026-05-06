@@ -3,6 +3,7 @@
     "dashboard": "Início",
     "explore": "Explorar",
     "events": "Eventos",
+    "experiences": "Experiências",
     "map": "Mapa",
     "chatbot": "Guia IA",
     "business": "Meu Negócio",
@@ -123,9 +124,6 @@
     "contextLocal": "Seu guia local do melhor de Creta",
     "contextResearcher": "Explore a culinária cretense, produtores e tradições",
     "contextDefault": "Personalizado para sua localização e preferências",
-    "newsTitle": "Últimas notícias de Creta",
-    "noNews": "Nenhuma notícia disponível.",
-    "readMore": "Explorar no app",
     "weatherUnavailable": "Clima indisponível",
     "feels": "sensação"
   },
@@ -147,8 +145,8 @@
     "forLabel": "para"
   },
   "events": {
-    "title": "Eventos",
-    "nearYou": "Eventos perto de você",
+    "title": "Experiências",
+    "nearYou": "Experiências perto de você",
     "subtitle": "Descubra festivais, mercados, degustações e mais em Creta",
     "upcoming": "Próximos",
     "past": "Passados",
@@ -181,7 +179,9 @@
     "freeEntry": "Entrada gratuita",
     "noMapPin": "Sem marcador no mapa ainda",
     "producers": "Produtores",
-    "producer": "Produtor"
+    "producer": "Produtor",
+    "farmersMarkets": "Feiras de Agricultores",
+    "farmersMarket": "Feira de Agricultores"
   },
   "chatbot": {
     "title": "Guia IA",

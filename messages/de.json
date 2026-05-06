@@ -3,6 +3,7 @@
     "dashboard": "Startseite",
     "explore": "Entdecken",
     "events": "Veranstaltungen",
+    "experiences": "Erlebnisse",
     "map": "Karte",
     "chatbot": "KI-Guide",
     "business": "Mein Betrieb",
@@ -123,9 +124,6 @@
     "contextLocal": "Ihr lokaler Reiseführer für das Beste auf Kreta",
     "contextResearcher": "Erkunden Sie kretische Küche, Erzeuger & Traditionen",
     "contextDefault": "Personalisiert für Ihren Standort und Ihre Vorlieben",
-    "newsTitle": "Neuigkeiten aus Kreta",
-    "noNews": "Keine Nachrichten verfügbar.",
-    "readMore": "In der App erkunden",
     "weatherUnavailable": "Wetter nicht verfügbar",
     "feels": "gefühlt"
   },
@@ -147,8 +145,8 @@
     "forLabel": "für"
   },
   "events": {
-    "title": "Veranstaltungen",
-    "nearYou": "Veranstaltungen in Ihrer Nähe",
+    "title": "Erlebnisse",
+    "nearYou": "Erlebnisse in deiner Nähe",
     "subtitle": "Entdecken Sie Festivals, Märkte, Verkostungen und mehr auf Kreta",
     "upcoming": "Bevorstehend",
     "past": "Vergangen",
@@ -181,7 +179,9 @@
     "freeEntry": "Freier Eintritt",
     "noMapPin": "Noch kein Kartenpin",
     "producers": "Erzeuger",
-    "producer": "Erzeuger"
+    "producer": "Erzeuger",
+    "farmersMarkets": "Bauernmärkte",
+    "farmersMarket": "Bauernmarkt"
   },
   "chatbot": {
     "title": "KI-Guide",

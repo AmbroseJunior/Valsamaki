@@ -3,6 +3,7 @@
     "dashboard": "首页",
     "explore": "探索",
     "events": "活动",
+    "experiences": "体验",
     "map": "地图",
     "chatbot": "AI导游",
     "business": "我的商家",
@@ -123,9 +124,6 @@
     "contextLocal": "您在克里特岛的本地指南",
     "contextResearcher": "探索克里特美食、生产商与传统文化",
     "contextDefault": "根据您的位置和偏好个性化定制",
-    "newsTitle": "克里特岛最新资讯",
-    "noNews": "暂无新闻。",
-    "readMore": "在应用内探索",
     "weatherUnavailable": "天气信息不可用",
     "feels": "体感"
   },
@@ -147,8 +145,8 @@
     "forLabel": "的"
   },
   "events": {
-    "title": "活动",
-    "nearYou": "附近的活动",
+    "title": "体验",
+    "nearYou": "附近的体验",
     "subtitle": "探索克里特岛的节日、市场、品酒会等更多活动",
     "upcoming": "即将举行",
     "past": "已结束",
@@ -181,7 +179,9 @@
     "freeEntry": "免费入场",
     "noMapPin": "暂无地图标记",
     "producers": "生产商",
-    "producer": "生产商"
+    "producer": "生产商",
+    "farmersMarkets": "农贸市场",
+    "farmersMarket": "农贸市场"
   },
   "chatbot": {
     "title": "AI导游",

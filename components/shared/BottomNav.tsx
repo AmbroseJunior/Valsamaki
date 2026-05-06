@@ -24,7 +24,7 @@ export function BottomNav() {
     { href: '/dashboard', label: t('home'), icon: Home },
     { href: '/map', label: t('map'), icon: Map },
     { href: '/explore', label: t('explore'), icon: Compass },
-    { href: '/events', label: t('events'), icon: Calendar },
+    { href: '/events', label: t('experiences'), icon: Calendar },
     { href: '/chatbot', label: t('aiChat'), icon: MessageSquare },
   ]
 

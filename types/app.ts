@@ -31,16 +31,6 @@ export interface AirQualityData {
   category: 'good' | 'moderate' | 'unhealthy' | 'hazardous'
 }
 
-export interface NewsArticle {
-  id: string
-  title: string
-  description: string
-  url: string
-  published_at: string
-  source: string
-  image_url?: string
-}
-
 export interface NearbyEntity {
   id: string
   type: 'business' | 'event'

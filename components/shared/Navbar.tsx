@@ -15,8 +15,7 @@ const NAV_LINKS = [
   { href: '/dashboard', key: 'dashboard' },
   { href: '/explore', key: 'explore' },
   { href: '/map', key: 'map' },
-  { href: '/events', key: 'events' },
-  { href: '/chatbot', key: 'chatbot' },
+  { href: '/events', key: 'experiences' },
 ]
 
 export function Navbar() {

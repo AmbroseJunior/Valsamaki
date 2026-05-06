@@ -1,4 +1,4 @@
-export const SUPPORTED_LOCALES = ['en', 'el', 'es', 'fr', 'de', 'it', 'ru', 'zh', 'ar', 'pt'] as const
+export const SUPPORTED_LOCALES = ['en', 'el', 'es', 'fr', 'de', 'it', 'nl', 'ru', 'zh', 'ar', 'pt'] as const
 export type Locale = (typeof SUPPORTED_LOCALES)[number]
 
 export const LOCALE_LABELS: Record<Locale, string> = {
@@ -8,6 +8,7 @@ export const LOCALE_LABELS: Record<Locale, string> = {
   fr: 'Français',
   de: 'Deutsch',
   it: 'Italiano',
+  nl: 'Nederlands',
   ru: 'Русский',
   zh: '中文',
   ar: 'العربية',

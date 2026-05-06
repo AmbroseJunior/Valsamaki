@@ -1,4 +1,5 @@
 import { getWeather } from '@/lib/api/external'
+import { getTranslations } from 'next-intl/server'
 import Image from 'next/image'
 import { Cloud, Droplets, Wind } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
@@ -11,12 +12,15 @@ interface WeatherWidgetProps {
 const HERAKLION = { lat: 35.3387, lng: 25.1442 }
 
 export async function WeatherWidget({ lat = HERAKLION.lat, lng = HERAKLION.lng }: WeatherWidgetProps) {
-  const weather = await getWeather(lat, lng)
+  const [weather, t] = await Promise.all([
+    getWeather(lat, lng),
+    getTranslations('dashboard'),
+  ])
 
   if (!weather) {
     return (
       <Card className="p-4">
-        <p className="text-sm text-[var(--color-muted-foreground)]">Weather unavailable</p>
+        <p className="text-sm text-[var(--color-muted-foreground)]">{t('weatherUnavailable')}</p>
       </Card>
     )
   }
@@ -44,7 +48,7 @@ export async function WeatherWidget({ lat = HERAKLION.lat, lng = HERAKLION.lng }
             <Wind className="h-3 w-3" /> {weather.wind_speed} m/s
           </span>
           <span className="flex items-center gap-1">
-            <Cloud className="h-3 w-3" /> {weather.feels_like}° feels
+            <Cloud className="h-3 w-3" /> {weather.feels_like}° {t('feels')}
           </span>
         </div>
       </CardContent>

@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react'
 import dynamic from 'next/dynamic'
 import { Search, X, MapPin, Phone, Globe, Calendar, Ticket } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
+import { useTranslations } from 'next-intl'
 import { createClient } from '@/lib/supabase/client'
 import { useLocation } from '@/hooks/useLocation'
 import { useRole } from '@/hooks/useRole'
@@ -23,6 +24,8 @@ type TabType = 'all' | 'businesses' | 'events'
 // ── Detail panels ────────────────────────────────────────────────────────────
 
 function BusinessPanel({ business, onClose }: { business: BusinessRow; onClose: () => void }) {
+  const t = useTranslations('map')
+
   return (
     <div className="bg-[var(--color-card)] rounded-[var(--radius-xl)] shadow-[var(--shadow-lg)] border border-[var(--color-border)] overflow-hidden">
       <div className="relative bg-[var(--highlight)] p-4">
@@ -64,12 +67,12 @@ function BusinessPanel({ business, onClose }: { business: BusinessRow; onClose: 
         </div>
         {business.lat && business.lng && (
           <div className="space-y-2">
-            <p className="text-xs font-semibold text-[var(--color-muted-foreground)] uppercase tracking-wide">Get there by</p>
+            <p className="text-xs font-semibold text-[var(--color-muted-foreground)] uppercase tracking-wide">{t('getDirections')}</p>
             <div className="grid grid-cols-3 gap-2">
               {[
-                { label: 'Walk', icon: '🚶', mode: 'walking' },
-                { label: 'Bus', icon: '🚌', mode: 'transit' },
-                { label: 'Drive', icon: '🚕', mode: 'driving' },
+                { label: t('walk'), icon: '🚶', mode: 'walking' },
+                { label: t('bus'), icon: '🚌', mode: 'transit' },
+                { label: t('drive'), icon: '🚕', mode: 'driving' },
               ].map(({ label, icon, mode }) => (
                 <a
                   key={mode}
@@ -89,7 +92,7 @@ function BusinessPanel({ business, onClose }: { business: BusinessRow; onClose: 
           href={`/chatbot?q=${encodeURIComponent('Tell me about ' + business.name)}`}
           className="flex items-center justify-center gap-2 w-full py-3 border-2 border-[var(--color-border)] text-[var(--color-foreground)] font-bold rounded-[var(--radius-full)] hover:border-[var(--highlight)] transition-colors text-sm"
         >
-          💬 Ask Valsamaki about this place
+          💬 {t('askAboutPlace')}
         </a>
       </div>
     </div>
@@ -97,6 +100,8 @@ function BusinessPanel({ business, onClose }: { business: BusinessRow; onClose: 
 }
 
 function EventPanel({ event, onClose }: { event: EventRow; onClose: () => void }) {
+  const t = useTranslations('map')
+
   return (
     <div className="bg-[var(--color-card)] rounded-[var(--radius-xl)] shadow-[var(--shadow-lg)] border border-[var(--color-border)] overflow-hidden">
       <div className="relative bg-[var(--color-primary)] p-4">
@@ -127,15 +132,15 @@ function EventPanel({ event, onClose }: { event: EventRow; onClose: () => void }
           )}
           <div className="flex items-center gap-2 text-sm font-semibold">
             <Ticket className="h-4 w-4 shrink-0 text-[var(--color-primary)]" />
-            <span>{event.price === 0 ? 'Free entry' : formatCurrency(event.price)}</span>
+            <span>{event.price === 0 ? t('freeEntry') : formatCurrency(event.price)}</span>
           </div>
         </div>
         {event.lat && event.lng && (
           <div className="grid grid-cols-3 gap-2">
             {[
-              { label: 'Walk', icon: '🚶', mode: 'walking' },
-              { label: 'Bus', icon: '🚌', mode: 'transit' },
-              { label: 'Drive', icon: '🚕', mode: 'driving' },
+              { label: t('walk'), icon: '🚶', mode: 'walking' },
+              { label: t('bus'), icon: '🚌', mode: 'transit' },
+              { label: t('drive'), icon: '🚕', mode: 'driving' },
             ].map(({ label, icon, mode }) => (
               <a
                 key={mode}
@@ -154,7 +159,7 @@ function EventPanel({ event, onClose }: { event: EventRow; onClose: () => void }
           href={`/chatbot?q=${encodeURIComponent('Tell me about the event: ' + event.title)}`}
           className="flex items-center justify-center gap-2 w-full py-3 border-2 border-[var(--color-border)] text-[var(--color-foreground)] font-bold rounded-[var(--radius-full)] hover:border-[var(--color-primary)] transition-colors text-sm"
         >
-          💬 Ask Valsamaki about this event
+          💬 {t('askAboutEvent')}
         </a>
       </div>
     </div>
@@ -164,6 +169,7 @@ function EventPanel({ event, onClose }: { event: EventRow; onClose: () => void }
 // ── Main page ────────────────────────────────────────────────────────────────
 
 export default function MapPage() {
+  const t = useTranslations('map')
   const [search, setSearch] = useState('')
   const [tab, setTab] = useState<TabType>('all')
   const [selectedBizId, setSelectedBizId] = useState<string | null>(null)
@@ -276,7 +282,7 @@ export default function MapPage() {
             <input
               value={search}
               onChange={(e) => { setSearch(e.target.value); clearSelection() }}
-              placeholder="Search businesses & events…"
+              placeholder={t('searchPlaceholder')}
               className="w-full pl-9 pr-9 py-2.5 rounded-[var(--radius-full)] border border-[var(--color-border)] bg-[var(--color-input)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--highlight)] transition-shadow"
             />
             {search && (
@@ -286,18 +292,18 @@ export default function MapPage() {
             )}
           </div>
           <div className="flex gap-1">
-            {(['all', 'businesses', 'events'] as const).map((t) => (
+            {(['all', 'businesses', 'events'] as const).map((tabKey) => (
               <button
-                key={t}
-                onClick={() => setTab(t)}
+                key={tabKey}
+                onClick={() => setTab(tabKey)}
                 className={cn(
                   'flex-1 py-1.5 rounded-[var(--radius-full)] text-xs font-semibold transition-colors',
-                  tab === t
+                  tab === tabKey
                     ? 'bg-[var(--highlight)] text-[var(--highlight-foreground)]'
                     : 'bg-[var(--color-muted)] text-[var(--color-muted-foreground)] hover:bg-[var(--color-border)]'
                 )}
               >
-                {t === 'all' ? '🌿 All' : t === 'businesses' ? '🏪 Places' : '🎉 Events'}
+                {tabKey === 'all' ? `🌿 ${t('all')}` : tabKey === 'businesses' ? `🏪 ${t('places')}` : `🎉 ${t('events')}`}
               </button>
             ))}
           </div>
@@ -311,7 +317,7 @@ export default function MapPage() {
                 onClick={clearSelection}
                 className="flex items-center gap-1 text-xs font-semibold text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)] mb-3 transition-colors"
               >
-                ← Back to list
+                ← {t('backToList')}
               </button>
               {selectedBiz && <BusinessPanel business={selectedBiz} onClose={clearSelection} />}
               {selectedEvt && <EventPanel event={selectedEvt} onClose={clearSelection} />}
@@ -320,7 +326,7 @@ export default function MapPage() {
             <>
               <div className="px-4 py-2.5 border-b border-[var(--color-border)] bg-[var(--color-muted)]">
                 <p className="text-xs font-semibold text-[var(--color-muted-foreground)]">
-                  {totalCount} result{totalCount !== 1 ? 's' : ''} found
+                  {totalCount} {totalCount === 1 ? t('resultFound') : t('resultsFound')}
                 </p>
               </div>
               <div className="divide-y divide-[var(--color-border)]">
@@ -343,7 +349,7 @@ export default function MapPage() {
                           </span>
                         )}
                         {!biz.lat && (
-                          <span className="text-[0.6rem] text-[var(--color-muted-foreground)] italic mt-0.5 block">No map pin yet</span>
+                          <span className="text-[0.6rem] text-[var(--color-muted-foreground)] italic mt-0.5 block">{t('noMapPin')}</span>
                         )}
                         {biz.category && (
                           <span className="inline-block mt-1 text-[0.65rem] font-semibold uppercase tracking-wide text-[var(--color-muted-foreground)] bg-[var(--color-muted)] px-2 py-0.5 rounded-full">
@@ -377,7 +383,7 @@ export default function MapPage() {
                           </span>
                         )}
                         {!evt.lat && (
-                          <span className="text-[0.6rem] text-[var(--color-muted-foreground)] italic mt-0.5 block">No map pin yet</span>
+                          <span className="text-[0.6rem] text-[var(--color-muted-foreground)] italic mt-0.5 block">{t('noMapPin')}</span>
                         )}
                       </div>
                     </div>
@@ -387,9 +393,9 @@ export default function MapPage() {
                 {totalCount === 0 && (
                   <div className="py-16 text-center">
                     <span className="text-3xl">🗺️</span>
-                    <p className="text-sm text-[var(--color-muted-foreground)] mt-2">No results found</p>
+                    <p className="text-sm text-[var(--color-muted-foreground)] mt-2">{t('noResults')}</p>
                     <button onClick={() => { setSearch(''); setTab('all') }} className="mt-2 text-xs text-[var(--highlight)] font-semibold hover:underline">
-                      Clear search
+                      {t('clearSearch')}
                     </button>
                   </div>
                 )}
@@ -405,7 +411,7 @@ export default function MapPage() {
           onClick={() => setSidebarOpen((v) => !v)}
           className="md:hidden absolute top-3 left-3 z-10 flex items-center gap-1.5 px-3 py-2 bg-[var(--color-card)] rounded-[var(--radius-full)] shadow-[var(--shadow-md)] text-xs font-semibold border border-[var(--color-border)]"
         >
-          {sidebarOpen ? 'Hide list' : 'Show list'}
+          {sidebarOpen ? t('hideList') : t('showList')}
         </button>
 
         <MapView

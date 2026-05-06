@@ -102,7 +102,7 @@ export function applySecurityHeaders(headers: Headers): void {
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob: https:",
       "font-src 'self' data:",
-      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.openweathermap.org https://openweathermap.org https://api.openaq.org https://newsapi.org https://api.deepseek.com https://generativelanguage.googleapis.com",
+      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://accounts.google.com https://api.openweathermap.org https://openweathermap.org https://api.openaq.org https://newsapi.org https://api.deepseek.com https://generativelanguage.googleapis.com",
       "frame-src 'none'",
       "object-src 'none'",
       "base-uri 'self'",

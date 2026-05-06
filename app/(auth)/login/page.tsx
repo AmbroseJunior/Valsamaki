@@ -3,6 +3,7 @@
 import { Suspense, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner'
 import { cn } from '@/lib/utils'
@@ -19,6 +20,7 @@ function safeNext(raw: string | null): string {
 
 function LoginForm() {
   const searchParams = useSearchParams()
+  const t = useTranslations('auth')
   const initialTab = searchParams.get('tab') === 'register' ? 'register' : 'login'
   const [tab, setTab] = useState<'login' | 'register'>(initialTab)
   const [email, setEmail] = useState('')
@@ -43,7 +45,7 @@ function LoginForm() {
       if (authError) throw authError
       router.push(next)
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Sign in failed. Please try again.')
+      setError(err instanceof Error ? err.message : t('signInFailed'))
     } finally {
       setLoading(false)
     }
@@ -60,28 +62,32 @@ function LoginForm() {
         options: { data: { name, role } },
       })
       if (authError) throw authError
-      if (!data.user) throw new Error('Registration failed')
+      if (!data.user) throw new Error(t('registrationFailed'))
       await supabase.from('profiles').upsert({ id: data.user.id, name, role, language: 'en' })
       router.push('/onboarding')
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Registration failed. Please try again.')
+      setError(err instanceof Error ? err.message : t('registrationFailed'))
     } finally {
       setLoading(false)
     }
   }
 
   async function handleGoogle() {
-    await supabase.auth.signInWithOAuth({
+    setError('')
+    const { error: oauthError } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}` },
     })
+    if (oauthError) setError(oauthError.message)
   }
 
   async function handleFacebook() {
-    await supabase.auth.signInWithOAuth({
+    setError('')
+    const { error: oauthError } = await supabase.auth.signInWithOAuth({
       provider: 'facebook',
       options: { redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}` },
     })
+    if (oauthError) setError(oauthError.message)
   }
 
   return (
@@ -93,7 +99,7 @@ function LoginForm() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/logo.svg" alt="valsamaki" className="w-14 h-14" />
             <span className="font-display font-semibold text-2xl text-[var(--color-foreground)]">valsamaki</span>
-            <span className="text-sm text-[var(--color-muted-foreground)]">Discover authentic Crete</span>
+            <span className="text-sm text-[var(--color-muted-foreground)]">{t('discoverCrete')}</span>
           </Link>
         </div>
 
@@ -107,18 +113,18 @@ function LoginForm() {
         <div className="bg-[var(--color-card)] rounded-[var(--radius-2xl)] border border-[var(--color-border)] shadow-[var(--shadow-lg)] overflow-hidden">
           {/* Tabs */}
           <div className="flex border-b border-[var(--color-border)]">
-            {(['login', 'register'] as const).map((t) => (
+            {(['login', 'register'] as const).map((tabKey) => (
               <button
-                key={t}
-                onClick={() => { setTab(t); setError('') }}
+                key={tabKey}
+                onClick={() => { setTab(tabKey); setError('') }}
                 className={cn(
                   'flex-1 py-4 text-sm font-bold transition-colors',
-                  tab === t
+                  tab === tabKey
                     ? 'border-b-2 border-[var(--highlight)] text-[var(--color-foreground)]'
                     : 'text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)]'
                 )}
               >
-                {t === 'login' ? 'Log In' : 'Sign Up'}
+                {tabKey === 'login' ? t('logIn') : t('signUp')}
               </button>
             ))}
           </div>
@@ -127,7 +133,7 @@ function LoginForm() {
             {tab === 'login' ? (
               <form onSubmit={handleSignIn} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-semibold text-[var(--color-muted-foreground)] mb-1.5 uppercase tracking-wide">Email</label>
+                  <label className="block text-xs font-semibold text-[var(--color-muted-foreground)] mb-1.5 uppercase tracking-wide">{t('email')}</label>
                   <input
                     type="email"
                     value={email}
@@ -139,7 +145,7 @@ function LoginForm() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-[var(--color-muted-foreground)] mb-1.5 uppercase tracking-wide">Password</label>
+                  <label className="block text-xs font-semibold text-[var(--color-muted-foreground)] mb-1.5 uppercase tracking-wide">{t('password')}</label>
                   <div className="relative">
                     <input
                       type={showPw ? 'text' : 'password'}
@@ -160,13 +166,13 @@ function LoginForm() {
                   disabled={loading}
                   className="w-full py-3 bg-[var(--highlight)] text-[var(--highlight-foreground)] font-bold rounded-[var(--radius-full)] hover:bg-[var(--highlight-dark)] transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
                 >
-                  {loading ? <LoadingSpinner size="sm" /> : 'Log In'}
+                  {loading ? <LoadingSpinner size="sm" /> : t('logIn')}
                 </button>
               </form>
             ) : (
               <form onSubmit={handleRegister} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-semibold text-[var(--color-muted-foreground)] mb-1.5 uppercase tracking-wide">Full Name</label>
+                  <label className="block text-xs font-semibold text-[var(--color-muted-foreground)] mb-1.5 uppercase tracking-wide">{t('fullName')}</label>
                   <input
                     value={name}
                     onChange={(e) => setName(e.target.value)}
@@ -176,7 +182,7 @@ function LoginForm() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-[var(--color-muted-foreground)] mb-1.5 uppercase tracking-wide">Email</label>
+                  <label className="block text-xs font-semibold text-[var(--color-muted-foreground)] mb-1.5 uppercase tracking-wide">{t('email')}</label>
                   <input
                     type="email"
                     value={email}
@@ -188,7 +194,7 @@ function LoginForm() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-[var(--color-muted-foreground)] mb-1.5 uppercase tracking-wide">Password</label>
+                  <label className="block text-xs font-semibold text-[var(--color-muted-foreground)] mb-1.5 uppercase tracking-wide">{t('password')}</label>
                   <div className="relative">
                     <input
                       type={showPw ? 'text' : 'password'}
@@ -196,7 +202,7 @@ function LoginForm() {
                       onChange={(e) => setPassword(e.target.value)}
                       required
                       minLength={8}
-                      placeholder="Min. 8 characters"
+                      placeholder={t('minChars', { n: 8 })}
                       className="w-full px-4 py-3 pr-11 rounded-[var(--radius)] border border-[var(--color-border)] bg-[var(--color-input)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--highlight)] transition-shadow"
                     />
                     <button type="button" onClick={() => setShowPw((v) => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-muted-foreground)]">
@@ -205,7 +211,7 @@ function LoginForm() {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-[var(--color-muted-foreground)] mb-1.5 uppercase tracking-wide">I am a…</label>
+                  <label className="block text-xs font-semibold text-[var(--color-muted-foreground)] mb-1.5 uppercase tracking-wide">{t('iAmA')}</label>
                   <div className="grid grid-cols-2 gap-2">
                     {(['user', 'producer'] as const).map((r) => (
                       <button
@@ -219,7 +225,7 @@ function LoginForm() {
                             : 'border-[var(--color-border)] hover:bg-[var(--color-muted)] text-[var(--color-foreground)]'
                         )}
                       >
-                        {r === 'user' ? '🗺️ Visitor' : '🧑‍🌾 Producer'}
+                        {r === 'user' ? `🗺️ ${t('visitor')}` : `🧑‍🌾 ${t('producer')}`}
                       </button>
                     ))}
                   </div>
@@ -230,7 +236,7 @@ function LoginForm() {
                   disabled={loading}
                   className="w-full py-3 bg-[var(--highlight)] text-[var(--highlight-foreground)] font-bold rounded-[var(--radius-full)] hover:bg-[var(--highlight-dark)] transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
                 >
-                  {loading ? <LoadingSpinner size="sm" /> : 'Create Account'}
+                  {loading ? <LoadingSpinner size="sm" /> : t('createAccountBtn')}
                 </button>
               </form>
             )}
@@ -241,7 +247,7 @@ function LoginForm() {
                 <div className="w-full border-t border-[var(--color-border)]" />
               </div>
               <div className="relative flex justify-center">
-                <span className="bg-[var(--color-card)] px-3 text-xs text-[var(--color-muted-foreground)] uppercase tracking-wide">or continue with</span>
+                <span className="bg-[var(--color-card)] px-3 text-xs text-[var(--color-muted-foreground)] uppercase tracking-wide">{t('continueWith')}</span>
               </div>
             </div>
 
@@ -277,14 +283,14 @@ function LoginForm() {
                 href="/"
                 className="text-xs text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)] underline-offset-2 hover:underline transition-colors"
               >
-                Continue as guest →
+                {t('continueAsGuest')}
               </Link>
             </div>
           </div>
         </div>
 
         <p className="text-xs text-center text-[var(--color-muted-foreground)] mt-4">
-          By signing up you agree to our terms of service and privacy policy.
+          {t('agreeTos')}
         </p>
       </div>
     </div>

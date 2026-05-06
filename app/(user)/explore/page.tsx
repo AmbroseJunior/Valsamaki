@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useSearchParams } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { FilterBar } from '@/components/shared/FilterBar'
 import { ExperienceCard } from '@/components/explore/ExperienceCard'
 import { ExperienceModal } from '@/components/explore/ExperienceModal'
@@ -25,11 +26,18 @@ function searchExperiences(items: Experience[], category: ExperienceCategory, q:
 
 export default function ExplorePage() {
   const params = useSearchParams()
+  const t = useTranslations('explore')
   const [activeCategory, setActiveCategory] = useState<ExperienceCategory>('all')
   const [query, setQuery] = useState(params.get('q') ?? '')
   const [selectedExp, setSelectedExp] = useState<Experience | null>(null)
 
   const filtered = searchExperiences(EXPERIENCES, activeCategory, query)
+
+  const countLabel = query.trim()
+    ? `${filtered.length === 1 ? t('result') : t('results')} ${t('forLabel')} "${query}"`
+    : activeCategory === 'all'
+      ? t('experiences')
+      : activeCategory.replace('_', ' ')
 
   return (
     <>
@@ -40,9 +48,9 @@ export default function ExplorePage() {
           <div className="flex items-center gap-2 flex-1">
             <Sparkles className="h-5 w-5 text-[var(--highlight)] shrink-0" />
             <div>
-              <h1 className="font-display font-bold text-2xl text-[var(--color-foreground)]">Explore Crete</h1>
+              <h1 className="font-display font-bold text-2xl text-[var(--color-foreground)]">{t('title')}</h1>
               <p className="text-sm text-[var(--color-muted-foreground)] mt-0.5">
-                {filtered.length} {query.trim() ? `result${filtered.length !== 1 ? 's' : ''} for "${query}"` : activeCategory === 'all' ? 'experiences' : activeCategory.replace('_', ' ')}
+                {filtered.length} {countLabel}
               </p>
             </div>
           </div>
@@ -52,7 +60,7 @@ export default function ExplorePage() {
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search experiences, places, tags…"
+              placeholder={t('searchExperiences')}
               className="w-full pl-9 pr-9 py-2.5 rounded-[var(--radius-full)] border border-[var(--color-border)] bg-[var(--color-input)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--highlight)] transition-shadow"
             />
             {query && (
@@ -73,17 +81,17 @@ export default function ExplorePage() {
           <div className="text-center py-20 text-[var(--color-muted-foreground)]">
             <span className="text-4xl">🔍</span>
             <p className="mt-3 font-semibold">
-              {query ? `No results for "${query}"` : 'No experiences in this category yet.'}
+              {query ? t('noResultsQuery', { query }) : t('noResultsCategory')}
             </p>
             <p className="text-sm mt-1">
-              {query ? 'Try a different keyword or clear the search.' : 'More coming soon!'}
+              {query ? t('tryDifferent') : t('moreSoon')}
             </p>
             {query && (
               <button
                 onClick={() => setQuery('')}
                 className="mt-3 text-sm text-[var(--highlight)] font-semibold hover:underline"
               >
-                Clear search
+                {t('clearSearch')}
               </button>
             )}
           </div>

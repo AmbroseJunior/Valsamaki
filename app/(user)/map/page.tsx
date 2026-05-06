@@ -37,12 +37,134 @@ interface RoutePanelProps {
   hasCoords: boolean
 }
 
+// ── Route metrics card ────────────────────────────────────────────────────────
+
+function fmtMins(s: number) {
+  const m = Math.round(s / 60)
+  return m < 60 ? `${m} min` : `${Math.floor(m / 60)}h ${m % 60}m`
+}
+
+function RouteMetricsCard({ mode, info }: { mode: RouteMode; info: RouteInfo }) {
+  const { distanceM, durationS } = info
+
+  // Derived metrics
+  const steps      = Math.round(distanceM / 0.762)
+  const calories   = Math.round(distanceM * 0.065)          // ~65 kcal/km walking
+  const co2g       = Math.round(distanceM * 0.12)           // 120 g CO₂/km avg car
+  const fuelEur    = ((distanceM / 1000) * 7 / 100 * 1.85).toFixed(2) // 7 L/100 km @ €1.85
+
+  // Estimated times for all 3 modes (ratios from the known mode)
+  const walkS  = mode === 'walking'  ? durationS : mode === 'driving' ? durationS * 4.2 : durationS * 1.8
+  const busS   = mode === 'transit'  ? durationS : mode === 'driving' ? durationS * 2.4 : durationS * 0.55
+  const driveS = mode === 'driving'  ? durationS : mode === 'walking' ? durationS * 0.24 : durationS * 0.42
+  const maxS   = Math.max(walkS, busS, driveS)
+
+  const modeConfig = {
+    walking: {
+      color: 'text-green-700 dark:text-green-400',
+      bg: 'bg-green-50 dark:bg-green-950/40',
+      border: 'border-green-300 dark:border-green-700',
+      barColor: 'bg-green-500',
+      metrics: [
+        { icon: '👣', label: 'Steps',    value: steps.toLocaleString() },
+        { icon: '🔥', label: 'Calories', value: `~${calories} kcal` },
+        { icon: '🌱', label: 'CO₂',      value: 'Zero' },
+      ],
+    },
+    transit: {
+      color: 'text-blue-700 dark:text-blue-400',
+      bg: 'bg-blue-50 dark:bg-blue-950/40',
+      border: 'border-blue-300 dark:border-blue-700',
+      barColor: 'bg-blue-500',
+      metrics: [
+        { icon: '🪙', label: 'Est. fare',   value: '~€1.20' },
+        { icon: '🌱', label: 'CO₂ saved',   value: `−${Math.round(co2g * 0.7)} g` },
+        { icon: '♿', label: 'Accessible',  value: 'Most stops' },
+      ],
+    },
+    driving: {
+      color: 'text-red-700 dark:text-red-400',
+      bg: 'bg-red-50 dark:bg-red-950/40',
+      border: 'border-red-300 dark:border-red-700',
+      barColor: 'bg-red-500',
+      metrics: [
+        { icon: '⛽', label: 'Fuel est.', value: `~€${fuelEur}` },
+        { icon: '💨', label: 'CO₂',       value: `~${co2g} g` },
+        { icon: '🅿️', label: 'Parking',   value: 'Plan ahead' },
+      ],
+    },
+  }
+
+  const cfg = modeConfig[mode]
+  const bars = [
+    { icon: '🚶', label: 'Walk',  s: walkS,  barCls: 'bg-green-400', active: mode === 'walking' },
+    { icon: '🚌', label: 'Bus',   s: busS,   barCls: 'bg-blue-400',  active: mode === 'transit' },
+    { icon: '🚕', label: 'Drive', s: driveS, barCls: 'bg-red-400',   active: mode === 'driving' },
+  ]
+
+  return (
+    <div className={`rounded-[var(--radius-xl)] border-2 ${cfg.border} ${cfg.bg} overflow-hidden`}>
+      {/* Header — duration + distance */}
+      <div className="flex items-center justify-between px-4 py-3 border-b border-inherit">
+        <div>
+          <p className={`text-2xl font-bold leading-tight ${cfg.color}`}>{info.duration}</p>
+          <p className="text-[11px] text-[var(--color-muted-foreground)] mt-0.5">
+            {info.distance} from your location
+          </p>
+        </div>
+        <span className="text-3xl leading-none">
+          {mode === 'walking' ? '🚶' : mode === 'transit' ? '🚌' : '🚕'}
+        </span>
+      </div>
+
+      {/* Metrics row — 3 columns */}
+      <div className="grid grid-cols-3 divide-x divide-[var(--color-border)]">
+        {cfg.metrics.map((m) => (
+          <div key={m.label} className="flex flex-col items-center gap-0.5 px-2 py-3 text-center">
+            <span className="text-base leading-none">{m.icon}</span>
+            <p className="text-[11px] font-bold text-[var(--color-foreground)] mt-1 leading-tight">{m.value}</p>
+            <p className="text-[9px] text-[var(--color-muted-foreground)] uppercase tracking-wide">{m.label}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Mode comparison bars */}
+      <div className="px-3 pb-3 pt-2 border-t border-inherit space-y-2">
+        <p className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-muted-foreground)] mb-1">
+          Mode comparison
+        </p>
+        {bars.map(({ icon, label, s, barCls, active }) => (
+          <div key={label} className="flex items-center gap-2">
+            <span className="text-xs w-4 shrink-0">{icon}</span>
+            <div className="flex-1 bg-[var(--color-border)] rounded-full h-2.5 overflow-hidden">
+              <div
+                className={`h-full rounded-full transition-all duration-700 ${barCls} ${active ? 'opacity-100' : 'opacity-40'}`}
+                style={{ width: `${Math.max(6, (s / maxS) * 100)}%` }}
+              />
+            </div>
+            <span className={cn(
+              'text-[10px] font-semibold w-12 text-right shrink-0',
+              active ? cfg.color : 'text-[var(--color-muted-foreground)]'
+            )}>
+              {fmtMins(s)}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ── Direction buttons ─────────────────────────────────────────────────────────
+
 function DirectionButtons({ activeRouteMode, onRouteMode, routeInfo, hasCoords }: RoutePanelProps) {
   const t = useTranslations('map')
+  const isCalculating = activeRouteMode !== null && routeInfo === null
+
   const modes: { label: string; icon: string; mode: RouteMode }[] = [
     { label: t('walk'), icon: '🚶', mode: 'walking' },
-    { label: t('bus'), icon: '🚌', mode: 'transit' },
-    { label: t('drive'), icon: '🚕', mode: 'driving' },
+    { label: t('bus'),  icon: '🚌', mode: 'transit' },
+    { label: t('drive'),icon: '🚕', mode: 'driving' },
   ]
   return (
     <div className="space-y-2">
@@ -69,16 +191,25 @@ function DirectionButtons({ activeRouteMode, onRouteMode, routeInfo, hasCoords }
         ))}
       </div>
 
-      {routeInfo && activeRouteMode && (
-        <div className="flex items-center justify-between bg-[var(--color-muted)] rounded-[var(--radius-lg)] px-3 py-2 mt-1">
-          <div>
-            <p className="text-sm font-bold text-[var(--color-foreground)]">{routeInfo.duration}</p>
-            <p className="text-xs text-[var(--color-muted-foreground)]">{routeInfo.distance}</p>
+      {/* Loading skeleton while OSRM calculates */}
+      {isCalculating && (
+        <div className="rounded-[var(--radius-xl)] border border-[var(--color-border)] p-4 animate-pulse space-y-2">
+          <div className="flex justify-between">
+            <div className="h-6 w-16 bg-[var(--color-muted)] rounded" />
+            <div className="h-8 w-8 bg-[var(--color-muted)] rounded-full" />
           </div>
-          <span className="text-2xl">
-            {activeRouteMode === 'walking' ? '🚶' : activeRouteMode === 'transit' ? '🚌' : '🚕'}
-          </span>
+          <div className="grid grid-cols-3 gap-2">
+            {[0,1,2].map(i => <div key={i} className="h-10 bg-[var(--color-muted)] rounded" />)}
+          </div>
+          <div className="space-y-1.5">
+            {[0,1,2].map(i => <div key={i} className="h-2.5 bg-[var(--color-muted)] rounded-full" />)}
+          </div>
         </div>
+      )}
+
+      {/* Rich metrics card */}
+      {routeInfo && activeRouteMode && !isCalculating && (
+        <RouteMetricsCard mode={activeRouteMode} info={routeInfo} />
       )}
 
       {!hasCoords && (

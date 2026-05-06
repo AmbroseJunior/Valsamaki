@@ -159,7 +159,12 @@ export default function MapInner({
 
         const distKm = (route.distance / 1000).toFixed(1)
         const durMin = Math.round(route.duration / 60)
-        onRouteInfo?.({ distance: `${distKm} km`, duration: `${durMin} min` })
+        onRouteInfo?.({
+          distance: `${distKm} km`,
+          duration: durMin < 60 ? `${durMin} min` : `${Math.floor(durMin / 60)}h ${durMin % 60}m`,
+          distanceM: route.distance,
+          durationS: route.duration,
+        })
       })
       .catch(() => {
         if (!cancelled) onRouteInfo?.(null)

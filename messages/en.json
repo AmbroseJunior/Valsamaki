@@ -179,7 +179,9 @@
     "askAboutPlace": "Ask Valsamaki about this place",
     "askAboutEvent": "Ask Valsamaki about this event",
     "freeEntry": "Free entry",
-    "noMapPin": "No map pin yet"
+    "noMapPin": "No map pin yet",
+    "producers": "Producers",
+    "producer": "Producer"
   },
   "chatbot": {
     "title": "AI Guide",

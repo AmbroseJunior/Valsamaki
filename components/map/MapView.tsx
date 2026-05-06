@@ -22,7 +22,7 @@ export interface MapMarker {
   id: string
   lat: number
   lng: number
-  type: 'business' | 'event' | 'user'
+  type: 'business' | 'event' | 'user' | 'producer'
   label: string
   category?: string
 }

@@ -3,7 +3,6 @@ import { validateLatLng } from '@/lib/security'
 import type { WeatherData, AirQualityData, NewsArticle } from '@/types/app'
 
 const WEATHER_KEY = process.env.OPENWEATHERMAP_API_KEY
-const NEWS_KEY = process.env.NEWS_API_KEY
 
 export async function getWeather(lat: number, lng: number): Promise<WeatherData | null> {
   if (!WEATHER_KEY) {
@@ -66,34 +65,81 @@ export async function getAirQuality(lat: number, lng: number): Promise<AirQualit
   }
 }
 
+// ── Cretan news via RSS scraping ─────────────────────────────────────────────
+// Sources: GTP Headlines (Greek Travel Pages) and Tomos News — both Crete-focused.
+// No external API key required; falls back gracefully if a feed is unreachable.
+
+const NEWS_FEEDS = [
+  { url: 'https://news.gtp.gr/feed/', name: 'GTP Headlines' },
+  { url: 'https://www.tomosnews.gr/feed/', name: 'Tomos News' },
+]
+
 export async function getCretanNews(): Promise<NewsArticle[]> {
-  if (!NEWS_KEY) {
-    logger.warn('NEWS_API_KEY not set — returning empty news')
-    return []
-  }
-
-  try {
-    const q = encodeURIComponent('(Crete OR Cretan) AND (food OR "olive oil" OR wine OR cuisine OR producer OR agriculture OR culture OR festival OR tradition OR Mediterranean OR organic)')
-    const url = `https://newsapi.org/v2/everything?q=${q}&language=en&sortBy=relevancy&pageSize=20&apiKey=${NEWS_KEY}`
-    const res = await fetch(url, { next: { revalidate: 3600 } })
-    if (!res.ok) throw new Error(`News API ${res.status}`)
-
-    const data = await res.json()
-    return (data.articles ?? []).map(
-      (a: Record<string, unknown>, i: number) => ({
-        id: String(i),
-        title: a.title,
-        description: a.description,
-        url: a.url,
-        published_at: a.publishedAt,
-        source: (a.source as Record<string, string>)?.name,
-        image_url: a.urlToImage,
+  const results = await Promise.allSettled(
+    NEWS_FEEDS.map(async ({ url, name }) => {
+      const res = await fetch(url, {
+        next: { revalidate: 3600 },
+        headers: { 'User-Agent': 'Valsamaki/1.0 news-aggregator' },
+        signal: AbortSignal.timeout(8000),
       })
-    )
-  } catch (err) {
-    logger.error('getCretanNews failed', err)
-    return []
+      if (!res.ok) throw new Error(`${name} HTTP ${res.status}`)
+      return parseRSSFeed(await res.text(), name)
+    })
+  )
+
+  const all: NewsArticle[] = []
+  results.forEach((r, i) => {
+    if (r.status === 'fulfilled') all.push(...r.value)
+    else logger.warn(`getCretanNews: ${NEWS_FEEDS[i].name} failed`, r.reason)
+  })
+  return all
+}
+
+function parseRSSFeed(xml: string, source: string): NewsArticle[] {
+  const items: NewsArticle[] = []
+  const itemRx = /<item>([\s\S]*?)<\/item>/g
+  let m: RegExpExecArray | null
+  let idx = 0
+
+  while ((m = itemRx.exec(xml)) !== null) {
+    const block = m[1]
+    const title = extractCdata(block, 'title') || extractTag(block, 'title')
+    if (!title) continue
+
+    const rawDesc = extractCdata(block, 'description') || extractTag(block, 'description')
+    const image_url =
+      block.match(/media:content[^>]*url="([^"]+)"/)?.[1] ||
+      block.match(/media:thumbnail[^>]*url="([^"]+)"/)?.[1] ||
+      block.match(/<enclosure[^>]+url="([^"]+)"[^>]+type="image/)?.[1] ||
+      rawDesc.match(/<img[^>]+src="(https?:\/\/[^"]+)"/)?.[1]
+
+    items.push({
+      id: `${source}-${idx++}`,
+      title: decodeEntities(title),
+      description: decodeEntities(stripHtml(rawDesc).slice(0, 300)),
+      url: extractTag(block, 'link') || extractTag(block, 'guid'),
+      published_at: extractTag(block, 'pubDate'),
+      source,
+      image_url: image_url?.trim(),
+    })
   }
+  return items
+}
+
+function extractTag(xml: string, tag: string): string {
+  return xml.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`))?.[1]?.trim() ?? ''
+}
+function extractCdata(xml: string, tag: string): string {
+  return xml.match(new RegExp(`<${tag}[^>]*><!\\[CDATA\\[([\\s\\S]*?)\\]\\]><\\/${tag}>`))?.[1]?.trim() ?? ''
+}
+function stripHtml(s: string): string {
+  return s.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
+}
+function decodeEntities(s: string): string {
+  return s
+    .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"').replace(/&#039;|&apos;/g, "'")
+    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)))
 }
 
 function mockWeather(): WeatherData {

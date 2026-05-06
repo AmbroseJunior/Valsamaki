@@ -179,7 +179,9 @@
     "askAboutPlace": "Спросить Valsamaki об этом месте",
     "askAboutEvent": "Спросить Valsamaki об этом мероприятии",
     "freeEntry": "Бесплатный вход",
-    "noMapPin": "Нет отметки на карте"
+    "noMapPin": "Нет отметки на карте",
+    "producers": "Производители",
+    "producer": "Производитель"
   },
   "chatbot": {
     "title": "ИИ-гид",

@@ -179,7 +179,9 @@
     "askAboutPlace": "اسأل Valsamaki عن هذا المكان",
     "askAboutEvent": "اسأل Valsamaki عن هذه الفعالية",
     "freeEntry": "دخول مجاني",
-    "noMapPin": "لا يوجد دبوس خريطة بعد"
+    "noMapPin": "لا يوجد دبوس خريطة بعد",
+    "producers": "المنتجون",
+    "producer": "منتج"
   },
   "chatbot": {
     "title": "دليل الذكاء الاصطناعي",

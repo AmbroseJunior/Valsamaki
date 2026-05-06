@@ -179,7 +179,9 @@
     "askAboutPlace": "Pregunta a Valsamaki sobre este lugar",
     "askAboutEvent": "Pregunta a Valsamaki sobre este evento",
     "freeEntry": "Entrada gratuita",
-    "noMapPin": "Sin ubicación en el mapa aún"
+    "noMapPin": "Sin ubicación en el mapa aún",
+    "producers": "Productores",
+    "producer": "Productor"
   },
   "chatbot": {
     "title": "Guía IA",

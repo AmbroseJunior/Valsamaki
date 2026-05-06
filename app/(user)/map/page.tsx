@@ -19,23 +19,53 @@ const MapView = dynamic(
   { ssr: false, loading: () => <div className="w-full h-full bg-[var(--color-muted)] animate-pulse rounded-[var(--radius)]" /> }
 )
 
-type TabType = 'all' | 'businesses' | 'events'
+type TabType = 'all' | 'businesses' | 'events' | 'producers'
+
+type BusinessWithOwner = BusinessRow & {
+  profiles?: { role: string; name: string | null } | null
+}
+
+// ── Directions helper ─────────────────────────────────────────────────────────
+// Falls back to address-based Google Maps search when lat/lng are absent.
+function directionsUrl(
+  lat: number | null | undefined,
+  lng: number | null | undefined,
+  address: string | null | undefined,
+  mode: string
+): string | null {
+  if (lat && lng) {
+    return `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=${mode}`
+  }
+  if (address) {
+    return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${address}, Crete, Greece`)}&travelmode=${mode}`
+  }
+  return null
+}
 
 // ── Detail panels ────────────────────────────────────────────────────────────
 
-function BusinessPanel({ business, onClose }: { business: BusinessRow; onClose: () => void }) {
+function BusinessPanel({ business, isProducer = false, onClose }: { business: BusinessWithOwner; isProducer?: boolean; onClose: () => void }) {
   const t = useTranslations('map')
+  const headerBg = isProducer ? 'bg-[var(--color-primary)]' : 'bg-[var(--highlight)]'
+  const headerText = 'text-[var(--highlight-foreground)]'
+
+  const directionModes = [
+    { label: t('walk'), icon: '🚶', mode: 'walking' },
+    { label: t('bus'), icon: '🚌', mode: 'transit' },
+    { label: t('drive'), icon: '🚕', mode: 'driving' },
+  ]
+  const hasDirections = business.lat || business.lng || business.address
 
   return (
     <div className="bg-[var(--color-card)] rounded-[var(--radius-xl)] shadow-[var(--shadow-lg)] border border-[var(--color-border)] overflow-hidden">
-      <div className="relative bg-[var(--highlight)] p-4">
+      <div className={`relative ${headerBg} p-4`}>
         <button onClick={onClose} className="absolute top-3 right-3 p-1.5 rounded-full bg-black/20 hover:bg-black/30 transition-colors">
           <X className="h-4 w-4 text-white" />
         </button>
         <div className="pr-8">
-          <h3 className="font-display font-bold text-lg text-[var(--highlight-foreground)] leading-snug">{business.name}</h3>
-          <span className="text-[0.65rem] font-bold uppercase tracking-wide bg-black/20 text-[var(--highlight-foreground)] px-2 py-0.5 rounded-full mt-1 inline-block">
-            {business.category?.replace(/_/g, ' ') ?? 'Business'}
+          <h3 className={`font-display font-bold text-lg ${headerText} leading-snug`}>{business.name}</h3>
+          <span className={`text-[0.65rem] font-bold uppercase tracking-wide bg-black/20 ${headerText} px-2 py-0.5 rounded-full mt-1 inline-block`}>
+            {isProducer ? `🫒 ${t('producer')}` : (business.category?.replace(/_/g, ' ') ?? 'Business')}
           </span>
         </div>
       </div>
@@ -65,29 +95,31 @@ function BusinessPanel({ business, onClose }: { business: BusinessRow; onClose: 
             </div>
           )}
         </div>
-        {business.lat && business.lng && (
+
+        {hasDirections && (
           <div className="space-y-2">
             <p className="text-xs font-semibold text-[var(--color-muted-foreground)] uppercase tracking-wide">{t('getDirections')}</p>
             <div className="grid grid-cols-3 gap-2">
-              {[
-                { label: t('walk'), icon: '🚶', mode: 'walking' },
-                { label: t('bus'), icon: '🚌', mode: 'transit' },
-                { label: t('drive'), icon: '🚕', mode: 'driving' },
-              ].map(({ label, icon, mode }) => (
-                <a
-                  key={mode}
-                  href={`https://www.google.com/maps/dir/?api=1&destination=${business.lat},${business.lng}&travelmode=${mode}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex flex-col items-center gap-1 py-2.5 rounded-[var(--radius-lg)] border border-[var(--color-border)] hover:border-[var(--highlight)] hover:bg-[var(--highlight)]/5 transition-colors text-center"
-                >
-                  <span className="text-xl">{icon}</span>
-                  <span className="text-[10px] font-semibold text-[var(--color-muted-foreground)]">{label}</span>
-                </a>
-              ))}
+              {directionModes.map(({ label, icon, mode }) => {
+                const url = directionsUrl(business.lat, business.lng, business.address, mode)
+                if (!url) return null
+                return (
+                  <a
+                    key={mode}
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex flex-col items-center gap-1 py-2.5 rounded-[var(--radius-lg)] border border-[var(--color-border)] hover:border-[var(--highlight)] hover:bg-[var(--highlight)]/5 transition-colors text-center"
+                  >
+                    <span className="text-xl">{icon}</span>
+                    <span className="text-[10px] font-semibold text-[var(--color-muted-foreground)]">{label}</span>
+                  </a>
+                )
+              })}
             </div>
           </div>
         )}
+
         <a
           href={`/chatbot?q=${encodeURIComponent('Tell me about ' + business.name)}`}
           className="flex items-center justify-center gap-2 w-full py-3 border-2 border-[var(--color-border)] text-[var(--color-foreground)] font-bold rounded-[var(--radius-full)] hover:border-[var(--highlight)] transition-colors text-sm"
@@ -101,6 +133,13 @@ function BusinessPanel({ business, onClose }: { business: BusinessRow; onClose: 
 
 function EventPanel({ event, onClose }: { event: EventRow; onClose: () => void }) {
   const t = useTranslations('map')
+  const hasDirections = event.lat || event.lng || event.address
+
+  const directionModes = [
+    { label: t('walk'), icon: '🚶', mode: 'walking' },
+    { label: t('bus'), icon: '🚌', mode: 'transit' },
+    { label: t('drive'), icon: '🚕', mode: 'driving' },
+  ]
 
   return (
     <div className="bg-[var(--color-card)] rounded-[var(--radius-xl)] shadow-[var(--shadow-lg)] border border-[var(--color-border)] overflow-hidden">
@@ -135,26 +174,28 @@ function EventPanel({ event, onClose }: { event: EventRow; onClose: () => void }
             <span>{event.price === 0 ? t('freeEntry') : formatCurrency(event.price)}</span>
           </div>
         </div>
-        {event.lat && event.lng && (
+
+        {hasDirections && (
           <div className="grid grid-cols-3 gap-2">
-            {[
-              { label: t('walk'), icon: '🚶', mode: 'walking' },
-              { label: t('bus'), icon: '🚌', mode: 'transit' },
-              { label: t('drive'), icon: '🚕', mode: 'driving' },
-            ].map(({ label, icon, mode }) => (
-              <a
-                key={mode}
-                href={`https://www.google.com/maps/dir/?api=1&destination=${event.lat},${event.lng}&travelmode=${mode}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex flex-col items-center gap-1 py-2.5 rounded-[var(--radius-lg)] border border-[var(--color-border)] hover:border-[var(--color-primary)] hover:bg-[var(--color-primary)]/5 transition-colors text-center"
-              >
-                <span className="text-xl">{icon}</span>
-                <span className="text-[10px] font-semibold text-[var(--color-muted-foreground)]">{label}</span>
-              </a>
-            ))}
+            {directionModes.map(({ label, icon, mode }) => {
+              const url = directionsUrl(event.lat, event.lng, event.address, mode)
+              if (!url) return null
+              return (
+                <a
+                  key={mode}
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex flex-col items-center gap-1 py-2.5 rounded-[var(--radius-lg)] border border-[var(--color-border)] hover:border-[var(--color-primary)] hover:bg-[var(--color-primary)]/5 transition-colors text-center"
+                >
+                  <span className="text-xl">{icon}</span>
+                  <span className="text-[10px] font-semibold text-[var(--color-muted-foreground)]">{label}</span>
+                </a>
+              )
+            })}
           </div>
         )}
+
         <a
           href={`/chatbot?q=${encodeURIComponent('Tell me about the event: ' + event.title)}`}
           className="flex items-center justify-center gap-2 w-full py-3 border-2 border-[var(--color-border)] text-[var(--color-foreground)] font-bold rounded-[var(--radius-full)] hover:border-[var(--color-primary)] transition-colors text-sm"
@@ -179,16 +220,20 @@ export default function MapPage() {
   const { coords } = useLocation(userId)
   const supabase = createClient()
 
-  // OWASP A03 — cap search length before it reaches the DB query
   const s = search.trim().slice(0, 100)
 
-  const { data: businesses = [] } = useQuery({
+  // Join profiles to identify producer-owned businesses
+  const { data: rawBusinesses = [] } = useQuery({
     queryKey: ['businesses-map', s],
-    queryFn: async (): Promise<BusinessRow[]> => {
-      let q = supabase.from('businesses').select('*').eq('is_active', true).limit(100)
+    queryFn: async (): Promise<BusinessWithOwner[]> => {
+      let q = supabase
+        .from('businesses')
+        .select('*, profiles!owner_id(role, name)')
+        .eq('is_active', true)
+        .limit(100)
       if (s) q = q.or(`name.ilike.%${s}%,description.ilike.%${s}%,address.ilike.%${s}%,category.ilike.%${s}%`)
       const { data } = await q
-      return (data ?? []) as BusinessRow[]
+      return (data ?? []) as unknown as BusinessWithOwner[]
     },
   })
 
@@ -208,9 +253,15 @@ export default function MapPage() {
     },
   })
 
+  // Producers = businesses whose owner has role 'producer'
+  const producers = useMemo(
+    () => rawBusinesses.filter((b) => b.profiles?.role === 'producer'),
+    [rawBusinesses]
+  )
+
   const selectedBiz = useMemo(
-    () => (selectedBizId ? (businesses.find((b) => b.id === selectedBizId) ?? null) : null),
-    [selectedBizId, businesses]
+    () => (selectedBizId ? (rawBusinesses.find((b) => b.id === selectedBizId) ?? null) : null),
+    [selectedBizId, rawBusinesses]
   )
   const selectedEvt = useMemo(
     () => (selectedEvtId ? (events.find((e) => e.id === selectedEvtId) ?? null) : null),
@@ -224,7 +275,7 @@ export default function MapPage() {
     setSelectedEvtId(null)
   }
 
-  function selectBiz(biz: BusinessRow) {
+  function selectBiz(biz: BusinessWithOwner) {
     setSelectedBizId(biz.id)
     setSelectedEvtId(null)
     setSidebarOpen(true)
@@ -237,14 +288,21 @@ export default function MapPage() {
   }
 
   const markers: MapMarker[] = useMemo(() => {
-    const bMarkers: MapMarker[] = businesses
+    const bMarkers: MapMarker[] = rawBusinesses
       .filter((b) => b.lat && b.lng)
-      .map((b) => ({ id: `b:${b.id}`, lat: b.lat!, lng: b.lng!, type: 'business' as const, label: b.name, category: b.category }))
+      .map((b) => ({
+        id: `b:${b.id}`,
+        lat: b.lat!,
+        lng: b.lng!,
+        type: b.profiles?.role === 'producer' ? 'producer' : 'business',
+        label: b.name,
+        category: b.category,
+      }))
     const eMarkers: MapMarker[] = events
       .filter((e) => e.lat && e.lng)
       .map((e) => ({ id: `e:${e.id}`, lat: e.lat!, lng: e.lng!, type: 'event' as const, label: e.title, category: e.category }))
     return [...bMarkers, ...eMarkers]
-  }, [businesses, events])
+  }, [rawBusinesses, events])
 
   const flyTo = useMemo<{ lat: number; lng: number; zoom?: number } | undefined>(() => {
     const item = selectedBiz ?? selectedEvt
@@ -254,7 +312,7 @@ export default function MapPage() {
 
   function handleMarkerClick(markerId: string) {
     if (markerId.startsWith('b:')) {
-      const biz = businesses.find((b) => b.id === markerId.slice(2))
+      const biz = rawBusinesses.find((b) => b.id === markerId.slice(2))
       if (biz) selectBiz(biz)
     } else if (markerId.startsWith('e:')) {
       const evt = events.find((e) => e.id === markerId.slice(2))
@@ -262,9 +320,17 @@ export default function MapPage() {
     }
   }
 
-  const visibleBusinesses: BusinessRow[] = tab === 'events' ? [] : businesses
-  const visibleEvents: EventRow[] = tab === 'businesses' ? [] : events
-  const totalCount = visibleBusinesses.length + visibleEvents.length
+  const visibleBusinesses = tab === 'events' || tab === 'producers' ? [] : rawBusinesses
+  const visibleEvents = tab === 'businesses' || tab === 'producers' ? [] : events
+  const visibleProducers = tab === 'producers' ? producers : []
+  const totalCount = visibleBusinesses.length + visibleEvents.length + visibleProducers.length
+
+  const TABS = [
+    { key: 'all' as const,        label: `🌿 ${t('all')}` },
+    { key: 'businesses' as const, label: `🏪 ${t('places')}` },
+    { key: 'events' as const,     label: `🎉 ${t('events')}` },
+    { key: 'producers' as const,  label: `🫒 ${t('producers')}` },
+  ]
 
   return (
     <div className="flex flex-col md:flex-row" style={{ height: 'calc(100dvh - var(--nav-height) - var(--bottom-nav-height))' }}>
@@ -291,19 +357,20 @@ export default function MapPage() {
               </button>
             )}
           </div>
-          <div className="flex gap-1">
-            {(['all', 'businesses', 'events'] as const).map((tabKey) => (
+          {/* 2×2 tab grid to fit 4 tabs */}
+          <div className="grid grid-cols-2 gap-1">
+            {TABS.map(({ key, label }) => (
               <button
-                key={tabKey}
-                onClick={() => setTab(tabKey)}
+                key={key}
+                onClick={() => setTab(key)}
                 className={cn(
-                  'flex-1 py-1.5 rounded-[var(--radius-full)] text-xs font-semibold transition-colors',
-                  tab === tabKey
+                  'py-1.5 rounded-[var(--radius-full)] text-xs font-semibold transition-colors truncate px-2',
+                  tab === key
                     ? 'bg-[var(--highlight)] text-[var(--highlight-foreground)]'
                     : 'bg-[var(--color-muted)] text-[var(--color-muted-foreground)] hover:bg-[var(--color-border)]'
                 )}
               >
-                {tabKey === 'all' ? `🌿 ${t('all')}` : tabKey === 'businesses' ? `🏪 ${t('places')}` : `🎉 ${t('events')}`}
+                {label}
               </button>
             ))}
           </div>
@@ -319,7 +386,13 @@ export default function MapPage() {
               >
                 ← {t('backToList')}
               </button>
-              {selectedBiz && <BusinessPanel business={selectedBiz} onClose={clearSelection} />}
+              {selectedBiz && (
+                <BusinessPanel
+                  business={selectedBiz}
+                  isProducer={selectedBiz.profiles?.role === 'producer'}
+                  onClose={clearSelection}
+                />
+              )}
               {selectedEvt && <EventPanel event={selectedEvt} onClose={clearSelection} />}
             </div>
           ) : (
@@ -330,6 +403,7 @@ export default function MapPage() {
                 </p>
               </div>
               <div className="divide-y divide-[var(--color-border)]">
+                {/* Businesses */}
                 {visibleBusinesses.map((biz) => (
                   <button
                     key={biz.id}
@@ -340,7 +414,9 @@ export default function MapPage() {
                     )}
                   >
                     <div className="flex items-start gap-3">
-                      <div className="shrink-0 w-9 h-9 rounded-[var(--radius)] bg-[var(--highlight)] flex items-center justify-center text-sm">🏪</div>
+                      <div className="shrink-0 w-9 h-9 rounded-[var(--radius)] bg-[var(--highlight)] flex items-center justify-center text-sm">
+                        {biz.profiles?.role === 'producer' ? '🫒' : '🏪'}
+                      </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-semibold text-sm text-[var(--color-foreground)] truncate">{biz.name}</p>
                         {biz.address && (
@@ -348,7 +424,7 @@ export default function MapPage() {
                             <MapPin className="h-3 w-3 shrink-0" />{biz.address}
                           </span>
                         )}
-                        {!biz.lat && (
+                        {!biz.lat && !biz.address && (
                           <span className="text-[0.6rem] text-[var(--color-muted-foreground)] italic mt-0.5 block">{t('noMapPin')}</span>
                         )}
                         {biz.category && (
@@ -361,6 +437,7 @@ export default function MapPage() {
                   </button>
                 ))}
 
+                {/* Events */}
                 {visibleEvents.map((evt) => (
                   <button
                     key={evt.id}
@@ -382,9 +459,39 @@ export default function MapPage() {
                             <MapPin className="h-3 w-3 shrink-0" />{evt.address}
                           </span>
                         )}
-                        {!evt.lat && (
+                        {!evt.lat && !evt.address && (
                           <span className="text-[0.6rem] text-[var(--color-muted-foreground)] italic mt-0.5 block">{t('noMapPin')}</span>
                         )}
+                      </div>
+                    </div>
+                  </button>
+                ))}
+
+                {/* Producers tab */}
+                {visibleProducers.map((p) => (
+                  <button
+                    key={p.id}
+                    onClick={() => selectBiz(p)}
+                    className={cn(
+                      'w-full text-left px-4 py-3.5 hover:bg-[var(--color-muted)] transition-colors',
+                      selectedBizId === p.id && 'bg-[var(--highlight)]/10 border-l-2 border-[var(--highlight)]'
+                    )}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="shrink-0 w-9 h-9 rounded-[var(--radius)] bg-[var(--color-primary)] flex items-center justify-center text-sm">🫒</div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-sm text-[var(--color-foreground)] truncate">{p.name}</p>
+                        {p.address && (
+                          <span className="text-xs text-[var(--color-muted-foreground)] truncate flex items-center gap-0.5 mt-0.5">
+                            <MapPin className="h-3 w-3 shrink-0" />{p.address}
+                          </span>
+                        )}
+                        {!p.lat && !p.address && (
+                          <span className="text-[0.6rem] text-[var(--color-muted-foreground)] italic mt-0.5 block">{t('noMapPin')}</span>
+                        )}
+                        <span className="inline-block mt-1 text-[0.65rem] font-semibold uppercase tracking-wide text-[var(--color-muted-foreground)] bg-[var(--color-muted)] px-2 py-0.5 rounded-full">
+                          {t('producer')}
+                        </span>
                       </div>
                     </div>
                   </button>
@@ -426,7 +533,13 @@ export default function MapPage() {
 
         {hasSelection && !sidebarOpen && (
           <div className="md:hidden absolute bottom-4 left-3 right-3 z-10">
-            {selectedBiz && <BusinessPanel business={selectedBiz} onClose={clearSelection} />}
+            {selectedBiz && (
+              <BusinessPanel
+                business={selectedBiz}
+                isProducer={selectedBiz.profiles?.role === 'producer'}
+                onClose={clearSelection}
+              />
+            )}
             {selectedEvt && <EventPanel event={selectedEvt} onClose={clearSelection} />}
           </div>
         )}

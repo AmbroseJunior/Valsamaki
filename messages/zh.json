@@ -179,7 +179,9 @@
     "askAboutPlace": "向Valsamaki询问此地点",
     "askAboutEvent": "向Valsamaki询问此活动",
     "freeEntry": "免费入场",
-    "noMapPin": "暂无地图标记"
+    "noMapPin": "暂无地图标记",
+    "producers": "生产商",
+    "producer": "生产商"
   },
   "chatbot": {
     "title": "AI导游",

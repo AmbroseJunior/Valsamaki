@@ -179,7 +179,9 @@
     "askAboutPlace": "Valsamaki nach diesem Ort fragen",
     "askAboutEvent": "Valsamaki nach dieser Veranstaltung fragen",
     "freeEntry": "Freier Eintritt",
-    "noMapPin": "Noch kein Kartenpin"
+    "noMapPin": "Noch kein Kartenpin",
+    "producers": "Erzeuger",
+    "producer": "Erzeuger"
   },
   "chatbot": {
     "title": "KI-Guide",

@@ -15,7 +15,9 @@
     "getStarted": "Loslegen",
     "home": "Startseite",
     "aiChat": "KI-Chat",
-    "language": "Language",`n    "plan": "Plan",`n    "searchPlaceholder": "Kreta durchsuchen…"
+    "language": "Language",
+    "plan": "Plan",
+    "searchPlaceholder": "Kreta durchsuchen…"
   },
   "auth": {
     "welcomeBack": "Willkommen zurück",
@@ -129,7 +131,9 @@
   },
   "explore": {
     "title": "Kreta entdecken",
-    "language": "Language",`n    "plan": "Plan",`n    "searchPlaceholder": "Betriebe, Orte suchen…",
+    "language": "Language",
+    "plan": "Plan",
+    "searchPlaceholder": "Betriebe, Orte suchen…",
     "searchExperiences": "Erlebnisse, Orte, Tags suchen…",
     "filters": "Filter",
     "noResults": "Keine Ergebnisse gefunden.",
@@ -160,7 +164,9 @@
     "locating": "Standort wird ermittelt…",
     "businesses": "Betriebe",
     "events": "Veranstaltungen",
-    "language": "Language",`n    "plan": "Plan",`n    "searchPlaceholder": "Betriebe & Veranstaltungen suchen…",
+    "language": "Language",
+    "plan": "Plan",
+    "searchPlaceholder": "Betriebe & Veranstaltungen suchen…",
     "getDirections": "So kommen Sie hin",
     "walk": "Zu Fuß",
     "bus": "Bus",

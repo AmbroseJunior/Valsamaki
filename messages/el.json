@@ -15,7 +15,9 @@
     "getStarted": "Ξεκινήστε",
     "home": "Αρχική",
     "aiChat": "AI Συνομιλία",
-    "language": "Language",`n    "plan": "Plan",`n    "searchPlaceholder": "Αναζήτηση στην Κρήτη…"
+    "language": "Language",
+    "plan": "Plan",
+    "searchPlaceholder": "Αναζήτηση στην Κρήτη…"
   },
   "auth": {
     "welcomeBack": "Καλώς ήρθες",
@@ -129,7 +131,9 @@
   },
   "explore": {
     "title": "Εξερεύνησε την Κρήτη",
-    "language": "Language",`n    "plan": "Plan",`n    "searchPlaceholder": "Αναζήτηση επιχειρήσεων, μέρων…",
+    "language": "Language",
+    "plan": "Plan",
+    "searchPlaceholder": "Αναζήτηση επιχειρήσεων, μέρων…",
     "searchExperiences": "Αναζήτηση εμπειριών, μέρων, ετικετών…",
     "filters": "Φίλτρα",
     "noResults": "Δεν βρέθηκαν αποτελέσματα.",
@@ -160,7 +164,9 @@
     "locating": "Εντοπισμός τοποθεσίας…",
     "businesses": "Επιχειρήσεις",
     "events": "Εκδηλώσεις",
-    "language": "Language",`n    "plan": "Plan",`n    "searchPlaceholder": "Αναζήτηση επιχειρήσεων & εκδηλώσεων…",
+    "language": "Language",
+    "plan": "Plan",
+    "searchPlaceholder": "Αναζήτηση επιχειρήσεων & εκδηλώσεων…",
     "getDirections": "Πήγαινε με",
     "walk": "Πεζή",
     "bus": "Λεωφορείο",

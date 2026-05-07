@@ -336,7 +336,7 @@ export default function PlanPage() {
             <div className="bg-[var(--color-card)] border border-[var(--color-border)] rounded-[var(--radius-2xl)] p-5 text-center space-y-1">
               <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-muted-foreground)]">🗣️ Greek Phrase of the Trip</p>
               <p className="font-display text-2xl font-bold text-[var(--highlight)]">{itinerary.localPhrase.greek}</p>
-              <p className="text-sm text-[var(--color-muted-foreground)] italic">"{itinerary.localPhrase.pronunciation}"</p>
+              <p className="text-sm text-[var(--color-muted-foreground)] italic">&quot;{itinerary.localPhrase.pronunciation}&quot;</p>
               <p className="text-sm text-[var(--color-foreground)] font-medium">{itinerary.localPhrase.meaning}</p>
             </div>
           )}

@@ -15,7 +15,9 @@
     "getStarted": "开始",
     "home": "首页",
     "aiChat": "AI聊天",
-    "language": "Language",`n    "plan": "Plan",`n    "searchPlaceholder": "搜索克里特岛…"
+    "language": "Language",
+    "plan": "Plan",
+    "searchPlaceholder": "搜索克里特岛…"
   },
   "auth": {
     "welcomeBack": "欢迎回来",
@@ -129,7 +131,9 @@
   },
   "explore": {
     "title": "探索克里特岛",
-    "language": "Language",`n    "plan": "Plan",`n    "searchPlaceholder": "搜索商家、地点…",
+    "language": "Language",
+    "plan": "Plan",
+    "searchPlaceholder": "搜索商家、地点…",
     "searchExperiences": "搜索体验、地点、标签…",
     "filters": "筛选",
     "noResults": "没有找到结果。",
@@ -160,7 +164,9 @@
     "locating": "定位中…",
     "businesses": "商家",
     "events": "活动",
-    "language": "Language",`n    "plan": "Plan",`n    "searchPlaceholder": "搜索商家和活动…",
+    "language": "Language",
+    "plan": "Plan",
+    "searchPlaceholder": "搜索商家和活动…",
     "getDirections": "出行方式",
     "walk": "步行",
     "bus": "公交",

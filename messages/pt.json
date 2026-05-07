@@ -15,7 +15,9 @@
     "getStarted": "Começar",
     "home": "Início",
     "aiChat": "Chat IA",
-    "language": "Language",`n    "plan": "Plan",`n    "searchPlaceholder": "Pesquisar em Creta…"
+    "language": "Language",
+    "plan": "Plan",
+    "searchPlaceholder": "Pesquisar em Creta…"
   },
   "auth": {
     "welcomeBack": "Bem-vindo de volta",
@@ -129,7 +131,9 @@
   },
   "explore": {
     "title": "Explorar Creta",
-    "language": "Language",`n    "plan": "Plan",`n    "searchPlaceholder": "Pesquisar negócios, lugares…",
+    "language": "Language",
+    "plan": "Plan",
+    "searchPlaceholder": "Pesquisar negócios, lugares…",
     "searchExperiences": "Buscar experiências, lugares, tags…",
     "filters": "Filtros",
     "noResults": "Nenhum resultado.",
@@ -160,7 +164,9 @@
     "locating": "Localizando…",
     "businesses": "Negócios",
     "events": "Eventos",
-    "language": "Language",`n    "plan": "Plan",`n    "searchPlaceholder": "Buscar empresas e eventos…",
+    "language": "Language",
+    "plan": "Plan",
+    "searchPlaceholder": "Buscar empresas e eventos…",
     "getDirections": "Como chegar",
     "walk": "A pé",
     "bus": "Ônibus",

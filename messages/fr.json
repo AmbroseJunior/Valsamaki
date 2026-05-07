@@ -1,4 +1,4 @@
-{
+﻿{
   "nav": {
     "dashboard": "Accueil",
     "explore": "Explorer",
@@ -15,7 +15,7 @@
     "getStarted": "Commencer",
     "home": "Accueil",
     "aiChat": "Chat IA",
-    "searchPlaceholder": "Rechercher en Crète…"
+    "language": "Language",`n    "plan": "Plan",`n    "searchPlaceholder": "Rechercher en Crète…"
   },
   "auth": {
     "welcomeBack": "Bon retour",
@@ -129,7 +129,7 @@
   },
   "explore": {
     "title": "Explorer la Crète",
-    "searchPlaceholder": "Rechercher des commerces, lieux…",
+    "language": "Language",`n    "plan": "Plan",`n    "searchPlaceholder": "Rechercher des commerces, lieux…",
     "searchExperiences": "Rechercher expériences, lieux, tags…",
     "filters": "Filtres",
     "noResults": "Aucun résultat.",
@@ -160,7 +160,7 @@
     "locating": "Localisation…",
     "businesses": "Commerces",
     "events": "Événements",
-    "searchPlaceholder": "Rechercher commerces & événements…",
+    "language": "Language",`n    "plan": "Plan",`n    "searchPlaceholder": "Rechercher commerces & événements…",
     "getDirections": "Y aller en",
     "walk": "À pied",
     "bus": "Bus",

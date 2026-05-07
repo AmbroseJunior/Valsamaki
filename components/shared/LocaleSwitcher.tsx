@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils'
 import { SUPPORTED_LOCALES, LOCALE_LABELS } from '@/lib/i18n/locales'
 import type { Locale } from '@/lib/i18n/locales'
 
-export function LocaleSwitcher({ className }: { className?: string }) {
+export function LocaleSwitcher({ className, dropUp = false }: { className?: string; dropUp?: boolean }) {
   const locale = useLocale() as Locale
   const router = useRouter()
   const [open, setOpen] = useState(false)
@@ -49,7 +49,7 @@ export function LocaleSwitcher({ className }: { className?: string }) {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-1 w-44 bg-[var(--color-card)] border border-[var(--color-border)] rounded-[var(--radius-lg)] shadow-[var(--shadow-lg)] py-1 z-[var(--z-dropdown)] overflow-hidden">
+        <div className={cn('absolute right-0 w-44 bg-[var(--color-card)] border border-[var(--color-border)] rounded-[var(--radius-lg)] shadow-[var(--shadow-lg)] py-1 z-[var(--z-dropdown)] overflow-hidden', dropUp ? 'bottom-full mb-1' : 'top-full mt-1')}>
           <div className="px-3 py-1.5 border-b border-[var(--color-border)] mb-1">
             <p className="text-[0.65rem] font-bold text-[var(--color-muted-foreground)] uppercase tracking-wide">Language</p>
           </div>

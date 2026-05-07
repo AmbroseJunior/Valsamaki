@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { SlidersHorizontal } from 'lucide-react'
 
-const CATEGORIES = ['All', 'Food & Wine', 'Culture', 'Outdoor', 'Music', 'Market', 'Workshop', 'Sports']
+const CATEGORIES = ['All', 'Culture', 'Outdoor', 'Music', 'Market', 'Workshop', 'Sports']
 
 interface EventFilterProps {
   onFilterChange: (category: string) => void

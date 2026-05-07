@@ -1,4 +1,4 @@
-{
+﻿{
   "nav": {
     "dashboard": "الرئيسية",
     "explore": "استكشف",
@@ -15,7 +15,7 @@
     "getStarted": "ابدأ",
     "home": "الرئيسية",
     "aiChat": "دردشة الذكاء الاصطناعي",
-    "searchPlaceholder": "البحث في كريت…"
+    "language": "Language",`n    "plan": "Plan",`n    "searchPlaceholder": "البحث في كريت…"
   },
   "auth": {
     "welcomeBack": "مرحباً بعودتك",
@@ -129,7 +129,7 @@
   },
   "explore": {
     "title": "استكشف كريت",
-    "searchPlaceholder": "ابحث عن أعمال تجارية، أماكن…",
+    "language": "Language",`n    "plan": "Plan",`n    "searchPlaceholder": "ابحث عن أعمال تجارية، أماكن…",
     "searchExperiences": "بحث في التجارب والأماكن والوسوم…",
     "filters": "تصفية",
     "noResults": "لا توجد نتائج.",
@@ -160,7 +160,7 @@
     "locating": "تحديد الموقع…",
     "businesses": "أعمال تجارية",
     "events": "فعاليات",
-    "searchPlaceholder": "بحث في الشركات والفعاليات…",
+    "language": "Language",`n    "plan": "Plan",`n    "searchPlaceholder": "بحث في الشركات والفعاليات…",
     "getDirections": "طريقة الوصول",
     "walk": "مشياً",
     "bus": "حافلة",

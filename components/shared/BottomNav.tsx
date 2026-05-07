@@ -5,7 +5,8 @@ import { usePathname } from 'next/navigation'
 import { useRole } from '@/hooks/useRole'
 import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
-import { Home, Map, Compass, Calendar, MessageSquare, User } from 'lucide-react'
+import { Home, Map, Compass, MessageSquare, User, Route } from 'lucide-react'
+import { LocaleSwitcher } from './LocaleSwitcher'
 
 export function BottomNav() {
   const pathname = usePathname()
@@ -24,7 +25,7 @@ export function BottomNav() {
     { href: '/dashboard', label: t('home'), icon: Home },
     { href: '/map', label: t('map'), icon: Map },
     { href: '/explore', label: t('explore'), icon: Compass },
-    { href: '/events', label: t('experiences'), icon: Calendar },
+    { href: '/plan', label: t('plan'), icon: Route },
     { href: '/chatbot', label: t('aiChat'), icon: MessageSquare },
   ]
 
@@ -59,6 +60,12 @@ export function BottomNav() {
             </Link>
           )
         })}
+        {isGuest && (
+          <div className="flex-1 flex flex-col items-center justify-center gap-0.5 relative">
+            <LocaleSwitcher dropUp className="flex flex-col items-center" />
+            <span className="text-[10px] font-semibold text-[var(--color-muted-foreground)]">{t('language')}</span>
+          </div>
+        )}
       </div>
     </nav>
   )

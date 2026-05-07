@@ -1,4 +1,4 @@
-{
+﻿{
   "nav": {
     "dashboard": "Home",
     "explore": "Ontdekken",
@@ -15,7 +15,7 @@
     "getStarted": "Aan de slag",
     "home": "Home",
     "aiChat": "AI-chat",
-    "searchPlaceholder": "Zoek op Kreta…"
+    "language": "Language",`n    "plan": "Plan",`n    "searchPlaceholder": "Zoek op Kreta…"
   },
   "auth": {
     "welcomeBack": "Welkom terug",
@@ -128,7 +128,7 @@
   },
   "explore": {
     "title": "Kreta verkennen",
-    "searchPlaceholder": "Zoek bedrijven, plaatsen…",
+    "language": "Language",`n    "plan": "Plan",`n    "searchPlaceholder": "Zoek bedrijven, plaatsen…",
     "searchExperiences": "Ervaringen, plaatsen, tags zoeken…",
     "filters": "Filters",
     "noResults": "Geen resultaten.",
@@ -159,7 +159,7 @@
     "locating": "Locatie bepalen…",
     "businesses": "Bedrijven",
     "events": "Evenementen",
-    "searchPlaceholder": "Zoek bedrijven, evenementen, markten…",
+    "language": "Language",`n    "plan": "Plan",`n    "searchPlaceholder": "Zoek bedrijven, evenementen, markten…",
     "getDirections": "Route plannen",
     "walk": "Lopen",
     "bus": "Bus",

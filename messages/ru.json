@@ -1,4 +1,4 @@
-{
+﻿{
   "nav": {
     "dashboard": "Главная",
     "explore": "Исследовать",
@@ -15,7 +15,7 @@
     "getStarted": "Начать",
     "home": "Главная",
     "aiChat": "ИИ Чат",
-    "searchPlaceholder": "Поиск по Криту…"
+    "language": "Language",`n    "plan": "Plan",`n    "searchPlaceholder": "Поиск по Криту…"
   },
   "auth": {
     "welcomeBack": "С возвращением",
@@ -129,7 +129,7 @@
   },
   "explore": {
     "title": "Исследуйте Крит",
-    "searchPlaceholder": "Поиск заведений, мест…",
+    "language": "Language",`n    "plan": "Plan",`n    "searchPlaceholder": "Поиск заведений, мест…",
     "searchExperiences": "Поиск впечатлений, мест, тегов…",
     "filters": "Фильтры",
     "noResults": "Ничего не найдено.",
@@ -160,7 +160,7 @@
     "locating": "Определение местоположения…",
     "businesses": "Заведения",
     "events": "Мероприятия",
-    "searchPlaceholder": "Поиск заведений и мероприятий…",
+    "language": "Language",`n    "plan": "Plan",`n    "searchPlaceholder": "Поиск заведений и мероприятий…",
     "getDirections": "Как добраться",
     "walk": "Пешком",
     "bus": "Автобус",

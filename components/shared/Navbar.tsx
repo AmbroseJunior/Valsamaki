@@ -14,6 +14,7 @@ import { useTranslations } from 'next-intl'
 const NAV_LINKS = [
   { href: '/dashboard', key: 'dashboard' },
   { href: '/explore', key: 'explore' },
+  { href: '/plan', key: 'plan' },
   { href: '/map', key: 'map' },
   { href: '/events', key: 'experiences' },
 ]

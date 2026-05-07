@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { getTranslations } from 'next-intl/server'
 import { redirect } from 'next/navigation'
 import { PersonalizedSection } from '@/components/dashboard/PersonalizedSection'
+import { LikedExperiencesSection } from '@/components/dashboard/LikedExperiencesSection'
 import { PageLoader } from '@/components/shared/LoadingSpinner'
 import type { UserPreferences } from '@/types/app'
 import type { Metadata } from 'next'
@@ -41,6 +42,8 @@ export default async function DashboardPage() {
         </h1>
         <p className="text-sm text-[var(--color-muted-foreground)] mt-1">{greetingContext}</p>
       </div>
+
+      <LikedExperiencesSection />
 
       <Suspense fallback={<PageLoader />}>
         <PersonalizedSection preferences={preferences} />

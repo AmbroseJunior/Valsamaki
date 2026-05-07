@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { X, MapPin, Star, Clock, DollarSign, ChevronLeft, ChevronRight, Navigation, MessageSquare, Heart, Leaf, Calendar } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { Experience } from '@/types/experience'
+import { useLikedExperiences } from '@/hooks/useLikedExperiences'
 
 interface ExperienceModalProps {
   experience: Experience | null
@@ -13,7 +14,7 @@ interface ExperienceModalProps {
 
 export function ExperienceModal({ experience, onClose }: ExperienceModalProps) {
   const [imgIndex, setImgIndex] = useState(0)
-  const [liked, setLiked] = useState(false)
+  const { isLiked, toggle: toggleLike } = useLikedExperiences()
 
   useEffect(() => {
     if (experience) {
@@ -37,7 +38,7 @@ export function ExperienceModal({ experience, onClose }: ExperienceModalProps) {
 
   if (!experience) return null
 
-  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${experience.coordinates.lat},${experience.coordinates.lng}`
+  const mapUrl = `/map?lat=${experience.coordinates.lat}&lng=${experience.coordinates.lng}&label=${encodeURIComponent(experience.title)}`
 
   return (
     <div
@@ -94,10 +95,10 @@ export function ExperienceModal({ experience, onClose }: ExperienceModalProps) {
 
           {/* Heart */}
           <button
-            onClick={() => setLiked((v) => !v)}
+            onClick={() => toggleLike(experience.id)}
             className="absolute top-3 left-3 p-2 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white transition-colors"
           >
-            <Heart className={cn('h-4 w-4', liked ? 'fill-[var(--highlight)] stroke-[var(--highlight)]' : 'stroke-gray-600')} />
+            <Heart className={cn('h-4 w-4', isLiked(experience.id) ? 'fill-[var(--highlight)] stroke-[var(--highlight)]' : 'stroke-gray-600')} />
           </button>
 
           {/* Thumbnails */}
@@ -199,9 +200,7 @@ export function ExperienceModal({ experience, onClose }: ExperienceModalProps) {
           {/* CTA buttons */}
           <div className="flex flex-col sm:flex-row gap-3 pt-1">
             <a
-              href={mapsUrl}
-              target="_blank"
-              rel="noopener noreferrer"
+              href={mapUrl}
               className="flex items-center justify-center gap-2 flex-1 py-3 bg-[var(--highlight)] text-[var(--highlight-foreground)] font-bold rounded-[var(--radius-full)] hover:bg-[var(--highlight-dark)] transition-colors"
             >
               <Navigation className="h-4 w-4" />

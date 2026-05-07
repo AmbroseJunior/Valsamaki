@@ -54,6 +54,7 @@ function fmtMins(s: number) {
 }
 
 function RouteMetricsCard({ mode, info }: { mode: RouteMode; info: RouteInfo }) {
+  const t = useTranslations('map')
   const { distanceM, durationS } = info
 
   // Derived metrics
@@ -75,9 +76,9 @@ function RouteMetricsCard({ mode, info }: { mode: RouteMode; info: RouteInfo }) 
       border: 'border-green-300 dark:border-green-700',
       barColor: 'bg-green-500',
       metrics: [
-        { icon: '👣', label: 'Steps',    value: steps.toLocaleString() },
-        { icon: '🔥', label: 'Calories', value: `~${calories} kcal` },
-        { icon: '🌱', label: 'CO₂',      value: 'Zero' },
+        { icon: '👣', label: t('steps'),    value: steps.toLocaleString() },
+        { icon: '🔥', label: t('calories'), value: `~${calories} kcal` },
+        { icon: '🌱', label: t('co2'),      value: t('co2Zero') },
       ],
     },
     transit: {
@@ -86,9 +87,9 @@ function RouteMetricsCard({ mode, info }: { mode: RouteMode; info: RouteInfo }) 
       border: 'border-blue-300 dark:border-blue-700',
       barColor: 'bg-blue-500',
       metrics: [
-        { icon: '🪙', label: 'Est. fare',   value: '~€1.20' },
-        { icon: '🌱', label: 'CO₂ saved',   value: `−${Math.round(co2g * 0.7)} g` },
-        { icon: '♿', label: 'Accessible',  value: 'Most stops' },
+        { icon: '🪙', label: t('estFare'),   value: '~€1.20' },
+        { icon: '🌱', label: t('co2Saved'),   value: `−${Math.round(co2g * 0.7)} g` },
+        { icon: '♿', label: t('accessible'),  value: t('mostStops') },
       ],
     },
     driving: {
@@ -97,9 +98,9 @@ function RouteMetricsCard({ mode, info }: { mode: RouteMode; info: RouteInfo }) 
       border: 'border-red-300 dark:border-red-700',
       barColor: 'bg-red-500',
       metrics: [
-        { icon: '⛽', label: 'Fuel est.', value: `~€${fuelEur}` },
-        { icon: '💨', label: 'CO₂',       value: `~${co2g} g` },
-        { icon: '🅿️', label: 'Parking',   value: 'Plan ahead' },
+        { icon: '⛽', label: t('fuelEst'), value: `~€${fuelEur}` },
+        { icon: '💨', label: t('co2'),       value: `~${co2g} g` },
+        { icon: '🅿️', label: t('parking'),   value: t('parkingNote') },
       ],
     },
   }
@@ -118,7 +119,7 @@ function RouteMetricsCard({ mode, info }: { mode: RouteMode; info: RouteInfo }) 
         <div>
           <p className={`text-2xl font-bold leading-tight ${cfg.color}`}>{info.duration}</p>
           <p className="text-[11px] text-[var(--color-muted-foreground)] mt-0.5">
-            {info.distance} from your location
+            {info.distance} {t('fromYourLocation')}
           </p>
         </div>
         <span className="text-3xl leading-none">
@@ -140,7 +141,7 @@ function RouteMetricsCard({ mode, info }: { mode: RouteMode; info: RouteInfo }) 
       {/* Mode comparison bars */}
       <div className="px-3 pb-3 pt-2 border-t border-inherit space-y-2">
         <p className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-muted-foreground)] mb-1">
-          Mode comparison
+          {t('modeComparison')}
         </p>
         {bars.map(({ icon, label, s, barCls, active }) => (
           <div key={label} className="flex items-center gap-2">
@@ -223,7 +224,7 @@ function DirectionButtons({ activeRouteMode, onRouteMode, routeInfo, routeLoadin
 
       {!hasCoords && (
         <p className="text-[10px] text-[var(--color-muted-foreground)] text-center italic">
-          No map coordinates — directions unavailable
+          {t('noCoords')}
         </p>
       )}
     </div>

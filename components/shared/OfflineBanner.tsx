@@ -3,9 +3,11 @@
 import { useOffline } from '@/hooks/useOffline'
 import { WifiOff } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useTranslations } from 'next-intl'
 
 export function OfflineBanner() {
   const { isOffline } = useOffline()
+  const t = useTranslations('common')
 
   return (
     <AnimatePresence>
@@ -19,7 +21,7 @@ export function OfflineBanner() {
           role="alert"
         >
           <WifiOff className="h-4 w-4 shrink-0" />
-          <span>You&apos;re offline — showing cached content</span>
+          <span>{t('offlineBanner')}</span>
         </motion.div>
       )}
     </AnimatePresence>

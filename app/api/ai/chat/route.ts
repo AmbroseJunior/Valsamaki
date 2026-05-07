@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
     // OWASP A01 — userId from session only, never trust client-supplied value
     const { data: profile } = await supabase
       .from('profiles')
-      .select('location_lat, location_lng')
+      .select('location_lat, location_lng, language')
       .eq('id', user.id)
       .single()
 
@@ -45,11 +45,13 @@ export async function POST(request: NextRequest) {
       ? { lat: profile.location_lat, lng: profile.location_lng }
       : null
 
+    const locale = (body?.locale as string | undefined) ?? profile?.language ?? 'en'
+
     const result = await mcpBridge({
       task: 'chat',
       userId: user.id,
       input: message,
-      context: { userLocation: location ?? undefined },
+      context: { userLocation: location ?? undefined, locale },
     })
 
     return NextResponse.json({ reply: result.output, provider: result.provider })

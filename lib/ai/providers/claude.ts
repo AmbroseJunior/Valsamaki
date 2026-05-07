@@ -67,6 +67,16 @@ export class ClaudeProvider implements AIProvider {
       parts.push(`\n## User Preferences\n${JSON.stringify(context.userPreferences, null, 2)}`)
     }
 
+    if (context.locale && context.locale !== 'en') {
+      const langName = LOCALE_NAMES[context.locale] ?? context.locale
+      parts.push(`\n## Language Instruction\nRespond ONLY in ${langName}. Do not switch to English.`)
+    }
+
     return parts.join('\n')
   }
+}
+
+const LOCALE_NAMES: Record<string, string> = {
+  el: 'Greek', de: 'German', es: 'Spanish', fr: 'French', it: 'Italian',
+  nl: 'Dutch', pt: 'Portuguese', ru: 'Russian', zh: 'Chinese (Simplified)', ar: 'Arabic',
 }

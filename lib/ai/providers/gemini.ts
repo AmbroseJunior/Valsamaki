@@ -33,6 +33,10 @@ export class GeminiProvider implements AIProvider {
     if (context.userPreferences) {
       systemParts.push(`User preferences: ${JSON.stringify(context.userPreferences)}`)
     }
+    if (context.locale && context.locale !== 'en') {
+      const langName: Record<string, string> = { el:'Greek',de:'German',es:'Spanish',fr:'French',it:'Italian',nl:'Dutch',pt:'Portuguese',ru:'Russian',zh:'Chinese',ar:'Arabic' }
+      systemParts.push(`IMPORTANT: Respond ONLY in ${langName[context.locale] ?? context.locale}. Do not switch to English.`)
+    }
 
     const openaiMessages: OpenAI.Chat.ChatCompletionMessageParam[] = [
       { role: 'system', content: systemParts.join('\n') },

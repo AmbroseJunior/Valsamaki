@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import { VoiceInput } from './VoiceInput'
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner'
 import { Send, Bot } from 'lucide-react'
+import { useTranslations, useLocale } from 'next-intl'
 import { cn } from '@/lib/utils'
 
 interface Message {
@@ -12,14 +13,9 @@ interface Message {
   content: string
 }
 
-const SUGGESTED = [
-  'What are the best olive oil farms near me?',
-  'Tell me about the Cretan diet and longevity',
-  'What events are happening this weekend?',
-  'Recommend a traditional Cretan restaurant',
-]
-
 export function Chatbot({ userId }: { userId: string }) {
+  const t = useTranslations('chatbot')
+  const locale = useLocale()
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
@@ -43,18 +39,18 @@ export function Chatbot({ userId }: { userId: string }) {
       const res = await fetch('/api/ai/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: trimmed, userId }),
+        body: JSON.stringify({ message: trimmed, userId, locale }),
       })
 
       const data = await res.json() as { reply?: string }
       setMessages((prev) => [
         ...prev,
-        { id: `a_${Date.now()}`, role: 'assistant', content: data.reply ?? 'Sorry, I could not respond.' },
+        { id: `a_${Date.now()}`, role: 'assistant', content: data.reply ?? t('errorResponse') },
       ])
     } catch {
       setMessages((prev) => [
         ...prev,
-        { id: `err_${Date.now()}`, role: 'assistant', content: 'I am temporarily offline. Please try again.' },
+        { id: `err_${Date.now()}`, role: 'assistant', content: t('offlineError') },
       ])
     } finally {
       setLoading(false)
@@ -72,21 +68,24 @@ export function Chatbot({ userId }: { userId: string }) {
               <span className="text-2xl">🫒</span>
             </div>
             <div>
-              <p className="font-display font-bold text-xl text-[var(--color-foreground)]">Ask me anything about Crete</p>
+              <p className="font-display font-bold text-xl text-[var(--color-foreground)]">{t('askAnything')}</p>
               <p className="text-sm text-[var(--color-muted-foreground)] mt-1">
-                Local food, producers, wellness, events, and the Mediterranean diet
+                {t('askSub')}
               </p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full max-w-lg">
-              {SUGGESTED.map((prompt) => (
+              {(['suggestion1','suggestion2','suggestion3','suggestion4'] as const).map((key) => {
+                const prompt = t(key)
+                return (
                 <button
-                  key={prompt}
+                  key={key}
                   onClick={() => send(prompt)}
                   className="text-left p-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] text-sm hover:bg-[var(--highlight)]/10 hover:border-[var(--highlight)] transition-colors text-[var(--color-foreground)]"
                 >
                   {prompt}
                 </button>
-              ))}
+              )})}
+
             </div>
           </div>
         )}
@@ -141,7 +140,7 @@ export function Chatbot({ userId }: { userId: string }) {
             ref={inputRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask about Crete…"
+            placeholder={t('inputPlaceholder')}
             disabled={loading}
             className="flex-1 bg-transparent outline-none text-sm text-[var(--color-foreground)] placeholder:text-[var(--color-muted-foreground)]"
           />

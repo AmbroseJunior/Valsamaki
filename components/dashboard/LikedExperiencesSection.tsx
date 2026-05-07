@@ -2,6 +2,7 @@
 
 import { Heart, MapPin, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { useLikedExperiences } from '@/hooks/useLikedExperiences'
 import { EXPERIENCES } from '@/lib/data/experiences'
 import { SCRAPED_EXPERIENCES } from '@/lib/data/scrapedExperiences'
@@ -10,6 +11,7 @@ const ALL_EXPERIENCES = [...EXPERIENCES, ...SCRAPED_EXPERIENCES]
 
 export function LikedExperiencesSection() {
   const { liked } = useLikedExperiences()
+  const t = useTranslations('common')
 
   if (liked.size === 0) return null
 
@@ -21,13 +23,13 @@ export function LikedExperiencesSection() {
       <div className="flex items-center justify-between mb-3">
         <h2 className="font-display font-bold text-lg flex items-center gap-2">
           <Heart className="h-4 w-4 fill-[var(--highlight)] stroke-[var(--highlight)]" />
-          Liked Experiences
+          {t('likedExperiences')}
         </h2>
         <Link
           href="/explore"
           className="text-xs font-semibold text-[var(--highlight)] hover:underline flex items-center gap-1"
         >
-          Explore all <ArrowRight className="h-3 w-3" />
+          {t('exploreAll')} <ArrowRight className="h-3 w-3" />
         </Link>
       </div>
 

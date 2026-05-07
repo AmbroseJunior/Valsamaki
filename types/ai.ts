@@ -12,6 +12,7 @@ export interface AIContext {
   conversationHistory?: AIMessage[]
   userLocation?: { lat: number; lng: number }
   maxTokens?: number
+  locale?: string
 }
 
 export interface AIProvider {

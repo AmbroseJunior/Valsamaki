@@ -1,4 +1,4 @@
-﻿{
+{
   "nav": {
     "dashboard": "Inicio",
     "explore": "Explorar",
@@ -17,7 +17,8 @@
     "aiChat": "Chat IA",
     "language": "Language",
     "plan": "Plan",
-    "searchPlaceholder": "Buscar en Creta…"
+    "searchPlaceholder": "Buscar en Creta…",
+    "likedExperiences": "Experiencias Favoritas"
   },
   "auth": {
     "welcomeBack": "Bienvenido de nuevo",
@@ -187,7 +188,24 @@
     "producers": "Productores",
     "producer": "Productor",
     "farmersMarkets": "Mercados de Agricultores",
-    "farmersMarket": "Mercado de Agricultores"
+    "farmersMarket": "Mercado de Agricultores",
+    "modeComparison": "Comparación de modos",
+    "noCoords": "Sin coordenadas — indicaciones no disponibles",
+    "fromYourLocation": "desde tu ubicación",
+    "steps": "Pasos",
+    "calories": "Calorías",
+    "co2": "CO₂",
+    "co2Zero": "Cero",
+    "estFare": "Tarifa estimada",
+    "co2Saved": "CO₂ ahorrado",
+    "accessible": "Accesible",
+    "mostStops": "Más paradas",
+    "fuelEst": "Est. combustible",
+    "parking": "Estacionamiento",
+    "parkingNote": "Planifica con anticipación",
+    "experiences": "Experiencias",
+    "sights": "Lugares de interés",
+    "viewDetails": "Ver detalles"
   },
   "chatbot": {
     "title": "Guía IA",
@@ -196,7 +214,16 @@
     "placeholder": "Pregunta sobre cocina cretense, productores locales…",
     "send": "Enviar",
     "voice": "Entrada de voz",
-    "poweredBy": "Ask Valsamaki — Tu guía IA de la Creta auténtica"
+    "poweredBy": "Ask Valsamaki — Tu guía IA de la Creta auténtica",
+    "askAnything": "Pregúntame cualquier cosa sobre Creta",
+    "askSub": "Comida local, productores, bienestar, eventos y la dieta mediterránea",
+    "errorResponse": "Lo siento, no pude responder.",
+    "offlineError": "Estoy temporalmente sin conexión. Por favor inténtalo de nuevo.",
+    "inputPlaceholder": "Pregunta sobre Creta…",
+    "suggestion1": "¿Cuáles son las mejores fincas de aceite de oliva cerca de mí?",
+    "suggestion2": "Cuéntame sobre la dieta cretense y la longevidad",
+    "suggestion3": "¿Qué eventos hay este fin de semana?",
+    "suggestion4": "Recomienda un restaurante cretense tradicional"
   },
   "settings": {
     "title": "Configuración",
@@ -240,6 +267,89 @@
     "offline": "Estás sin conexión. Algunas funciones pueden no estar disponibles.",
     "darkMode": "Modo oscuro",
     "lightMode": "Modo claro",
-    "language": "Idioma"
+    "language": "Idioma",
+    "offlineBanner": "Estás sin conexión — mostrando contenido en caché",
+    "likedExperiences": "Experiencias Favoritas",
+    "exploreAll": "Explorar todo"
+  },
+  "plan": {
+    "title": "Planifica tu aventura de bienestar cretense",
+    "subtitle": "Cuéntanos tus preferencias — nuestra IA crea un itinerario personalizado día a día con experiencias locales reales.",
+    "badge": "Impulsado por IA",
+    "daysLabel": "¿Cuántos días?",
+    "daysMin": "1 día",
+    "daysMax": "7 días",
+    "interestsLabel": "¿Qué te interesa?",
+    "interestsPick": "(elige cualquiera)",
+    "styleLabel": "Estilo de viaje",
+    "dietLabel": "Preferencia dietética",
+    "generating": "Creando tu itinerario…",
+    "generate": "Generar mi itinerario",
+    "day": "Día",
+    "morning": "Mañana",
+    "afternoon": "Tarde",
+    "evening": "Noche",
+    "greekPhrase": "🗣️ Frase griega del viaje",
+    "packingTips": "🎒 Consejos de equipaje",
+    "startOver": "Empezar de nuevo",
+    "shareTrip": "Compartir viaje",
+    "errorFormat": "La IA devolvió un formato inesperado — toca Generar de nuevo.",
+    "interests": {
+      "food": "Comida Local",
+      "olive_oil": "Aceite de Oliva",
+      "hiking": "Senderismo",
+      "history": "Historia",
+      "wellness": "Bienestar",
+      "markets": "Mercados",
+      "sea": "Deportes Acuáticos"
+    },
+    "diets": {
+      "none": "Sin preferencia",
+      "vegetarian": "Vegetariano",
+      "vegan": "Vegano",
+      "gluten_free": "Sin gluten",
+      "pescatarian": "Pescetariano"
+    },
+    "styles": {
+      "relaxed": "Relajado",
+      "relaxedDesc": "Ritmo tranquilo, menos paradas",
+      "balanced": "Equilibrado",
+      "balancedDesc": "Mezcla de actividad y descanso",
+      "active": "Activo",
+      "activeDesc": "Días llenos de actividades",
+      "cultural": "Cultural",
+      "culturalDesc": "Museos, historia, arte"
+    }
+  },
+  "home": {
+    "hero": "Descubre la auténtica Creta",
+    "heroSub": "Productores locales, bienestar, cultura y la dieta mediterránea",
+    "mapView": "Vista del mapa",
+    "mapSub": "Encuentra productores cerca de ti",
+    "products": "Productos locales",
+    "productsSub": "Orgánico y tradicional",
+    "personalised": "Personalizado para ti",
+    "quizTitle": "Haz el quiz de bienestar cretense",
+    "quizSub": "Experiencias seleccionadas por IA en 2 minutos",
+    "startQuiz": "Iniciar quiz →",
+    "nearYou": "Cerca de ti",
+    "viewMap": "Ver en el mapa",
+    "allExperiences": "Todas las experiencias",
+    "ctaTitle": "Únete a más de 2.400 exploradores de Creta",
+    "ctaSub": "Crea una cuenta gratuita para guardar favoritos, obtener recomendaciones de IA y desbloquear la experiencia completa.",
+    "signUpFree": "Registrarse gratis",
+    "signIn": "Iniciar sesión",
+    "producerTitle": "¿Eres un productor cretense?",
+    "producerSub": "Conéctate con locales y turistas. Lista tus productos y experiencias.",
+    "listBusiness": "Listar tu negocio",
+    "footer": "© 2026 Valsamaki — Conectando Creta, un productor a la vez. 🫒",
+    "footerMedDiet": "Dieta Mediterránea",
+    "footerMap": "Mapa",
+    "footerExperiences": "Experiencias"
+  },
+  "languagePicker": {
+    "welcome": "Bienvenido — Elige tu idioma",
+    "subtitle": "Καλώς ήρθες · Bienvenido · Bienvenue · Benvenuto",
+    "continue": "Continuar sin cambiar →"
   }
 }

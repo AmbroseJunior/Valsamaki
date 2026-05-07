@@ -508,9 +508,42 @@ export default function MapPage() {
   const [activeRouteMode, setActiveRouteMode] = useState<RouteMode | null>(null)
   const [routeInfo, setRouteInfo] = useState<RouteInfo | null>(null)
   const [routeLoading, setRouteLoading] = useState(false)
+  const [gpsCoords, setGpsCoords] = useState<{ lat: number; lng: number } | null>(null)
+  const [geocodedCoords, setGeocodedCoords] = useState<{ lat: number; lng: number } | null>(null)
   const { userId } = useRole()
   const { coords } = useLocation(userId)
   const supabase = createClient()
+
+  // Request GPS for ALL users (including guests) so routing always starts from real location
+  useEffect(() => {
+    if (!navigator.geolocation) return
+    const id = navigator.geolocation.watchPosition(
+      (pos) => setGpsCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+      () => {},
+      { enableHighAccuracy: true, maximumAge: 30_000 }
+    )
+    return () => navigator.geolocation.clearWatch(id)
+  }, [])
+
+  // Geocode address via Nominatim when selected item has no lat/lng
+  useEffect(() => {
+    setGeocodedCoords(null)
+    const hasDestCoords =
+      (selectedBizId && rawBusinesses.find(b => b.id === selectedBizId)?.lat) ||
+      (selectedEvtId)  // events may have coords; handled below
+    if (hasDestCoords) return
+    const address = (selectedBizId ? rawBusinesses.find(b => b.id === selectedBizId)?.address : null)
+    if (!address) return
+    let cancelled = false
+    fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address + ', Crete, Greece')}&format=json&limit=1`)
+      .then(r => r.json())
+      .then((data: Array<{ lat: string; lon: string }>) => {
+        if (!cancelled && data[0]) setGeocodedCoords({ lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) })
+      })
+      .catch(() => {})
+    return () => { cancelled = true }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedBizId, selectedEvtId])
 
   // Sync URL param changes (e.g. navbar search)
   useEffect(() => {
@@ -636,12 +669,14 @@ export default function MapPage() {
   const routeTarget = useMemo<RouteTarget | undefined>(() => {
     if (!activeRouteMode) return undefined
     if (selectedBiz?.lat && selectedBiz?.lng) return { lat: selectedBiz.lat, lng: selectedBiz.lng, mode: activeRouteMode }
+    if (geocodedCoords && selectedBiz) return { ...geocodedCoords, mode: activeRouteMode }
     if (selectedEvt?.lat && selectedEvt?.lng) return { lat: selectedEvt.lat, lng: selectedEvt.lng, mode: activeRouteMode }
+    if (geocodedCoords && selectedEvt) return { ...geocodedCoords, mode: activeRouteMode }
     if (selectedMarket) return { lat: selectedMarket.lat, lng: selectedMarket.lng, mode: activeRouteMode }
     if (selectedExp?.coordinates) return { lat: selectedExp.coordinates.lat, lng: selectedExp.coordinates.lng, mode: activeRouteMode }
     if (selectedPlace) return { lat: selectedPlace.coordinates.lat, lng: selectedPlace.coordinates.lng, mode: activeRouteMode }
     return undefined
-  }, [activeRouteMode, selectedBiz, selectedEvt, selectedMarket, selectedExp, selectedPlace])
+  }, [activeRouteMode, selectedBiz, selectedEvt, selectedMarket, selectedExp, selectedPlace, geocodedCoords])
 
   const routeProps: RoutePanelProps = {
     activeRouteMode,
@@ -649,8 +684,8 @@ export default function MapPage() {
     routeInfo,
     routeLoading,
     hasCoords: !!(
-      (selectedBiz?.lat && selectedBiz?.lng) ||
-      (selectedEvt?.lat && selectedEvt?.lng) ||
+      (selectedBiz?.lat && selectedBiz?.lng) || selectedBiz?.address || geocodedCoords ||
+      (selectedEvt?.lat && selectedEvt?.lng) || selectedEvt?.address ||
       selectedMarket ||
       selectedExp?.coordinates ||
       selectedPlace
@@ -722,7 +757,8 @@ export default function MapPage() {
     { key: 'experiences' as const, label: `✨ ${t('experiences')}` },
   ]
 
-  const userOrigin = coords?.lat && coords?.lng ? { lat: coords.lat, lng: coords.lng } : undefined
+  const effectiveCoords = coords ?? gpsCoords
+  const userOrigin = effectiveCoords ? { lat: effectiveCoords.lat, lng: effectiveCoords.lng } : undefined
 
   return (
     <div className="flex flex-col md:flex-row" style={{ height: 'calc(100dvh - var(--nav-height) - var(--bottom-nav-height))' }}>
@@ -749,7 +785,7 @@ export default function MapPage() {
               </button>
             )}
           </div>
-          <div className="grid grid-cols-4 gap-1">
+          <div className="grid grid-cols-5 gap-1">
             {TABS.map(({ key, label }) => (
               <button
                 key={key}

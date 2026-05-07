@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { Send, X, Bot, MessageSquare } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 
 interface Message {
   id: string
@@ -20,6 +21,7 @@ export function FloatingChatbot() {
   const [loading, setLoading] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const t = useTranslations('chatbot')
 
   useEffect(() => {
     const supabase = createClient()
@@ -48,9 +50,9 @@ export function FloatingChatbot() {
         body: JSON.stringify({ message: trimmed, userId }),
       })
       const data = await res.json() as { reply?: string }
-      setMessages((p) => [...p, { id: `a_${Date.now()}`, role: 'assistant', content: data.reply ?? 'Sorry, I could not respond.' }])
+      setMessages((p) => [...p, { id: `a_${Date.now()}`, role: 'assistant', content: data.reply ?? t('errorResponse') }])
     } catch {
-      setMessages((p) => [...p, { id: `e_${Date.now()}`, role: 'assistant', content: 'I am temporarily offline. Please try again.' }])
+      setMessages((p) => [...p, { id: `e_${Date.now()}`, role: 'assistant', content: t('offlineError') }])
     } finally {
       setLoading(false)
     }
@@ -76,8 +78,8 @@ export function FloatingChatbot() {
           <div className="flex items-center gap-2 px-4 py-3 border-b border-[var(--color-border)] bg-[var(--color-card)] shrink-0">
             <div className="w-7 h-7 rounded-full bg-[var(--highlight)] flex items-center justify-center text-sm">🫒</div>
             <div className="flex-1">
-              <p className="text-sm font-bold leading-tight">Ask Valsamaki</p>
-              <p className="text-[10px] text-[var(--color-muted-foreground)]">AI guide to authentic Crete</p>
+              <p className="text-sm font-bold leading-tight">{t('headerTitle')}</p>
+              <p className="text-[10px] text-[var(--color-muted-foreground)]">{t('headerSubtitle')}</p>
             </div>
             <button onClick={() => setOpen(false)} className="p-1 rounded-full hover:bg-[var(--color-muted)] transition-colors text-[var(--color-muted-foreground)]">
               <X className="h-4 w-4" />
@@ -86,20 +88,20 @@ export function FloatingChatbot() {
 
           {/* Body */}
           {isLoading ? (
-            <div className="flex-1 flex items-center justify-center text-[var(--color-muted-foreground)] text-sm">Loading…</div>
+            <div className="flex-1 flex items-center justify-center text-[var(--color-muted-foreground)] text-sm">{t('loading')}</div>
           ) : isGuest ? (
             <div className="flex-1 flex flex-col items-center justify-center gap-4 px-6 text-center">
               <div className="w-14 h-14 rounded-full bg-[var(--highlight)]/20 flex items-center justify-center text-2xl">🫒</div>
               <div>
-                <p className="font-bold text-base">Chat with your Crete AI guide</p>
-                <p className="text-sm text-[var(--color-muted-foreground)] mt-1">Sign in to ask about local producers, food, experiences and more.</p>
+                <p className="font-bold text-base">{t('guestTitle')}</p>
+                <p className="text-sm text-[var(--color-muted-foreground)] mt-1">{t('guestSubtitle')}</p>
               </div>
               <Link
                 href="/login"
                 onClick={() => setOpen(false)}
                 className="px-5 py-2 rounded-full bg-[var(--highlight)] text-[var(--highlight-foreground)] text-sm font-bold hover:bg-[var(--highlight-dark)] transition-colors"
               >
-                Sign in to chat
+                {t('guestSignIn')}
               </Link>
             </div>
           ) : (
@@ -107,9 +109,9 @@ export function FloatingChatbot() {
               <div className="flex-1 overflow-y-auto p-3 space-y-3">
                 {messages.length === 0 && (
                   <div className="flex flex-col items-center justify-center h-full gap-3 text-center pb-4">
-                    <p className="text-sm font-semibold text-[var(--color-foreground)]">Ask me anything about Crete</p>
+                    <p className="text-sm font-semibold text-[var(--color-foreground)]">{t('promptTitle')}</p>
                     <div className="flex flex-col gap-1.5 w-full">
-                      {['Best olive oil farms?', 'Local markets this week?', 'Traditional Cretan recipes'].map((s) => (
+                      {[t('quickSuggestion1'), t('quickSuggestion2'), t('quickSuggestion3')].map((s) => (
                         <button key={s} onClick={() => send(s)} className="text-left text-xs p-2 rounded-[var(--radius-lg)] border border-[var(--color-border)] hover:bg-[var(--highlight)]/10 hover:border-[var(--highlight)] transition-colors">
                           {s}
                         </button>
@@ -149,7 +151,7 @@ export function FloatingChatbot() {
                     ref={inputRef}
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
-                    placeholder="Ask about Crete…"
+                    placeholder={t('inputPlaceholder')}
                     disabled={loading}
                     className="flex-1 bg-transparent outline-none text-xs text-[var(--color-foreground)] placeholder:text-[var(--color-muted-foreground)]"
                   />
@@ -172,7 +174,7 @@ export function FloatingChatbot() {
             ? 'bg-[var(--color-muted)] text-[var(--color-foreground)]'
             : 'bg-[var(--highlight)] text-[var(--highlight-foreground)] hover:scale-105'
         )}
-        aria-label="Open AI guide"
+        aria-label={t('openAriaLabel')}
       >
         {open ? <X className="h-5 w-5" /> : <MessageSquare className="h-5 w-5" />}
       </button>

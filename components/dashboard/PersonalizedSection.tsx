@@ -32,16 +32,16 @@ const INTEREST_EVENT_CATS: Record<string, string[]> = {
   wine:       ['food_wine'],
 }
 
-const DIET_NOTE: Record<string, string> = {
-  vegetarian:  'vegetarian-friendly',
-  vegan:       'plant-based',
-  pescatarian: 'seafood-inclusive',
-  gluten_free: 'gluten-free',
+const DIET_NOTE_KEYS: Record<string, string> = {
+  vegetarian:  'vegFriendly',
+  vegan:       'plantBased',
+  pescatarian: 'seafoodInclusive',
+  gluten_free: 'glutenFree',
 }
 
-const INTEREST_LABELS: Record<string, string> = {
-  local_food: 'local food', olive_oil: 'olive oil', hiking: 'hiking',
-  history: 'history', wellness: 'wellness', wine: 'wine',
+const INTEREST_LABEL_KEYS: Record<string, string> = {
+  local_food: 'interestLocalFood', olive_oil: 'interestOliveOil', hiking: 'interestHiking',
+  history: 'interestHistory', wellness: 'interestWellness', wine: 'interestWine',
 }
 
 function getRecommendedExperiences(prefs: UserPreferences | null) {
@@ -86,10 +86,10 @@ export async function PersonalizedSection({ preferences }: { preferences: UserPr
 
   const contextLabel = hasPrefs
     ? (() => {
-        const top = preferences!.interests!.slice(0, 2).map((i) => INTEREST_LABELS[i] ?? i)
-        const parts = [`Based on your interest in ${top.join(' & ')}`]
-        if (preferences?.dietary_preference && DIET_NOTE[preferences.dietary_preference]) {
-          parts.push(`${DIET_NOTE[preferences.dietary_preference]} options highlighted`)
+        const top = preferences!.interests!.slice(0, 2).map((i) => t(INTEREST_LABEL_KEYS[i] as 'interestLocalFood' ?? 'interestLocalFood'))
+        const parts = [t('basedOnInterest', { interests: top.join(' & ') })]
+        if (preferences?.dietary_preference && DIET_NOTE_KEYS[preferences.dietary_preference]) {
+          parts.push(t('dietHighlighted', { diet: t(DIET_NOTE_KEYS[preferences.dietary_preference] as 'vegFriendly') }))
         }
         return parts.join(' · ')
       })()
@@ -220,8 +220,8 @@ export async function PersonalizedSection({ preferences }: { preferences: UserPr
             <div className="inline-flex p-2.5 bg-white/90 backdrop-blur-sm rounded-[var(--radius-xl)] mb-3 group-hover:scale-110 transition-transform">
               <MapPin className="h-6 w-6 text-amber-500" />
             </div>
-            <h3 className="font-display font-bold text-xl text-gray-900 mb-1">Map View</h3>
-            <p className="text-sm text-gray-800 font-medium">Find experiences near you</p>
+            <h3 className="font-display font-bold text-xl text-gray-900 mb-1">{t('mapView')}</h3>
+            <p className="text-sm text-gray-800 font-medium">{t('mapSubtitle')}</p>
           </div>
         </Link>
 
@@ -242,8 +242,8 @@ export async function PersonalizedSection({ preferences }: { preferences: UserPr
             <div className="inline-flex p-2.5 bg-white/90 backdrop-blur-sm rounded-[var(--radius-xl)] mb-3 group-hover:scale-110 transition-transform">
               <span className="text-xl leading-none">🌱</span>
             </div>
-            <h3 className="font-display font-bold text-xl text-white mb-1">Local Products</h3>
-            <p className="text-sm text-white/90 font-medium">Discover their natural properties and health benefits</p>
+            <h3 className="font-display font-bold text-xl text-white mb-1">{t('localProducts')}</h3>
+            <p className="text-sm text-white/90 font-medium">{t('localProductsSubtitle')}</p>
           </div>
         </Link>
       </div>

@@ -6,6 +6,7 @@ import { X, MapPin, Star, Clock, DollarSign, ChevronLeft, ChevronRight, Navigati
 import { cn } from '@/lib/utils'
 import type { Experience } from '@/types/experience'
 import { useLikedExperiences } from '@/hooks/useLikedExperiences'
+import { useTranslations } from 'next-intl'
 
 interface ExperienceModalProps {
   experience: Experience | null
@@ -15,6 +16,7 @@ interface ExperienceModalProps {
 export function ExperienceModal({ experience, onClose }: ExperienceModalProps) {
   const [imgIndex, setImgIndex] = useState(0)
   const { isLiked, toggle: toggleLike } = useLikedExperiences()
+  const t = useTranslations('explore')
 
   useEffect(() => {
     if (experience) {
@@ -146,7 +148,7 @@ export function ExperienceModal({ experience, onClose }: ExperienceModalProps) {
             <div className="flex items-center gap-1.5 mt-1.5 text-sm text-[var(--color-muted-foreground)]">
               <MapPin className="h-4 w-4 shrink-0" />
               <span>{experience.location}</span>
-              {experience.distance !== undefined && <span>· {experience.distance} km away</span>}
+              {experience.distance !== undefined && <span>· {experience.distance} {t('kmAway')}</span>}
             </div>
           </div>
 
@@ -155,7 +157,7 @@ export function ExperienceModal({ experience, onClose }: ExperienceModalProps) {
 
           {/* Health benefits */}
           <div>
-            <h3 className="font-display font-bold text-sm mb-2 text-[var(--color-foreground)]">Health Benefits</h3>
+            <h3 className="font-display font-bold text-sm mb-2 text-[var(--color-foreground)]">{t('healthBenefits')}</h3>
             <div className="flex flex-wrap gap-2">
               {experience.healthBenefits.map((b) => (
                 <span key={b} className="flex items-center gap-1 bg-[var(--color-green-bg)] text-[var(--color-green)] text-xs font-semibold px-3 py-1.5 rounded-[var(--radius-full)]">
@@ -172,7 +174,7 @@ export function ExperienceModal({ experience, onClose }: ExperienceModalProps) {
               <div className="flex items-start gap-2 p-3 bg-[var(--color-muted)] rounded-[var(--radius)]">
                 <Clock className="h-4 w-4 text-[var(--color-muted-foreground)] mt-0.5 shrink-0" />
                 <div>
-                  <p className="text-[0.65rem] text-[var(--color-muted-foreground)] uppercase font-semibold tracking-wide">Hours</p>
+                  <p className="text-[0.65rem] text-[var(--color-muted-foreground)] uppercase font-semibold tracking-wide">{t('hours')}</p>
                   <p className="text-xs font-semibold mt-0.5">{experience.hours}</p>
                 </div>
               </div>
@@ -181,7 +183,7 @@ export function ExperienceModal({ experience, onClose }: ExperienceModalProps) {
               <div className="flex items-start gap-2 p-3 bg-[var(--color-muted)] rounded-[var(--radius)]">
                 <DollarSign className="h-4 w-4 text-[var(--color-muted-foreground)] mt-0.5 shrink-0" />
                 <div>
-                  <p className="text-[0.65rem] text-[var(--color-muted-foreground)] uppercase font-semibold tracking-wide">Price</p>
+                  <p className="text-[0.65rem] text-[var(--color-muted-foreground)] uppercase font-semibold tracking-wide">{t('priceLabel')}</p>
                   <p className="text-xs font-semibold mt-0.5">{experience.price}</p>
                 </div>
               </div>
@@ -204,14 +206,14 @@ export function ExperienceModal({ experience, onClose }: ExperienceModalProps) {
               className="flex items-center justify-center gap-2 flex-1 py-3 bg-[var(--highlight)] text-[var(--highlight-foreground)] font-bold rounded-[var(--radius-full)] hover:bg-[var(--highlight-dark)] transition-colors"
             >
               <Navigation className="h-4 w-4" />
-              Get Directions
+              {t('getDirections')}
             </a>
             <a
               href={`/chatbot?q=${encodeURIComponent('Tell me more about ' + experience.title)}`}
               className="flex items-center justify-center gap-2 flex-1 py-3 border-2 border-[var(--color-border)] text-[var(--color-foreground)] font-bold rounded-[var(--radius-full)] hover:border-[var(--highlight)] hover:bg-[var(--highlight)]/10 transition-colors"
             >
               <MessageSquare className="h-4 w-4" />
-              Ask Valsamaki
+              {t('askValsamaki')}
             </a>
           </div>
 
@@ -222,11 +224,11 @@ export function ExperienceModal({ experience, onClose }: ExperienceModalProps) {
           >
             <Calendar className="h-5 w-5 text-[var(--highlight)] shrink-0" />
             <div className="flex-1">
-              <p className="text-sm font-bold text-[var(--color-foreground)]">Plan Your Visit</p>
-              <p className="text-xs text-[var(--color-muted-foreground)] mt-0.5">Build your personalised Crete itinerary</p>
+              <p className="text-sm font-bold text-[var(--color-foreground)]">{t('planYourVisit')}</p>
+              <p className="text-xs text-[var(--color-muted-foreground)] mt-0.5">{t('buildItinerary')}</p>
             </div>
             <span className="text-xs font-bold bg-[var(--highlight)] text-[var(--highlight-foreground)] px-3 py-1.5 rounded-[var(--radius-full)] shrink-0">
-              Plan →
+              {t('planNow')}
             </span>
           </a>
         </div>

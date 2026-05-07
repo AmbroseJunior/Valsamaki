@@ -142,15 +142,17 @@ export default function MapInner({
     const origin = userOrigin ?? HERAKLION
     // OSRM supports foot and car; transit approximated as foot
     const profile = routeTarget.mode === 'driving' ? 'car' : 'foot'
-    const osrmUrl =
-      `https://router.project-osrm.org/route/v1/${profile}/` +
-      `${origin.lng},${origin.lat};${routeTarget.lng},${routeTarget.lat}` +
-      `?overview=full&geometries=geojson`
+    const coordStr = `${origin.lng},${origin.lat};${routeTarget.lng},${routeTarget.lat}`
+    const routingUrl = `/api/routing?profile=${profile}&coords=${encodeURIComponent(coordStr)}`
 
-    fetch(osrmUrl)
+    fetch(routingUrl)
       .then((r) => r.json())
       .then((data) => {
-        if (cancelled || !data.routes?.[0] || !mapRef.current || !LRef.current) return
+        if (cancelled) return
+        if (!data.routes?.[0] || !mapRef.current || !LRef.current) {
+          onRouteInfo?.(null)
+          return
+        }
         const route = data.routes[0]
         const latlngs: [number, number][] = route.geometry.coordinates.map(
           ([routeLng, routeLat]: [number, number]) => [routeLat, routeLng]

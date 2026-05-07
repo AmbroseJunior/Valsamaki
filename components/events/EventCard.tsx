@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Calendar, MapPin, Users, Ticket } from 'lucide-react'
 import { formatDate, formatCurrency } from '@/lib/utils'
 import type { EventRow } from '@/types/database'
+import { useTranslations } from 'next-intl'
 
 interface EventCardProps {
   event: EventRow
@@ -15,6 +16,7 @@ interface EventCardProps {
 }
 
 export function EventCard({ event, onRsvp, compact = false }: EventCardProps) {
+  const t = useTranslations('events')
   return (
     <Card className="overflow-hidden hover:shadow-[var(--shadow-md)] transition-shadow">
       {event.images?.[0] && (
@@ -31,7 +33,7 @@ export function EventCard({ event, onRsvp, compact = false }: EventCardProps) {
         <div className="flex items-start justify-between gap-2">
           <h3 className="font-display font-semibold leading-tight">{event.title}</h3>
           <Badge variant={event.price === 0 ? 'default' : 'accent'} className="shrink-0">
-            {event.price === 0 ? 'Free' : formatCurrency(event.price)}
+            {event.price === 0 ? t('free') : formatCurrency(event.price)}
           </Badge>
         </div>
 
@@ -55,7 +57,7 @@ export function EventCard({ event, onRsvp, compact = false }: EventCardProps) {
           {event.max_attendees && (
             <span className="flex items-center gap-1.5">
               <Users className="h-3.5 w-3.5 shrink-0" />
-              Up to {event.max_attendees} attendees
+              {t('upTo')} {event.max_attendees} {t('attendees')}
             </span>
           )}
         </div>
@@ -64,7 +66,7 @@ export function EventCard({ event, onRsvp, compact = false }: EventCardProps) {
           <Badge variant="muted">{event.category}</Badge>
           {onRsvp && (
             <Button size="sm" className="ml-auto gap-1.5" onClick={() => onRsvp(event.id)}>
-              <Ticket className="h-3.5 w-3.5" /> RSVP
+              <Ticket className="h-3.5 w-3.5" /> {t('rsvp')}
             </Button>
           )}
         </div>

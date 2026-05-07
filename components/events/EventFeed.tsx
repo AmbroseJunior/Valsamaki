@@ -11,6 +11,7 @@ import { useOffline } from '@/hooks/useOffline'
 import { useRole } from '@/hooks/useRole'
 import { Search, X } from 'lucide-react'
 import type { EventRow } from '@/types/database'
+import { useTranslations } from 'next-intl'
 
 export function EventFeed() {
   const [category, setCategory] = useState('')
@@ -18,6 +19,7 @@ export function EventFeed() {
   const { userId, role } = useRole()
   const { isOffline } = useOffline()
   const supabase = createClient()
+  const t = useTranslations('events')
 
   const { data: events, isLoading } = useQuery({
     queryKey: ['events', category, search],
@@ -74,7 +76,7 @@ export function EventFeed() {
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search events by name, location, keyword…"
+          placeholder={t('searchPlaceholder')}
           className="w-full pl-9 pr-9 py-2.5 rounded-[var(--radius-full)] border border-[var(--color-border)] bg-[var(--color-input)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--highlight)] transition-shadow"
         />
         {search && (
@@ -97,8 +99,8 @@ export function EventFeed() {
         {events?.length === 0 && (
           <p className="col-span-full text-center text-[var(--color-muted-foreground)] py-12">
             {search
-              ? `No events found for "${search}". Try a different keyword.`
-              : 'No events found. Check back soon!'}
+              ? t('noEventsFound', { search })
+              : t('noEventsSoon')}
           </p>
         )}
       </div>

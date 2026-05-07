@@ -227,6 +227,12 @@ function DirectionButtons({ activeRouteMode, onRouteMode, routeInfo, routeLoadin
           {t('noCoords')}
         </p>
       )}
+
+      {hasCoords && activeRouteMode && !routeLoading && !routeInfo && (
+        <p className="text-[10px] text-red-500 dark:text-red-400 text-center">
+          {t('routeError')}
+        </p>
+      )}
     </div>
   )
 }

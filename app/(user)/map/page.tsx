@@ -29,7 +29,7 @@ const MapView = dynamic(
   { ssr: false, loading: () => <div className="w-full h-full bg-[var(--color-muted)] animate-pulse rounded-[var(--radius)]" /> }
 )
 
-type TabType = 'all' | 'events' | 'markets' | 'sights' | 'experiences'
+type TabType = 'all' | 'markets' | 'sights' | 'experiences'
 type RouteMode = 'walking' | 'transit' | 'driving'
 
 type BusinessWithOwner = BusinessRow & {
@@ -694,7 +694,7 @@ export default function MapPage() {
 
   const markers: MapMarker[] = useMemo(() => {
     const showBiz = tab === 'all'
-    const showEvt = tab === 'all' || tab === 'events'
+    const showEvt = tab === 'all'
     const showMkt = tab === 'all' || tab === 'markets'
     const showExp = tab === 'all' || tab === 'experiences'
     const showPl  = tab === 'all' || tab === 'sights'
@@ -743,7 +743,7 @@ export default function MapPage() {
   }
 
   const visibleBusinesses = tab === 'all' ? rawBusinesses : []
-  const visibleEvents = tab === 'all' || tab === 'events' ? events : []
+  const visibleEvents = tab === 'all' ? events : []
   const visibleFarmersMarkets = tab === 'all' || tab === 'markets' ? filteredMarkets : []
   const visibleExperiences = tab === 'all' || tab === 'experiences' ? filteredExperiences : []
   const visiblePlaces = tab === 'all' || tab === 'sights' ? filteredPlaces : []
@@ -751,7 +751,6 @@ export default function MapPage() {
 
   const TABS = [
     { key: 'all' as const,         label: `🌍 ${t('all')}` },
-    { key: 'events' as const,      label: `🎉 ${t('events')}` },
     { key: 'markets' as const,     label: `🌿 ${t('farmersMarkets')}` },
     { key: 'sights' as const,      label: `🏛️ ${t('sights')}` },
     { key: 'experiences' as const, label: `✨ ${t('experiences')}` },
@@ -785,7 +784,7 @@ export default function MapPage() {
               </button>
             )}
           </div>
-          <div className="grid grid-cols-5 gap-1">
+          <div className="grid grid-cols-4 gap-1">
             {TABS.map(({ key, label }) => (
               <button
                 key={key}

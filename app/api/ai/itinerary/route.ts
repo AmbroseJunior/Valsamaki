@@ -62,7 +62,15 @@ Return ONLY valid JSON (no markdown, no explanation) in this exact shape:
   try {
     const provider = getPrimaryProvider()
     const text = await provider.complete(prompt, {})
-    const itinerary = JSON.parse(extractJSON(text))
+    let itinerary: unknown = null
+    let lastErr: unknown = null
+
+    // Two-pass parse: first pass clean, second pass aggressive repair
+    for (const cleaned of [extractJSON(text), aggressiveRepair(text)]) {
+      try { itinerary = JSON.parse(cleaned); break } catch (e) { lastErr = e }
+    }
+
+    if (!itinerary) throw lastErr
     return NextResponse.json({ itinerary })
   } catch (e) {
     const msg = e instanceof Error ? e.message : 'Failed to generate itinerary'
@@ -71,15 +79,27 @@ Return ONLY valid JSON (no markdown, no explanation) in this exact shape:
 }
 
 function extractJSON(raw: string): string {
-  // Strip markdown code fences (```json ... ``` or ``` ... ```)
   let text = raw.replace(/```(?:json)?\s*/gi, '').replace(/```/g, '')
-  // Find outermost { ... }
   const start = text.indexOf('{')
   const end = text.lastIndexOf('}')
   if (start !== -1 && end !== -1) text = text.slice(start, end + 1)
-  // Remove trailing commas before } or ] (common AI mistake)
   text = text.replace(/,\s*([}\]])/g, '$1')
-  // Remove JS-style // comments
   text = text.replace(/\/\/[^\n]*/g, '')
+  return text.trim()
+}
+
+function aggressiveRepair(raw: string): string {
+  let text = extractJSON(raw)
+  // Replace literal (unescaped) newlines inside quoted strings
+  text = text.replace(/"([^"]*)"/g, (_, inner) =>
+    `"${inner.replace(/\n/g, '\\n').replace(/\r/g, '').replace(/\t/g, ' ')}"`)
+  // Remove any remaining control characters
+  // eslint-disable-next-line no-control-regex
+  text = text.replace(/[\x00-\x08\x0b\x0c\x0e-\x1f]/g, '')
+  // Fix common AI mistake: ... or … inside arrays
+  text = text.replace(/\.\.\.[\s,]*/g, '')
+  text = text.replace(/…[\s,]*/g, '')
+  // Fix trailing commas again after other replacements
+  text = text.replace(/,\s*([}\]])/g, '$1')
   return text.trim()
 }

@@ -82,6 +82,16 @@ export default function MapInner({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // Invalidate map size on container resize (fixes grey tiles on sidebar toggle / responsive layout)
+  useEffect(() => {
+    if (!mapReady || !containerRef.current) return
+    const observer = new ResizeObserver(() => {
+      mapRef.current?.invalidateSize()
+    })
+    observer.observe(containerRef.current)
+    return () => observer.disconnect()
+  }, [mapReady])
+
   // Re-draw markers whenever data changes
   useEffect(() => {
     if (!mapReady) return

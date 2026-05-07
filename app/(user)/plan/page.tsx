@@ -37,10 +37,7 @@ const INTERESTS = [
   { id: 'olive_oil', label: 'Olive Oil', emoji: '🫒' },
   { id: 'hiking', label: 'Hiking', emoji: '🥾' },
   { id: 'history', label: 'History', emoji: '🏛️' },
-  { id: 'beaches', label: 'Beaches', emoji: '🏖️' },
-  { id: 'wine', label: 'Wine', emoji: '🍷' },
   { id: 'wellness', label: 'Wellness', emoji: '💆' },
-  { id: 'culture', label: 'Culture', emoji: '🎭' },
   { id: 'markets', label: 'Markets', emoji: '🛒' },
   { id: 'sea', label: 'Water Sports', emoji: '🚣' },
 ]
@@ -163,7 +160,9 @@ export default function PlanPage() {
       if (data.error) throw new Error(data.error)
       setItinerary(data.itinerary)
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to generate itinerary')
+      const raw = e instanceof Error ? e.message : ''
+      const isParseErr = /json|unexpected|position|\btoken\b/i.test(raw)
+      setError(isParseErr ? 'AI returned an unexpected format — tap Generate again to retry.' : (raw || 'Failed to generate itinerary'))
     } finally {
       setLoading(false)
     }
@@ -192,7 +191,7 @@ export default function PlanPage() {
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--highlight)]/10 text-[var(--highlight)] text-xs font-bold uppercase tracking-wider">
           <Sparkles className="h-3 w-3" /> AI-Powered
         </div>
-        <h1 className="font-display text-3xl font-bold">Plan Your Crete Trip</h1>
+        <h1 className="font-display text-3xl font-bold">Plan Your Cretan Wellness Adventure</h1>
         <p className="text-[var(--color-muted-foreground)]">
           Tell us your preferences — our AI builds a personalised day-by-day itinerary from real local experiences.
         </p>

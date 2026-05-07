@@ -216,16 +216,19 @@ export function ExperienceModal({ experience, onClose }: ExperienceModalProps) {
           </div>
 
           {/* Plan Your Visit */}
-          <div className="flex items-center gap-3 p-4 bg-[var(--highlight)]/10 rounded-[var(--radius-lg)] border border-[var(--highlight)]/30">
-            <Calendar className="h-5 w-5 text-[var(--color-foreground)] shrink-0" />
-            <div>
+          <a
+            href={`/plan?interest=${encodeURIComponent(experience.category)}`}
+            className="flex items-center gap-3 p-4 bg-[var(--highlight)]/10 rounded-[var(--radius-lg)] border border-[var(--highlight)]/30 hover:bg-[var(--highlight)]/20 transition-colors"
+          >
+            <Calendar className="h-5 w-5 text-[var(--highlight)] shrink-0" />
+            <div className="flex-1">
               <p className="text-sm font-bold text-[var(--color-foreground)]">Plan Your Visit</p>
-              <p className="text-xs text-[var(--color-muted-foreground)] mt-0.5">Save to your itinerary and get personalised tips</p>
+              <p className="text-xs text-[var(--color-muted-foreground)] mt-0.5">Build your personalised Crete itinerary</p>
             </div>
-            <button className="ml-auto text-xs font-bold bg-[var(--highlight)] text-[var(--highlight-foreground)] px-3 py-1.5 rounded-[var(--radius-full)] hover:bg-[var(--highlight-dark)] transition-colors shrink-0">
-              Save
-            </button>
-          </div>
+            <span className="text-xs font-bold bg-[var(--highlight)] text-[var(--highlight-foreground)] px-3 py-1.5 rounded-[var(--radius-full)] shrink-0">
+              Plan →
+            </span>
+          </a>
         </div>
       </div>
     </div>

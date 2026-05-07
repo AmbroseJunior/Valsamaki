@@ -1,11 +1,9 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import Anthropic from '@anthropic-ai/sdk'
 import { rateLimit, validateString } from '@/lib/security'
+import { getPrimaryProvider } from '@/lib/ai/providers'
 
 export const maxDuration = 10
-
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY ?? '' })
 
 export async function POST(request: NextRequest) {
   const ip = request.headers.get('x-forwarded-for') ?? 'unknown'
@@ -16,21 +14,14 @@ export async function POST(request: NextRequest) {
   const query = validateString(body?.query, { maxLength: 100 })
   if (!query || query.length < 2) return NextResponse.json({ suggestions: [] })
 
-  if (!process.env.ANTHROPIC_API_KEY) return NextResponse.json({ suggestions: [] })
-
   try {
-    const response = await client.messages.create({
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: 150,
-      system: `You suggest search terms for a Crete experience discovery app.
-Given a partial query, return exactly 4 short search suggestions (2-5 words each)
-that a tourist might type to find experiences, places, foods, or activities in Crete.
-Output ONLY a JSON array of strings, no other text. Example: ["olive oil tasting","gorge hiking","village cooking class","sea cave kayaking"]`,
-      messages: [{ role: 'user', content: query }],
-    })
-
-    const text = response.content[0]?.type === 'text' ? response.content[0].text.trim() : '[]'
-    const suggestions = JSON.parse(text) as string[]
+    const provider = getPrimaryProvider()
+    const prompt = `You suggest Crete experience search terms. Given the partial query "${query}", return exactly 4 short suggestions (2-5 words each) that a tourist might type to find experiences, places, foods, or activities in Crete. Output ONLY a JSON array of strings, no other text. Example: ["olive oil tasting","gorge hiking","village cooking class","sea cave kayaking"]`
+    const text = await provider.complete(prompt, {})
+    const jsonStart = text.indexOf('[')
+    const jsonEnd = text.lastIndexOf(']')
+    const clean = jsonStart !== -1 ? text.slice(jsonStart, jsonEnd + 1) : '[]'
+    const suggestions = JSON.parse(clean) as string[]
     return NextResponse.json({ suggestions: Array.isArray(suggestions) ? suggestions.slice(0, 5) : [] })
   } catch {
     return NextResponse.json({ suggestions: [] })

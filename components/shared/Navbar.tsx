@@ -49,7 +49,7 @@ export function Navbar() {
   function handleSearch(e: React.FormEvent) {
     e.preventDefault()
     if (searchQuery.trim()) {
-      router.push(`/explore?q=${encodeURIComponent(searchQuery.trim())}`)
+      router.push(`/map?q=${encodeURIComponent(searchQuery.trim())}`)
       setSearchOpen(false)
       setSearchQuery('')
     }
@@ -192,6 +192,9 @@ export function Navbar() {
                   <Link href="/settings" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-[var(--color-muted)] transition-colors" onClick={() => setMenuOpen(false)}>
                     {t('settings')}
                   </Link>
+                  <Link href="/explore?liked=1" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-[var(--color-muted)] transition-colors" onClick={() => setMenuOpen(false)}>
+                    ❤️ {t('likedExperiences')}
+                  </Link>
                   {isProducer && (
                     <>
                       <Link href="/business" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-[var(--color-muted)] transition-colors" onClick={() => setMenuOpen(false)}>{t('business')}</Link>
@@ -235,6 +238,12 @@ export function Navbar() {
                 className="w-full pl-9 pr-4 py-2.5 rounded-[var(--radius)] border border-[var(--color-border)] bg-[var(--color-muted)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--highlight)] text-[var(--color-foreground)]"
               />
             </form>
+
+            {/* Language switcher — always visible for every user */}
+            <div className="flex items-center justify-between px-3 py-2 rounded-[var(--radius)] bg-[var(--color-muted)]">
+              <span className="text-xs font-bold text-[var(--color-muted-foreground)] uppercase tracking-wide">{t('language')}</span>
+              <LocaleSwitcher />
+            </div>
 
             {isGuest ? (
               <>

@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { MapPin, Star, Heart, ChevronLeft, ChevronRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { Experience } from '@/types/experience'
+import { useLikedExperiences } from '@/hooks/useLikedExperiences'
 
 interface ExperienceCardProps {
   experience: Experience
@@ -14,8 +15,8 @@ interface ExperienceCardProps {
 
 export function ExperienceCard({ experience, onClick, className }: ExperienceCardProps) {
   const [imgIndex, setImgIndex] = useState(0)
-  const [liked, setLiked] = useState(false)
   const [imgHovered, setImgHovered] = useState(false)
+  const { isLiked, toggle: toggleLike } = useLikedExperiences()
 
   const prev = useCallback((e: React.MouseEvent) => {
     e.stopPropagation()
@@ -27,10 +28,10 @@ export function ExperienceCard({ experience, onClick, className }: ExperienceCar
     setImgIndex((i) => (i + 1) % experience.images.length)
   }, [experience.images.length])
 
-  const toggleLike = useCallback((e: React.MouseEvent) => {
+  const handleToggleLike = useCallback((e: React.MouseEvent) => {
     e.stopPropagation()
-    setLiked((v) => !v)
-  }, [])
+    toggleLike(experience.id)
+  }, [toggleLike, experience.id])
 
   return (
     <div
@@ -74,11 +75,11 @@ export function ExperienceCard({ experience, onClick, className }: ExperienceCar
 
         {/* Heart button */}
         <button
-          onClick={toggleLike}
+          onClick={handleToggleLike}
           className="absolute top-3 right-3 p-1.5 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white transition-colors"
-          aria-label={liked ? 'Remove from favourites' : 'Add to favourites'}
+          aria-label={isLiked(experience.id) ? 'Remove from favourites' : 'Add to favourites'}
         >
-          <Heart className={cn('h-4 w-4 transition-colors', liked ? 'fill-[var(--highlight)] stroke-[var(--highlight)]' : 'stroke-gray-600')} />
+          <Heart className={cn('h-4 w-4 transition-colors', isLiked(experience.id) ? 'fill-[var(--highlight)] stroke-[var(--highlight)]' : 'stroke-gray-600')} />
         </button>
 
         {/* Image nav arrows */}

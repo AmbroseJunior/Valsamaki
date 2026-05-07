@@ -1,16 +1,14 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import Anthropic from '@anthropic-ai/sdk'
 import { rateLimit } from '@/lib/security'
+import { getPrimaryProvider } from '@/lib/ai/providers'
 
 export const maxDuration = 30
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY ?? '' })
-
 const CRETE_CONTEXT = `
-Real experiences available in the app:
-- Gorge of Samaria hike (Chania) — full-day trek, 16 km
-- Minoan Palace of Knossos (Heraklion) — archaeological site, 2-3 hrs
+Real experiences available:
+- Gorge of Samaria hike (Chania) — full-day 16 km trek
+- Minoan Palace of Knossos (Heraklion) — 2-3 hrs archaeological site
 - Olive oil tasting at traditional farm (Rethymno) — 2 hrs
 - Cretan cooking class with local family (Heraklion) — 3 hrs
 - Sea kayaking Balos Lagoon (Chania) — half-day
@@ -30,10 +28,6 @@ export async function POST(request: NextRequest) {
   const ip = request.headers.get('x-forwarded-for') ?? 'unknown'
   const rl = rateLimit(`itinerary:${ip}`, 10, 60_000)
   if (!rl.ok) return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 })
-
-  if (!process.env.ANTHROPIC_API_KEY) {
-    return NextResponse.json({ error: 'AI not configured' }, { status: 503 })
-  }
 
   const body = await request.json().catch(() => ({}))
   const days = Math.min(Math.max(parseInt(body?.days) || 3, 1), 7)
@@ -66,19 +60,15 @@ Return ONLY valid JSON (no markdown, no explanation) in this exact shape:
 }`
 
   try {
-    const response = await client.messages.create({
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: 2000,
-      messages: [{ role: 'user', content: prompt }],
-    })
-
-    const text = response.content[0]?.type === 'text' ? response.content[0].text.trim() : '{}'
+    const provider = getPrimaryProvider()
+    const text = await provider.complete(prompt, {})
     const jsonStart = text.indexOf('{')
     const jsonEnd = text.lastIndexOf('}')
     const clean = jsonStart !== -1 && jsonEnd !== -1 ? text.slice(jsonStart, jsonEnd + 1) : text
     const itinerary = JSON.parse(clean)
     return NextResponse.json({ itinerary })
-  } catch {
-    return NextResponse.json({ error: 'Failed to generate itinerary' }, { status: 500 })
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : 'Failed to generate itinerary'
+    return NextResponse.json({ error: msg }, { status: 500 })
   }
 }

@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import dynamic from 'next/dynamic'
-import { Search, X, MapPin, Phone, Globe, Calendar, Ticket } from 'lucide-react'
+import { useSearchParams } from 'next/navigation'
+import { Search, X, MapPin, Phone, Globe, Calendar, Ticket, Star, ExternalLink } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslations } from 'next-intl'
 import { createClient } from '@/lib/supabase/client'
@@ -15,13 +16,20 @@ import type { BusinessRow, EventRow } from '@/types/database'
 import type { MapMarker, RouteTarget, RouteInfo } from '@/components/map/MapView'
 import { FARMERS_MARKETS } from '@/lib/data/farmersMarkets'
 import type { FarmersMarket } from '@/lib/data/farmersMarkets'
+import { EXPERIENCES } from '@/lib/data/experiences'
+import { SCRAPED_EXPERIENCES } from '@/lib/data/scrapedExperiences'
+import type { Experience } from '@/types/experience'
+import { SCRAPED_PLACES } from '@/lib/data/scrapedPlaces'
+import type { CretePlace } from '@/lib/data/scrapedPlaces'
+
+const ALL_MAP_EXPERIENCES: Experience[] = [...EXPERIENCES, ...SCRAPED_EXPERIENCES]
 
 const MapView = dynamic(
   () => import('@/components/map/MapView').then((m) => m.MapView),
   { ssr: false, loading: () => <div className="w-full h-full bg-[var(--color-muted)] animate-pulse rounded-[var(--radius)]" /> }
 )
 
-type TabType = 'all' | 'businesses' | 'events' | 'producers' | 'markets'
+type TabType = 'all' | 'businesses' | 'events' | 'producers' | 'markets' | 'experiences' | 'sights'
 type RouteMode = 'walking' | 'transit' | 'driving'
 
 type BusinessWithOwner = BusinessRow & {
@@ -390,15 +398,112 @@ function FarmersMarketPanel({
   )
 }
 
+// ── Experience + Place panels ─────────────────────────────────────────────────
+
+const PLACE_CATEGORY_ICONS: Record<string, string> = {
+  archaeological: '🏛️', beach: '🏖️', gorge: '🌲', cave: '🕳️', museum: '🏺', nature: '🌿',
+}
+
+function ExperiencePanel({
+  experience, onClose, routeProps,
+}: { experience: Experience; onClose: () => void; routeProps: RoutePanelProps }) {
+  const t = useTranslations('map')
+  return (
+    <div className="bg-[var(--color-card)] rounded-[var(--radius-xl)] shadow-[var(--shadow-lg)] border border-[var(--color-border)] overflow-hidden">
+      <div className="relative bg-gradient-to-br from-amber-500 to-orange-500 p-4">
+        <button onClick={onClose} className="absolute top-3 right-3 p-1.5 rounded-full bg-black/20 hover:bg-black/30 transition-colors">
+          <X className="h-4 w-4 text-white" />
+        </button>
+        <div className="pr-8">
+          <h3 className="font-display font-bold text-lg text-white leading-snug">{experience.title}</h3>
+          <div className="flex items-center gap-2 mt-1">
+            <span className="text-[0.65rem] font-bold uppercase tracking-wide bg-black/20 text-white px-2 py-0.5 rounded-full">
+              ✨ {experience.category.replace('_', ' ')}
+            </span>
+            <span className="flex items-center gap-0.5 text-xs text-white/90">
+              <Star className="h-3 w-3 fill-white stroke-white" />{experience.rating} ({experience.reviewCount})
+            </span>
+          </div>
+        </div>
+      </div>
+      {experience.images[0] && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={experience.images[0]} alt={experience.title} className="w-full h-32 object-cover" />
+      )}
+      <div className="p-4 space-y-3">
+        <p className="text-sm text-[var(--color-foreground)] leading-relaxed line-clamp-3">{experience.shortDescription}</p>
+        <div className="space-y-1.5 text-sm text-[var(--color-muted-foreground)]">
+          <div className="flex items-center gap-2"><MapPin className="h-4 w-4 shrink-0 text-amber-500" /><span>{experience.location}</span></div>
+          {experience.hours && <div className="flex items-center gap-2"><Calendar className="h-4 w-4 shrink-0 text-amber-500" /><span>{experience.hours}</span></div>}
+          {experience.price && <div className="flex items-center gap-2"><Ticket className="h-4 w-4 shrink-0 text-amber-500" /><span>{experience.price}</span></div>}
+        </div>
+        <DirectionButtons {...routeProps} />
+        <a href={`/explore?q=${encodeURIComponent(experience.title)}`} className="flex items-center justify-center gap-2 w-full py-2.5 border-2 border-amber-400 text-[var(--color-foreground)] font-bold rounded-[var(--radius-full)] hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors text-sm">
+          <ExternalLink className="h-4 w-4" /> {t('viewDetails')}
+        </a>
+      </div>
+    </div>
+  )
+}
+
+function PlacePanel({
+  place, onClose, routeProps,
+}: { place: CretePlace; onClose: () => void; routeProps: RoutePanelProps }) {
+  const t = useTranslations('map')
+  return (
+    <div className="bg-[var(--color-card)] rounded-[var(--radius-xl)] shadow-[var(--shadow-lg)] border border-[var(--color-border)] overflow-hidden">
+      {place.image && (
+        <div className="relative h-36 overflow-hidden">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={place.image} alt={place.title} className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+          <button onClick={onClose} className="absolute top-3 right-3 p-1.5 rounded-full bg-black/30 hover:bg-black/50 transition-colors">
+            <X className="h-4 w-4 text-white" />
+          </button>
+          <div className="absolute bottom-0 left-0 right-0 p-3">
+            <h3 className="font-display font-bold text-white text-base leading-snug">{place.title}</h3>
+            <div className="flex items-center gap-2 mt-0.5">
+              <span className="text-[0.6rem] font-bold uppercase tracking-wide bg-white/20 text-white px-2 py-0.5 rounded-full">{place.region}</span>
+              <span className="text-[0.6rem] text-white/80">{PLACE_CATEGORY_ICONS[place.category] ?? '📍'} {place.category}</span>
+            </div>
+          </div>
+        </div>
+      )}
+      <div className="p-4 space-y-3">
+        <p className="text-sm text-[var(--color-foreground)] leading-relaxed line-clamp-3">{place.description}</p>
+        {place.highlights.length > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            {place.highlights.slice(0, 4).map((h) => (
+              <span key={h} className="text-[0.6rem] font-semibold bg-[var(--color-muted)] text-[var(--color-muted-foreground)] px-2 py-0.5 rounded-full border border-[var(--color-border)]">{h}</span>
+            ))}
+          </div>
+        )}
+        <div className="space-y-1.5 text-sm text-[var(--color-muted-foreground)]">
+          <div className="flex items-center gap-2"><MapPin className="h-4 w-4 shrink-0 text-[var(--color-primary)]" /><span>{place.location}</span></div>
+          {place.hours && <div className="flex items-center gap-2"><Calendar className="h-4 w-4 shrink-0 text-[var(--color-primary)]" /><span>{place.hours}</span></div>}
+          {place.price && <div className="flex items-center gap-2"><Ticket className="h-4 w-4 shrink-0 text-[var(--color-primary)]" /><span>{place.price}</span></div>}
+        </div>
+        <DirectionButtons {...routeProps} />
+        <a href={`/chatbot?q=${encodeURIComponent('Tell me about ' + place.title + ' in Crete')}`} className="flex items-center justify-center gap-2 w-full py-2.5 border-2 border-[var(--color-border)] text-[var(--color-foreground)] font-bold rounded-[var(--radius-full)] hover:border-[var(--color-primary)] transition-colors text-sm">
+          💬 {t('askAboutPlace')}
+        </a>
+      </div>
+    </div>
+  )
+}
+
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 export default function MapPage() {
   const t = useTranslations('map')
-  const [search, setSearch] = useState('')
+  const searchParams = useSearchParams()
+  const [search, setSearch] = useState(searchParams.get('q') ?? '')
   const [tab, setTab] = useState<TabType>('all')
   const [selectedBizId, setSelectedBizId] = useState<string | null>(null)
   const [selectedEvtId, setSelectedEvtId] = useState<string | null>(null)
   const [selectedMarketId, setSelectedMarketId] = useState<string | null>(null)
+  const [selectedExpId, setSelectedExpId] = useState<string | null>(null)
+  const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null)
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [activeRouteMode, setActiveRouteMode] = useState<RouteMode | null>(null)
   const [routeInfo, setRouteInfo] = useState<RouteInfo | null>(null)
@@ -406,6 +511,12 @@ export default function MapPage() {
   const { userId } = useRole()
   const { coords } = useLocation(userId)
   const supabase = createClient()
+
+  // Sync URL param changes (e.g. navbar search)
+  useEffect(() => {
+    const q = searchParams.get('q')
+    if (q) setSearch(q)
+  }, [searchParams])
 
   const s = search.trim().slice(0, 100)
 
@@ -452,6 +563,22 @@ export default function MapPage() {
     )
   }, [s])
 
+  const filteredExperiences = useMemo(() => {
+    if (!s) return ALL_MAP_EXPERIENCES
+    const term = s.toLowerCase()
+    return ALL_MAP_EXPERIENCES.filter(
+      (e) => e.title.toLowerCase().includes(term) || e.location.toLowerCase().includes(term) || e.tags.some((tg) => tg.toLowerCase().includes(term))
+    )
+  }, [s])
+
+  const filteredPlaces = useMemo(() => {
+    if (!s) return SCRAPED_PLACES
+    const term = s.toLowerCase()
+    return SCRAPED_PLACES.filter(
+      (p) => p.title.toLowerCase().includes(term) || p.region.toLowerCase().includes(term) || p.tags.some((tg) => tg.toLowerCase().includes(term))
+    )
+  }, [s])
+
   const producers = useMemo(
     () => rawBusinesses.filter((b) => b.profiles?.role === 'producer'),
     [rawBusinesses]
@@ -470,29 +597,44 @@ export default function MapPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [selectedMarketId, s]
   )
-  const hasSelection = selectedBiz !== null || selectedEvt !== null || selectedMarket !== null
+  const selectedExp = useMemo(
+    () => (selectedExpId ? (ALL_MAP_EXPERIENCES.find((e) => e.id === selectedExpId) ?? null) : null),
+    [selectedExpId]
+  )
+  const selectedPlace = useMemo(
+    () => (selectedPlaceId ? (SCRAPED_PLACES.find((p) => p.id === selectedPlaceId) ?? null) : null),
+    [selectedPlaceId]
+  )
+  const hasSelection = selectedBiz !== null || selectedEvt !== null || selectedMarket !== null || selectedExp !== null || selectedPlace !== null
 
   function clearSelection() {
-    setSelectedBizId(null)
-    setSelectedEvtId(null)
-    setSelectedMarketId(null)
-    setActiveRouteMode(null)
-    setRouteInfo(null)
-    setRouteLoading(false)
+    setSelectedBizId(null); setSelectedEvtId(null); setSelectedMarketId(null)
+    setSelectedExpId(null); setSelectedPlaceId(null)
+    setActiveRouteMode(null); setRouteInfo(null); setRouteLoading(false)
   }
 
   function selectBiz(biz: BusinessWithOwner) {
-    setSelectedBizId(biz.id); setSelectedEvtId(null); setSelectedMarketId(null)
+    setSelectedBizId(biz.id); setSelectedEvtId(null); setSelectedMarketId(null); setSelectedExpId(null); setSelectedPlaceId(null)
     setActiveRouteMode(null); setRouteInfo(null); setRouteLoading(false); setSidebarOpen(true)
   }
 
   function selectEvt(evt: EventRow) {
-    setSelectedEvtId(evt.id); setSelectedBizId(null); setSelectedMarketId(null)
+    setSelectedEvtId(evt.id); setSelectedBizId(null); setSelectedMarketId(null); setSelectedExpId(null); setSelectedPlaceId(null)
     setActiveRouteMode(null); setRouteInfo(null); setRouteLoading(false); setSidebarOpen(true)
   }
 
   function selectMarket(mkt: FarmersMarket) {
-    setSelectedMarketId(mkt.id); setSelectedBizId(null); setSelectedEvtId(null)
+    setSelectedMarketId(mkt.id); setSelectedBizId(null); setSelectedEvtId(null); setSelectedExpId(null); setSelectedPlaceId(null)
+    setActiveRouteMode(null); setRouteInfo(null); setRouteLoading(false); setSidebarOpen(true)
+  }
+
+  function selectExp(exp: Experience) {
+    setSelectedExpId(exp.id); setSelectedBizId(null); setSelectedEvtId(null); setSelectedMarketId(null); setSelectedPlaceId(null)
+    setActiveRouteMode(null); setRouteInfo(null); setRouteLoading(false); setSidebarOpen(true)
+  }
+
+  function selectPlace(place: CretePlace) {
+    setSelectedPlaceId(place.id); setSelectedBizId(null); setSelectedEvtId(null); setSelectedMarketId(null); setSelectedExpId(null)
     setActiveRouteMode(null); setRouteInfo(null); setRouteLoading(false); setSidebarOpen(true)
   }
 
@@ -501,37 +643,55 @@ export default function MapPage() {
     if (selectedBiz?.lat && selectedBiz?.lng) return { lat: selectedBiz.lat, lng: selectedBiz.lng, mode: activeRouteMode }
     if (selectedEvt?.lat && selectedEvt?.lng) return { lat: selectedEvt.lat, lng: selectedEvt.lng, mode: activeRouteMode }
     if (selectedMarket) return { lat: selectedMarket.lat, lng: selectedMarket.lng, mode: activeRouteMode }
+    if (selectedExp?.coordinates) return { lat: selectedExp.coordinates.lat, lng: selectedExp.coordinates.lng, mode: activeRouteMode }
+    if (selectedPlace) return { lat: selectedPlace.coordinates.lat, lng: selectedPlace.coordinates.lng, mode: activeRouteMode }
     return undefined
-  }, [activeRouteMode, selectedBiz, selectedEvt, selectedMarket])
+  }, [activeRouteMode, selectedBiz, selectedEvt, selectedMarket, selectedExp, selectedPlace])
 
   const routeProps: RoutePanelProps = {
     activeRouteMode,
     onRouteMode: (mode) => { setActiveRouteMode(mode); setRouteInfo(null); setRouteLoading(mode !== null) },
     routeInfo,
     routeLoading,
-    hasCoords: !!((selectedBiz?.lat && selectedBiz?.lng) || (selectedEvt?.lat && selectedEvt?.lng) || selectedMarket),
+    hasCoords: !!(
+      (selectedBiz?.lat && selectedBiz?.lng) ||
+      (selectedEvt?.lat && selectedEvt?.lng) ||
+      selectedMarket ||
+      selectedExp?.coordinates ||
+      selectedPlace
+    ),
   }
 
   const markers: MapMarker[] = useMemo(() => {
-    const bMarkers: MapMarker[] = rawBusinesses
+    const showBiz = tab === 'all' || tab === 'businesses'
+    const showEvt = tab === 'all' || tab === 'events'
+    const showMkt = tab === 'all' || tab === 'markets'
+    const showExp = tab === 'all' || tab === 'experiences'
+    const showPl  = tab === 'all' || tab === 'sights'
+    const bMarkers: MapMarker[] = (showBiz ? rawBusinesses : [])
       .filter((b) => b.lat && b.lng)
       .map((b) => ({ id: `b:${b.id}`, lat: b.lat!, lng: b.lng!, type: b.profiles?.role === 'producer' ? 'producer' : 'business', label: b.name, category: b.category }))
-    const eMarkers: MapMarker[] = events
+    const eMarkers: MapMarker[] = (showEvt ? events : [])
       .filter((e) => e.lat && e.lng)
       .map((e) => ({ id: `e:${e.id}`, lat: e.lat!, lng: e.lng!, type: 'event' as const, label: e.title, category: e.category }))
-    const mMarkers: MapMarker[] = (tab === 'all' || tab === 'markets' ? filteredMarkets : [])
+    const mMarkers: MapMarker[] = (showMkt ? filteredMarkets : [])
       .map((m) => ({ id: `m:${m.id}`, lat: m.lat, lng: m.lng, type: 'farmers_market' as const, label: m.nameEn }))
-    return [...bMarkers, ...eMarkers, ...mMarkers]
-  }, [rawBusinesses, events, filteredMarkets, tab])
+    const expMarkers: MapMarker[] = (showExp ? filteredExperiences : [])
+      .filter((ex) => ex.coordinates)
+      .map((ex) => ({ id: `exp:${ex.id}`, lat: ex.coordinates.lat, lng: ex.coordinates.lng, type: 'experience' as const, label: ex.title }))
+    const plMarkers: MapMarker[] = (showPl ? filteredPlaces : [])
+      .map((p) => ({ id: `pl:${p.id}`, lat: p.coordinates.lat, lng: p.coordinates.lng, type: 'place' as const, label: p.title }))
+    return [...bMarkers, ...eMarkers, ...mMarkers, ...expMarkers, ...plMarkers]
+  }, [rawBusinesses, events, filteredMarkets, filteredExperiences, filteredPlaces, tab])
 
   const flyTo = useMemo<{ lat: number; lng: number; zoom?: number } | undefined>(() => {
     const item = selectedBiz ?? selectedEvt
-    if (!item?.lat || !item?.lng) {
-      if (selectedMarket) return { lat: selectedMarket.lat, lng: selectedMarket.lng, zoom: 16 }
-      return undefined
-    }
-    return { lat: item.lat, lng: item.lng, zoom: 16 }
-  }, [selectedBiz, selectedEvt, selectedMarket])
+    if (item?.lat && item?.lng) return { lat: item.lat, lng: item.lng, zoom: 16 }
+    if (selectedMarket) return { lat: selectedMarket.lat, lng: selectedMarket.lng, zoom: 16 }
+    if (selectedExp?.coordinates) return { lat: selectedExp.coordinates.lat, lng: selectedExp.coordinates.lng, zoom: 15 }
+    if (selectedPlace) return { lat: selectedPlace.coordinates.lat, lng: selectedPlace.coordinates.lng, zoom: 15 }
+    return undefined
+  }, [selectedBiz, selectedEvt, selectedMarket, selectedExp, selectedPlace])
 
   function handleMarkerClick(markerId: string) {
     if (markerId.startsWith('b:')) {
@@ -543,21 +703,31 @@ export default function MapPage() {
     } else if (markerId.startsWith('m:')) {
       const mkt = filteredMarkets.find((m) => m.id === markerId.slice(2))
       if (mkt) selectMarket(mkt)
+    } else if (markerId.startsWith('exp:')) {
+      const exp = ALL_MAP_EXPERIENCES.find((ex) => ex.id === markerId.slice(4))
+      if (exp) selectExp(exp)
+    } else if (markerId.startsWith('pl:')) {
+      const pl = SCRAPED_PLACES.find((p) => p.id === markerId.slice(3))
+      if (pl) selectPlace(pl)
     }
   }
 
-  const visibleBusinesses = tab === 'events' || tab === 'producers' || tab === 'markets' ? [] : rawBusinesses
-  const visibleEvents = tab === 'businesses' || tab === 'producers' || tab === 'markets' ? [] : events
+  const visibleBusinesses = tab === 'all' || tab === 'businesses' ? rawBusinesses : []
+  const visibleEvents = tab === 'all' || tab === 'events' ? events : []
   const visibleProducers = tab === 'producers' ? producers : []
   const visibleFarmersMarkets = tab === 'all' || tab === 'markets' ? filteredMarkets : []
-  const totalCount = visibleBusinesses.length + visibleEvents.length + visibleProducers.length + visibleFarmersMarkets.length
+  const visibleExperiences = tab === 'all' || tab === 'experiences' ? filteredExperiences : []
+  const visiblePlaces = tab === 'all' || tab === 'sights' ? filteredPlaces : []
+  const totalCount = visibleBusinesses.length + visibleEvents.length + visibleProducers.length + visibleFarmersMarkets.length + visibleExperiences.length + visiblePlaces.length
 
   const TABS = [
-    { key: 'all' as const,        label: `🌿 ${t('all')}` },
-    { key: 'businesses' as const, label: `🏪 ${t('places')}` },
-    { key: 'events' as const,     label: `🎉 ${t('events')}` },
-    { key: 'producers' as const,  label: `🫒 ${t('producers')}` },
-    { key: 'markets' as const,    label: `🌿 ${t('farmersMarkets')}` },
+    { key: 'all' as const,         label: `🌍 ${t('all')}` },
+    { key: 'businesses' as const,  label: `🏪 ${t('places')}` },
+    { key: 'events' as const,      label: `🎉 ${t('events')}` },
+    { key: 'producers' as const,   label: `🫒 ${t('producers')}` },
+    { key: 'markets' as const,     label: `🌿 ${t('farmersMarkets')}` },
+    { key: 'experiences' as const, label: `✨ ${t('experiences') ?? 'Experiences'}` },
+    { key: 'sights' as const,      label: `🏛️ ${t('sights') ?? 'Sights'}` },
   ]
 
   const userOrigin = coords?.lat && coords?.lng ? { lat: coords.lat, lng: coords.lng } : undefined
@@ -587,7 +757,7 @@ export default function MapPage() {
               </button>
             )}
           </div>
-          <div className="grid grid-cols-3 gap-1 sm:grid-cols-5">
+          <div className="grid grid-cols-4 gap-1 sm:grid-cols-7">
             {TABS.map(({ key, label }) => (
               <button
                 key={key}
@@ -625,6 +795,8 @@ export default function MapPage() {
               )}
               {selectedEvt && <EventPanel event={selectedEvt} onClose={clearSelection} routeProps={routeProps} />}
               {selectedMarket && <FarmersMarketPanel market={selectedMarket} onClose={clearSelection} routeProps={routeProps} />}
+              {selectedExp && <ExperiencePanel experience={selectedExp} onClose={clearSelection} routeProps={routeProps} />}
+              {selectedPlace && <PlacePanel place={selectedPlace} onClose={clearSelection} routeProps={routeProps} />}
             </div>
           ) : (
             <>
@@ -753,6 +925,61 @@ export default function MapPage() {
                   </button>
                 ))}
 
+                {/* ✨ Experiences */}
+                {visibleExperiences.map((exp) => (
+                  <button
+                    key={exp.id}
+                    onClick={() => selectExp(exp)}
+                    className={cn(
+                      'w-full text-left px-4 py-3.5 hover:bg-[var(--color-muted)] transition-colors',
+                      selectedExpId === exp.id && 'bg-amber-50 dark:bg-amber-900/20 border-l-2 border-amber-500'
+                    )}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="shrink-0 w-9 h-9 rounded-[var(--radius)] bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-sm">✨</div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-sm text-[var(--color-foreground)] truncate">{exp.title}</p>
+                        <span className="text-xs text-[var(--color-muted-foreground)] truncate flex items-center gap-0.5 mt-0.5">
+                          <MapPin className="h-3 w-3 shrink-0" />{exp.location}
+                        </span>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                          <Star className="h-3 w-3 fill-amber-400 stroke-amber-400 shrink-0" />
+                          <span className="text-[0.65rem] font-bold text-amber-600">{exp.rating}</span>
+                          {exp.price && <span className="text-[0.65rem] text-[var(--color-muted-foreground)]">· {exp.price}</span>}
+                        </div>
+                      </div>
+                    </div>
+                  </button>
+                ))}
+
+                {/* 🏛️ Tourist Sights */}
+                {visiblePlaces.map((place) => (
+                  <button
+                    key={place.id}
+                    onClick={() => selectPlace(place)}
+                    className={cn(
+                      'w-full text-left px-4 py-3.5 hover:bg-[var(--color-muted)] transition-colors',
+                      selectedPlaceId === place.id && 'bg-[var(--highlight)]/10 border-l-2 border-[var(--highlight)]'
+                    )}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div
+                        className="shrink-0 w-9 h-9 rounded-[var(--radius)] bg-cover bg-center overflow-hidden flex items-end justify-end p-0.5"
+                        style={{ backgroundImage: `url(${place.image})` }}
+                      >
+                        <span className="text-sm leading-none drop-shadow">{PLACE_CATEGORY_ICONS[place.category] ?? '📍'}</span>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-sm text-[var(--color-foreground)] truncate">{place.title}</p>
+                        <p className="text-[0.65rem] text-[var(--color-muted-foreground)] truncate">{place.subtitle}</p>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                          <span className="text-[0.6rem] font-bold uppercase tracking-wide text-[var(--color-muted-foreground)] bg-[var(--color-muted)] px-1.5 py-0.5 rounded-full border border-[var(--color-border)]">{place.region}</span>
+                          {place.price && <span className="text-[0.6rem] text-[var(--color-muted-foreground)]">{place.price}</span>}
+                        </div>
+                      </div>
+                    </div>
+                  </button>
+                ))}
 
                 {totalCount === 0 && (
                   <div className="py-16 text-center">
@@ -803,6 +1030,8 @@ export default function MapPage() {
             )}
             {selectedEvt && <EventPanel event={selectedEvt} onClose={clearSelection} routeProps={routeProps} />}
             {selectedMarket && <FarmersMarketPanel market={selectedMarket} onClose={clearSelection} routeProps={routeProps} />}
+            {selectedExp && <ExperiencePanel experience={selectedExp} onClose={clearSelection} routeProps={routeProps} />}
+            {selectedPlace && <PlacePanel place={selectedPlace} onClose={clearSelection} routeProps={routeProps} />}
           </div>
         )}
       </div>

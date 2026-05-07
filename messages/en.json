@@ -17,6 +17,7 @@
     "aiChat": "AI Chat",
     "language": "Language",
     "plan": "Plan",
+    "likedExperiences": "Liked Experiences",
     "searchPlaceholder": "Search Crete…"
   },
   "auth": {
@@ -182,7 +183,10 @@
     "producers": "Producers",
     "producer": "Producer",
     "farmersMarkets": "Farmers Markets",
-    "farmersMarket": "Farmers Market"
+    "farmersMarket": "Farmers Market",
+    "experiences": "Experiences",
+    "sights": "Sights",
+    "viewDetails": "View Details"
   },
   "chatbot": {
     "title": "AI Guide",

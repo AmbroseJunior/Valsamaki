@@ -48,7 +48,7 @@ export class GeminiProvider implements AIProvider {
           model: 'gemini-2.0-flash',
           messages: openaiMessages,
           temperature: 0.7,
-          max_tokens: 512,
+          max_tokens: context.maxTokens ?? 512,
         },
         { signal: controller.signal }
       )

@@ -31,7 +31,7 @@ export class ClaudeProvider implements AIProvider {
     try {
       const response = await this.client.messages.create({
         model: 'claude-haiku-4-5-20251001',
-        max_tokens: 1024,
+        max_tokens: context.maxTokens ?? 1024,
         system: systemWithContext,
         messages: messages.map((m) => ({
           role: m.role as 'user' | 'assistant',

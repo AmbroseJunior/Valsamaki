@@ -50,7 +50,7 @@ export class DeepSeekProvider implements AIProvider {
           model: 'deepseek-chat',
           messages: openaiMessages,
           temperature: 0.7,
-          max_tokens: 512,
+          max_tokens: context.maxTokens ?? 512,
         },
         { signal: controller.signal }
       )

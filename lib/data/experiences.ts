@@ -96,9 +96,9 @@ export const EXPERIENCES: Experience[] = [
     rating: 4.8,
     reviewCount: 201,
     images: [
-      'https://images.unsplash.com/photo-1573062546432-a9e76e6b2a58?w=800&q=80',
-      'https://images.unsplash.com/photo-1564419320461-6870880221ad?w=800&q=80',
-      'https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?w=800&q=80',
+      'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=800&q=80',
+      'https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?w=800&q=80',
+      'https://images.unsplash.com/photo-1568702846914-96b305d2aaeb?w=800&q=80',
     ],
     shortDescription: 'Award-winning biodynamic vineyard growing native Cretan grape varietals with mountain views.',
     description: 'Nestled in the White Mountains foothills, Diktynna cultivates native Cretan grape varieties using certified biodynamic and organic practices. Their Vidiano white is among the finest in Greece. Tours include vineyard walk, cellar visit, and guided tasting.',

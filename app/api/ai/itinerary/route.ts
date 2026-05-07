@@ -62,13 +62,24 @@ Return ONLY valid JSON (no markdown, no explanation) in this exact shape:
   try {
     const provider = getPrimaryProvider()
     const text = await provider.complete(prompt, {})
-    const jsonStart = text.indexOf('{')
-    const jsonEnd = text.lastIndexOf('}')
-    const clean = jsonStart !== -1 && jsonEnd !== -1 ? text.slice(jsonStart, jsonEnd + 1) : text
-    const itinerary = JSON.parse(clean)
+    const itinerary = JSON.parse(extractJSON(text))
     return NextResponse.json({ itinerary })
   } catch (e) {
     const msg = e instanceof Error ? e.message : 'Failed to generate itinerary'
     return NextResponse.json({ error: msg }, { status: 500 })
   }
+}
+
+function extractJSON(raw: string): string {
+  // Strip markdown code fences (```json ... ``` or ``` ... ```)
+  let text = raw.replace(/```(?:json)?\s*/gi, '').replace(/```/g, '')
+  // Find outermost { ... }
+  const start = text.indexOf('{')
+  const end = text.lastIndexOf('}')
+  if (start !== -1 && end !== -1) text = text.slice(start, end + 1)
+  // Remove trailing commas before } or ] (common AI mistake)
+  text = text.replace(/,\s*([}\]])/g, '$1')
+  // Remove JS-style // comments
+  text = text.replace(/\/\/[^\n]*/g, '')
+  return text.trim()
 }

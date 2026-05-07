@@ -18,9 +18,10 @@ export async function POST(request: NextRequest) {
     const provider = getPrimaryProvider()
     const prompt = `You suggest Crete experience search terms. Given the partial query "${query}", return exactly 4 short suggestions (2-5 words each) that a tourist might type to find experiences, places, foods, or activities in Crete. Output ONLY a JSON array of strings, no other text. Example: ["olive oil tasting","gorge hiking","village cooking class","sea cave kayaking"]`
     const text = await provider.complete(prompt, {})
-    const jsonStart = text.indexOf('[')
-    const jsonEnd = text.lastIndexOf(']')
-    const clean = jsonStart !== -1 ? text.slice(jsonStart, jsonEnd + 1) : '[]'
+    const stripped = text.replace(/```(?:json)?\s*/gi, '').replace(/```/g, '')
+    const jsonStart = stripped.indexOf('[')
+    const jsonEnd = stripped.lastIndexOf(']')
+    const clean = jsonStart !== -1 ? stripped.slice(jsonStart, jsonEnd + 1).replace(/,\s*]/g, ']') : '[]'
     const suggestions = JSON.parse(clean) as string[]
     return NextResponse.json({ suggestions: Array.isArray(suggestions) ? suggestions.slice(0, 5) : [] })
   } catch {

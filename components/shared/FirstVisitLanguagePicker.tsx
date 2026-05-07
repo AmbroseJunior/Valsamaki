@@ -4,24 +4,11 @@ import { useState, useEffect, startTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { SUPPORTED_LOCALES } from '@/lib/i18n/locales'
+import { SUPPORTED_LOCALES, LOCALE_LABELS, LOCALE_FLAGS } from '@/lib/i18n/locales'
 import type { Locale } from '@/lib/i18n/locales'
 
-const STORAGE_KEY = 'valsamaki_lang_selected'
-
-const LOCALE_META: Record<string, { flag: string; label: string }> = {
-  en: { flag: '🇬🇧', label: 'English' },
-  el: { flag: '🇬🇷', label: 'Ελληνικά' },
-  es: { flag: '🇪🇸', label: 'Español' },
-  fr: { flag: '🇫🇷', label: 'Français' },
-  de: { flag: '🇩🇪', label: 'Deutsch' },
-  it: { flag: '🇮🇹', label: 'Italiano' },
-  nl: { flag: '🇳🇱', label: 'Nederlands' },
-  ru: { flag: '🇷🇺', label: 'Русский' },
-  zh: { flag: '🇨🇳', label: '中文' },
-  ar: { flag: '🇸🇦', label: 'العربية' },
-  pt: { flag: '🇵🇹', label: 'Português' },
-}
+// sessionStorage key — resets every new browser session so every visitor sees it
+const SESSION_KEY = 'valsamaki_lang_chosen'
 
 export function FirstVisitLanguagePicker() {
   const [visible, setVisible] = useState(false)
@@ -31,7 +18,7 @@ export function FirstVisitLanguagePicker() {
 
   useEffect(() => {
     try {
-      if (!localStorage.getItem(STORAGE_KEY)) setVisible(true)
+      if (!sessionStorage.getItem(SESSION_KEY)) setVisible(true)
     } catch {}
   }, [])
 
@@ -41,7 +28,7 @@ export function FirstVisitLanguagePicker() {
     if (loading) return
     setSelected(locale)
     setLoading(true)
-    try { localStorage.setItem(STORAGE_KEY, '1') } catch {}
+    try { sessionStorage.setItem(SESSION_KEY, '1') } catch {}
     await fetch('/api/locale', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -52,7 +39,7 @@ export function FirstVisitLanguagePicker() {
   }
 
   function skip() {
-    try { localStorage.setItem(STORAGE_KEY, '1') } catch {}
+    try { sessionStorage.setItem(SESSION_KEY, '1') } catch {}
     setVisible(false)
   }
 
@@ -85,7 +72,6 @@ export function FirstVisitLanguagePicker() {
       {/* Language grid */}
       <div className="relative grid grid-cols-2 sm:grid-cols-3 gap-2.5 w-full max-w-sm sm:max-w-md">
         {SUPPORTED_LOCALES.map((loc) => {
-          const meta = LOCALE_META[loc]
           const isSelected = selected === loc
           return (
             <button
@@ -101,8 +87,8 @@ export function FirstVisitLanguagePicker() {
                 loading && !isSelected && 'opacity-30 pointer-events-none'
               )}
             >
-              <span className="text-3xl leading-none">{meta.flag}</span>
-              <span className="text-sm font-bold text-white leading-tight text-center">{meta.label}</span>
+              <span className="text-3xl leading-none">{LOCALE_FLAGS[loc]}</span>
+              <span className="text-sm font-bold text-white leading-tight text-center">{LOCALE_LABELS[loc]}</span>
               {isSelected && <Check className="h-3.5 w-3.5 text-[#FCDA06] mt-0.5" />}
             </button>
           )

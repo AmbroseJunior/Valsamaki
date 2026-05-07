@@ -526,26 +526,6 @@ export default function MapPage() {
     return () => navigator.geolocation.clearWatch(id)
   }, [])
 
-  // Geocode address via Nominatim when selected item has no lat/lng
-  useEffect(() => {
-    setGeocodedCoords(null)
-    const hasDestCoords =
-      (selectedBizId && rawBusinesses.find(b => b.id === selectedBizId)?.lat) ||
-      (selectedEvtId)  // events may have coords; handled below
-    if (hasDestCoords) return
-    const address = (selectedBizId ? rawBusinesses.find(b => b.id === selectedBizId)?.address : null)
-    if (!address) return
-    let cancelled = false
-    fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address + ', Crete, Greece')}&format=json&limit=1`)
-      .then(r => r.json())
-      .then((data: Array<{ lat: string; lon: string }>) => {
-        if (!cancelled && data[0]) setGeocodedCoords({ lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) })
-      })
-      .catch(() => {})
-    return () => { cancelled = true }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedBizId, selectedEvtId])
-
   // Sync URL param changes (e.g. navbar search)
   useEffect(() => {
     const q = searchParams.get('q')
@@ -583,6 +563,33 @@ export default function MapPage() {
       return (data ?? []) as EventRow[]
     },
   })
+
+  // Geocode address via Nominatim when selected item has no lat/lng
+  // Must be after useQuery declarations so rawBusinesses/events are in scope
+  useEffect(() => {
+    setGeocodedCoords(null)
+    let address: string | null = null
+
+    if (selectedBizId) {
+      const biz = rawBusinesses.find(b => b.id === selectedBizId)
+      if (biz?.lat && biz?.lng) return  // already has direct coords
+      address = biz?.address ?? null
+    } else if (selectedEvtId) {
+      const evt = events.find(e => e.id === selectedEvtId)
+      if (evt?.lat && evt?.lng) return  // already has direct coords
+      address = evt?.address ?? null
+    }
+
+    if (!address) return
+    let cancelled = false
+    fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address + ', Crete, Greece')}&format=json&limit=1`)
+      .then(r => r.json())
+      .then((data: Array<{ lat: string; lon: string }>) => {
+        if (!cancelled && data[0]) setGeocodedCoords({ lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) })
+      })
+      .catch(() => {})
+    return () => { cancelled = true }
+  }, [selectedBizId, selectedEvtId, rawBusinesses, events])
 
   const filteredMarkets = useMemo(() => {
     if (!s) return FARMERS_MARKETS
@@ -685,11 +692,14 @@ export default function MapPage() {
     routeInfo,
     routeLoading,
     hasCoords: !!(
-      (selectedBiz?.lat && selectedBiz?.lng) || selectedBiz?.address || geocodedCoords ||
-      (selectedEvt?.lat && selectedEvt?.lng) || selectedEvt?.address ||
+      (selectedBiz?.lat && selectedBiz?.lng) ||
+      (selectedBiz?.address && geocodedCoords) ||
+      (selectedEvt?.lat && selectedEvt?.lng) ||
+      (selectedEvt?.address && geocodedCoords) ||
       selectedMarket ||
       selectedExp?.coordinates ||
-      selectedPlace
+      selectedPlace ||
+      geocodedCoords
     ),
   }
 

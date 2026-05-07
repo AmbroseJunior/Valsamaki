@@ -60,12 +60,10 @@ export function BottomNav() {
             </Link>
           )
         })}
-        {isGuest && (
-          <div className="flex-1 flex flex-col items-center justify-center gap-0.5 relative">
-            <LocaleSwitcher dropUp className="flex flex-col items-center" />
-            <span className="text-[10px] font-semibold text-[var(--color-muted-foreground)]">{t('language')}</span>
-          </div>
-        )}
+        <div className="flex-1 flex flex-col items-center justify-center gap-0.5 relative">
+          <LocaleSwitcher dropUp className="flex flex-col items-center" />
+          <span className="text-[10px] font-semibold text-[var(--color-muted-foreground)]">{t('language')}</span>
+        </div>
       </div>
     </nav>
   )

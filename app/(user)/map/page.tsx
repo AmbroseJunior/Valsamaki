@@ -29,7 +29,7 @@ const MapView = dynamic(
   { ssr: false, loading: () => <div className="w-full h-full bg-[var(--color-muted)] animate-pulse rounded-[var(--radius)]" /> }
 )
 
-type TabType = 'all' | 'events' | 'markets'
+type TabType = 'all' | 'events' | 'markets' | 'sights'
 type RouteMode = 'walking' | 'transit' | 'driving'
 
 type BusinessWithOwner = BusinessRow & {
@@ -662,7 +662,7 @@ export default function MapPage() {
     const showEvt = tab === 'all' || tab === 'events'
     const showMkt = tab === 'all' || tab === 'markets'
     const showExp = tab === 'all'
-    const showPl  = tab === 'all'
+    const showPl  = tab === 'all' || tab === 'sights'
     const bMarkers: MapMarker[] = (showBiz ? rawBusinesses : [])
       .filter((b) => b.lat && b.lng)
       .map((b) => ({ id: `b:${b.id}`, lat: b.lat!, lng: b.lng!, type: b.profiles?.role === 'producer' ? 'producer' : 'business', label: b.name, category: b.category }))
@@ -711,13 +711,14 @@ export default function MapPage() {
   const visibleEvents = tab === 'all' || tab === 'events' ? events : []
   const visibleFarmersMarkets = tab === 'all' || tab === 'markets' ? filteredMarkets : []
   const visibleExperiences = tab === 'all' ? filteredExperiences : []
-  const visiblePlaces = tab === 'all' ? filteredPlaces : []
+  const visiblePlaces = tab === 'all' || tab === 'sights' ? filteredPlaces : []
   const totalCount = visibleBusinesses.length + visibleEvents.length + visibleFarmersMarkets.length + visibleExperiences.length + visiblePlaces.length
 
   const TABS = [
     { key: 'all' as const,     label: `🌍 ${t('all')}` },
     { key: 'events' as const,  label: `🎉 ${t('events')}` },
     { key: 'markets' as const, label: `🌿 ${t('farmersMarkets')}` },
+    { key: 'sights' as const,  label: `🏛️ Sights` },
   ]
 
   const userOrigin = coords?.lat && coords?.lng ? { lat: coords.lat, lng: coords.lng } : undefined

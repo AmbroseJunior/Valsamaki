@@ -29,7 +29,7 @@ const MapView = dynamic(
   { ssr: false, loading: () => <div className="w-full h-full bg-[var(--color-muted)] animate-pulse rounded-[var(--radius)]" /> }
 )
 
-type TabType = 'all' | 'businesses' | 'events' | 'producers' | 'markets' | 'experiences' | 'sights'
+type TabType = 'all' | 'events' | 'markets' | 'sights'
 type RouteMode = 'walking' | 'transit' | 'driving'
 
 type BusinessWithOwner = BusinessRow & {
@@ -579,11 +579,6 @@ export default function MapPage() {
     )
   }, [s])
 
-  const producers = useMemo(
-    () => rawBusinesses.filter((b) => b.profiles?.role === 'producer'),
-    [rawBusinesses]
-  )
-
   const selectedBiz = useMemo(
     () => (selectedBizId ? (rawBusinesses.find((b) => b.id === selectedBizId) ?? null) : null),
     [selectedBizId, rawBusinesses]
@@ -663,10 +658,10 @@ export default function MapPage() {
   }
 
   const markers: MapMarker[] = useMemo(() => {
-    const showBiz = tab === 'all' || tab === 'businesses'
+    const showBiz = tab === 'all'
     const showEvt = tab === 'all' || tab === 'events'
     const showMkt = tab === 'all' || tab === 'markets'
-    const showExp = tab === 'all' || tab === 'experiences'
+    const showExp = tab === 'all'
     const showPl  = tab === 'all' || tab === 'sights'
     const bMarkers: MapMarker[] = (showBiz ? rawBusinesses : [])
       .filter((b) => b.lat && b.lng)
@@ -712,22 +707,18 @@ export default function MapPage() {
     }
   }
 
-  const visibleBusinesses = tab === 'all' || tab === 'businesses' ? rawBusinesses : []
+  const visibleBusinesses = tab === 'all' ? rawBusinesses : []
   const visibleEvents = tab === 'all' || tab === 'events' ? events : []
-  const visibleProducers = tab === 'producers' ? producers : []
   const visibleFarmersMarkets = tab === 'all' || tab === 'markets' ? filteredMarkets : []
-  const visibleExperiences = tab === 'all' || tab === 'experiences' ? filteredExperiences : []
+  const visibleExperiences = tab === 'all' ? filteredExperiences : []
   const visiblePlaces = tab === 'all' || tab === 'sights' ? filteredPlaces : []
-  const totalCount = visibleBusinesses.length + visibleEvents.length + visibleProducers.length + visibleFarmersMarkets.length + visibleExperiences.length + visiblePlaces.length
+  const totalCount = visibleBusinesses.length + visibleEvents.length + visibleFarmersMarkets.length + visibleExperiences.length + visiblePlaces.length
 
   const TABS = [
-    { key: 'all' as const,         label: `🌍 ${t('all')}` },
-    { key: 'businesses' as const,  label: `🏪 ${t('places')}` },
-    { key: 'events' as const,      label: `🎉 ${t('events')}` },
-    { key: 'producers' as const,   label: `🫒 ${t('producers')}` },
-    { key: 'markets' as const,     label: `🌿 ${t('farmersMarkets')}` },
-    { key: 'experiences' as const, label: `✨ ${t('experiences') ?? 'Experiences'}` },
-    { key: 'sights' as const,      label: `🏛️ ${t('sights') ?? 'Sights'}` },
+    { key: 'all' as const,     label: `🌍 ${t('all')}` },
+    { key: 'events' as const,  label: `🎉 ${t('events')}` },
+    { key: 'markets' as const, label: `🌿 ${t('farmersMarkets')}` },
+    { key: 'sights' as const,  label: `🏛️ ${t('sights') ?? 'Sights'}` },
   ]
 
   const userOrigin = coords?.lat && coords?.lng ? { lat: coords.lat, lng: coords.lng } : undefined
@@ -757,7 +748,7 @@ export default function MapPage() {
               </button>
             )}
           </div>
-          <div className="grid grid-cols-4 gap-1 sm:grid-cols-7">
+          <div className="grid grid-cols-4 gap-1">
             {TABS.map(({ key, label }) => (
               <button
                 key={key}
@@ -870,35 +861,6 @@ export default function MapPage() {
                   </button>
                 ))}
 
-                {/* Producers tab */}
-                {visibleProducers.map((p) => (
-                  <button
-                    key={p.id}
-                    onClick={() => selectBiz(p)}
-                    className={cn(
-                      'w-full text-left px-4 py-3.5 hover:bg-[var(--color-muted)] transition-colors',
-                      selectedBizId === p.id && 'bg-[var(--highlight)]/10 border-l-2 border-[var(--highlight)]'
-                    )}
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className="shrink-0 w-9 h-9 rounded-[var(--radius)] bg-[var(--color-primary)] flex items-center justify-center text-sm">🫒</div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-sm text-[var(--color-foreground)] truncate">{p.name}</p>
-                        {p.address && (
-                          <span className="text-xs text-[var(--color-muted-foreground)] truncate flex items-center gap-0.5 mt-0.5">
-                            <MapPin className="h-3 w-3 shrink-0" />{p.address}
-                          </span>
-                        )}
-                        {!p.lat && !p.address && (
-                          <span className="text-[0.6rem] text-[var(--color-muted-foreground)] italic mt-0.5 block">{t('noMapPin')}</span>
-                        )}
-                        <span className="inline-block mt-1 text-[0.65rem] font-semibold uppercase tracking-wide text-[var(--color-muted-foreground)] bg-[var(--color-muted)] px-2 py-0.5 rounded-full">
-                          {t('producer')}
-                        </span>
-                      </div>
-                    </div>
-                  </button>
-                ))}
 
                 {/* Farmers Markets */}
                 {visibleFarmersMarkets.map((mkt) => (

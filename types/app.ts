@@ -16,11 +16,20 @@ export interface UserPreferences {
 export interface WeatherData {
   temp: number
   feels_like: number
+  temp_min: number
+  temp_max: number
   description: string
   icon: string
   humidity: number
   wind_speed: number
+  wind_deg: number
+  pressure: number
+  visibility: number
+  clouds: number
+  sunrise: number
+  sunset: number
   city: string
+  country: string
 }
 
 export interface AirQualityData {

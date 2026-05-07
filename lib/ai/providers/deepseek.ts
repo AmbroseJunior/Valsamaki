@@ -3,7 +3,7 @@ import type { AIProvider, AIMessage, AIContext } from '@/types/ai'
 import { logger } from '@/lib/logger'
 import { buildCretanKnowledgeBlock } from '@/lib/ai/cretan-knowledge'
 
-const TIMEOUT_MS = 8_000
+const TIMEOUT_MS = 20_000
 
 const STRICT_GROUNDING_RULES = `
 ## STRICT RESPONSE RULES
@@ -59,9 +59,11 @@ export class DeepSeekProvider implements AIProvider {
       return response.choices[0]?.message?.content ?? 'I could not generate a response.'
     } catch (err) {
       clearTimeout(timeout)
+      const isAbort = err instanceof Error && (err.name === 'AbortError' || err.message.toLowerCase().includes('aborted'))
+      if (isAbort) throw new Error('Request timed out — try again')
       logger.error('DeepSeek chat error', err)
       const msg = err instanceof Error ? err.message : String(err)
-      throw new Error(`DeepSeek: ${msg}`)
+      throw new Error(msg)
     }
   }
 

@@ -23,11 +23,20 @@ export async function getWeather(lat: number, lng: number): Promise<WeatherData 
     return {
       temp: Math.round(data.main.temp),
       feels_like: Math.round(data.main.feels_like),
+      temp_min: Math.round(data.main.temp_min),
+      temp_max: Math.round(data.main.temp_max),
       description: data.weather[0].description,
       icon: data.weather[0].icon,
       humidity: data.main.humidity,
-      wind_speed: data.wind.speed,
+      wind_speed: Math.round(data.wind.speed * 10) / 10,
+      wind_deg: data.wind.deg ?? 0,
+      pressure: data.main.pressure,
+      visibility: Math.round((data.visibility ?? 10000) / 1000),
+      clouds: data.clouds?.all ?? 0,
+      sunrise: data.sys.sunrise,
+      sunset: data.sys.sunset,
       city: data.name,
+      country: data.sys.country ?? '',
     }
   } catch (err) {
     logger.error('getWeather failed', err)
@@ -70,11 +79,20 @@ function mockWeather(): WeatherData {
   return {
     temp: 24,
     feels_like: 22,
+    temp_min: 19,
+    temp_max: 27,
     description: 'Clear sky',
     icon: '01d',
     humidity: 55,
     wind_speed: 3.2,
+    wind_deg: 180,
+    pressure: 1015,
+    visibility: 10,
+    clouds: 5,
+    sunrise: Math.floor(Date.now() / 1000) - 3600 * 5,
+    sunset: Math.floor(Date.now() / 1000) + 3600 * 4,
     city: 'Heraklion',
+    country: 'GR',
   }
 }
 

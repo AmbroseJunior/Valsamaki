@@ -26,13 +26,7 @@ export default async function DashboardPage() {
   const preferences = (profile?.preferences ?? null) as UserPreferences | null
   const firstName = profile?.name ? profile.name.split(' ')[0] : null
 
-  const greetingContext = preferences?.reason_for_visit === 'tourist'
-    ? t('contextTourist')
-    : preferences?.reason_for_visit === 'local'
-    ? t('contextLocal')
-    : preferences?.reason_for_visit === 'researcher'
-    ? t('contextResearcher')
-    : t('contextDefault')
+  const greetingContext = t('contextDefault')
 
   return (
     <div className="max-w-[var(--max-content-width)] mx-auto px-4 py-6 space-y-6">

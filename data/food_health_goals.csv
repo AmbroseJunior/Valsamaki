@@ -2,7 +2,7 @@ food_id,goal_id,evidence_strength,notes
 1,1,3,RCT (Noce 2021) + review (Esposito 2025); oleocanthal and hydroxytyrosol mechanisms well-characterised
 1,2,3,PREDIMED and Harvard cohort data; 15–30% CV event reduction
 1,3,2,CKD RCT showed gut-related inflammatory marker improvement; mechanistic pathway less direct
-1,4,2,Large cohort associations with longevity outcomes; not yet isolated from full MedDiet
+1,4,2,"Prospective cohort (Zhang 2021) n=521,120 over 16yr: HR 0.96 per tbsp/day for cardiometabolic mortality; replacing butter with olive oil linked to lower all-cause, CVD, diabetes, cancer, and Alzheimer's mortality — observational, not RCT"
 4,6,3,DB-RCT (Wightman 2018) n=155; reduced state anxiety and improved cognitive accuracy vs placebo and Ginkgo
 4,4,2,Animal Alzheimer model (Hofrichter 2016) showed Aβ42 reduction and neuronal rescue; human longevity evidence indirect
 4,2,2,Small RCT (Papanikolaou 2024) n=28; systolic BP −10.8 mmHg and HR reduction confirmed in humans
@@ -26,3 +26,4 @@ food_id,goal_id,evidence_strength,notes
 2,6,1,"In vitro only (Chalatsa 2018): C. spinosum extract blocked both AD pathological hallmarks (tau tangles and amyloid plaques) in neuronal cell culture — mechanistically relevant to cognitive decline prevention but not yet validated beyond cell models"
 2,1,1,"In vitro only (Stagos 2018): C. spinosum increased GSH +10.5% and reduced ROS −15.6% in human endothelial cells; (Brieudes 2016): Cretan decoction significantly reduced intracellular ROS in human fibroblasts; cichoric acid and caftaric acid are potent antioxidants"
 2,2,1,"In vitro only (Stagos 2018): C. spinosum extract protected human vascular endothelial cells from oxidative stress via GSH elevation and ROS reduction — relevant to endothelial function but not yet validated in cardiovascular animal or human models"
+1,6,2,"PREDIMED-NAVARRA RCT (Martínez-Lapiscina 2013) n=522 over 6.5yr: MedDiet+EVOO showed MMSE +0.62 (p=0.005) and CDT +0.51 (p=0.001) vs low-fat control; EVOO effect not fully isolated from full MedDiet intervention"

@@ -54,8 +54,11 @@ export function buildCretanKnowledgeBlock(): string {
   const healthGoals  = parseCSV('health_goals.csv')
   const foodGoals    = parseCSV('food_health_goals.csv')
   const studies      = parseCSV('studies.csv')
+  const nutrition    = parseCSV('nutrition.csv')
+  const foodDetails  = parseCSV('food_details.csv')
 
-  const goalById = Object.fromEntries(healthGoals.map((g) => [g.goal_id, g.name]))
+  const goalById     = Object.fromEntries(healthGoals.map((g) => [g.goal_id, g.name]))
+  const detailByFood = Object.fromEntries(foodDetails.map((d) => [d.food_id, d]))
 
   const lines: string[] = [
     '## CRETAN FOOD KNOWLEDGE BASE — VERIFIED SCIENTIFIC DATA',
@@ -67,6 +70,21 @@ export function buildCretanKnowledgeBlock(): string {
   for (const food of foods) {
     lines.push(`### ${food.name}`)
     lines.push(food.description)
+
+    const detail = detailByFood[food.food_id]
+    if (detail) {
+      lines.push(`**Flavour profile:** ${detail.flavour_profile}`)
+      lines.push(`**How to use:** ${detail.preparation}`)
+      lines.push(`**Historical use:** ${detail.historical_use}`)
+    }
+
+    const fNutrition = nutrition.filter((n) => n.food_id === food.food_id)
+    if (fNutrition.length) {
+      lines.push('**Nutritional highlights:**')
+      for (const n of fNutrition) {
+        lines.push(`- ${n.nutrient} [${n.significance}]: ${n.health_implication}`)
+      }
+    }
 
     const fCompounds = compounds.filter((c) => c.food_id === food.food_id)
     if (fCompounds.length) {

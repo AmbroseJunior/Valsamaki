@@ -13,7 +13,7 @@ import { Search, X } from 'lucide-react'
 import type { EventRow } from '@/types/database'
 import { useTranslations } from 'next-intl'
 
-export function EventFeed() {
+export function EventFeed({ hideSearch }: { hideSearch?: boolean } = {}) {
   const [category, setCategory] = useState('')
   const [search, setSearch] = useState('')
   const { userId, role } = useRole()
@@ -70,23 +70,25 @@ export function EventFeed() {
 
   return (
     <div className="space-y-4">
-      {/* Search bar */}
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--color-muted-foreground)]" />
-        <input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder={t('searchPlaceholder')}
-          className="w-full pl-9 pr-9 py-2.5 rounded-[var(--radius-full)] border border-[var(--color-border)] bg-[var(--color-input)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--highlight)] transition-shadow"
-        />
-        {search && (
-          <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2">
-            <X className="h-4 w-4 text-[var(--color-muted-foreground)]" />
-          </button>
-        )}
-      </div>
-
-      <EventFilter onFilterChange={setCategory} selected={category} />
+      {!hideSearch && (
+        <>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--color-muted-foreground)]" />
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder={t('searchPlaceholder')}
+              className="w-full pl-9 pr-9 py-2.5 rounded-[var(--radius-full)] border border-[var(--color-border)] bg-[var(--color-input)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--highlight)] transition-shadow"
+            />
+            {search && (
+              <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2">
+                <X className="h-4 w-4 text-[var(--color-muted-foreground)]" />
+              </button>
+            )}
+          </div>
+          <EventFilter onFilterChange={setCategory} selected={category} />
+        </>
+      )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {events?.map((event) => (

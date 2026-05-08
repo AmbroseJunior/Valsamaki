@@ -58,7 +58,17 @@
   }
 }
 
+@keyframes scannerLine {
+  0%, 100% { top: 4px; }
+  50%        { top: calc(100% - 4px); }
+}
+
 @layer utilities {
+  .animate-scanner-line {
+    animation: scannerLine 2.5s ease-in-out infinite;
+    position: absolute;
+  }
+
   .text-balance {
     text-wrap: balance;
   }

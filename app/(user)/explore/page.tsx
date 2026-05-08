@@ -11,8 +11,9 @@ import { SCRAPED_EXPERIENCES } from '@/lib/data/scrapedExperiences'
 import type { Experience, ExperienceCategory } from '@/types/experience'
 
 const ALL_EXPERIENCES: Experience[] = [...EXPERIENCES, ...SCRAPED_EXPERIENCES]
-import { Sparkles, Search, X, SlidersHorizontal } from 'lucide-react'
+import { Sparkles, Search, X, SlidersHorizontal, ScanQrCode } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { QRScannerModal } from '@/components/scanner/QRScannerModal'
 
 type PriceFilter = 'all' | 'free' | 'under30' | 'under60'
 type DistanceFilter = 'all' | '5' | '10' | '25'
@@ -101,6 +102,7 @@ export default function ExplorePage() {
   const [distanceFilter, setDistanceFilter] = useState<DistanceFilter>('all')
   const [sortKey, setSortKey] = useState<SortKey>('default')
   const [showFilters, setShowFilters] = useState(false)
+  const [scanOpen, setScanOpen] = useState(false)
   const [aiSuggestions, setAiSuggestions] = useState<string[]>([])
   const [showSuggestions, setShowSuggestions] = useState(false)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -154,6 +156,15 @@ export default function ExplorePage() {
           </div>
 
           <div className="flex items-center gap-2">
+            {/* QR scan button */}
+            <button
+              onClick={() => setScanOpen(true)}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-[var(--radius-full)] border border-[var(--color-border)] bg-[var(--color-muted)] text-sm font-semibold text-[var(--color-muted-foreground)] hover:border-[var(--highlight)] hover:text-[var(--highlight)] transition-colors"
+            >
+              <ScanQrCode className="h-4 w-4" />
+              <span className="hidden sm:block">Scan</span>
+            </button>
+
             {/* Filter toggle */}
             <button
               onClick={() => setShowFilters((v) => !v)}
@@ -308,6 +319,7 @@ export default function ExplorePage() {
       </div>
 
       <ExperienceModal experience={selectedExp} onClose={() => setSelectedExp(null)} />
+      <QRScannerModal open={scanOpen} onClose={() => setScanOpen(false)} />
     </>
   )
 }

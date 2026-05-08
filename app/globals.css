@@ -48,6 +48,16 @@
   }
 }
 
+/* Map page — subtract bottom nav only on mobile where it exists */
+.map-page {
+  height: calc(100dvh - var(--nav-height) - var(--bottom-nav-height));
+}
+@media (min-width: 768px) {
+  .map-page {
+    height: calc(100dvh - var(--nav-height));
+  }
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;

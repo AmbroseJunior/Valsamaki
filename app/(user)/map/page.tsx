@@ -774,10 +774,15 @@ export default function MapPage() {
   ]
 
   const effectiveCoords = coords ?? gpsCoords
-  const userOrigin = effectiveCoords ? { lat: effectiveCoords.lat, lng: effectiveCoords.lng } : undefined
+  // Memoize by value so MapInner's routing effect doesn't re-fire on every render
+  const userOrigin = useMemo<{ lat: number; lng: number } | undefined>(
+    () => effectiveCoords ? { lat: effectiveCoords.lat, lng: effectiveCoords.lng } : undefined,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [effectiveCoords?.lat, effectiveCoords?.lng]
+  )
 
   return (
-    <div className="flex flex-col md:flex-row" style={{ height: 'calc(100dvh - var(--nav-height) - var(--bottom-nav-height))' }}>
+    <div className="map-page flex flex-col md:flex-row">
       {/* Sidebar */}
       <div className={cn(
         'flex flex-col border-r border-[var(--color-border)] bg-[var(--color-background)] transition-all duration-200',

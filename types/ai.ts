@@ -13,6 +13,7 @@ export interface AIContext {
   userLocation?: { lat: number; lng: number }
   maxTokens?: number
   locale?: string
+  staticData?: string
 }
 
 export interface AIProvider {

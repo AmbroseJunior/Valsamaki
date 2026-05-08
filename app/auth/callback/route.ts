@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
     const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code)
 
     if (!exchangeError) {
-      // Ensure a profile row exists for OAuth sign-ins (Google, Facebook, etc.)
+      // Ensure a profile row exists for OAuth sign-ins (Google, Apple, etc.)
       const { data: { user: authUser } } = await supabase.auth.getUser()
       if (authUser) {
         await supabase.from('profiles').upsert(
@@ -36,6 +36,17 @@ export async function GET(request: NextRequest) {
           },
           { onConflict: 'id', ignoreDuplicates: true }
         )
+
+        // New users (no preferences yet) should complete the questionnaire first
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('preferences')
+          .eq('id', authUser.id)
+          .single()
+
+        const isNewUser = !profile?.preferences
+        const destination = isNewUser ? '/onboarding' : next
+        return NextResponse.redirect(`${origin}${destination}`)
       }
 
       return NextResponse.redirect(`${origin}${next}`)

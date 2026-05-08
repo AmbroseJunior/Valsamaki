@@ -54,7 +54,7 @@ export default function GuestHomePage() {
 
             {/* Local Products card */}
             <Link
-              href="/explore"
+              href="/products"
               className="relative bg-[var(--color-green)] rounded-[var(--radius-xl)] p-5 overflow-hidden group hover:shadow-[var(--shadow-md)] transition-shadow"
             >
               <div className="relative z-10">

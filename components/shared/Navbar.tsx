@@ -75,7 +75,7 @@ export function Navbar() {
           onClick={() => setMenuOpen(false)}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.svg" alt="valsamaki" className="w-8 h-8 md:w-9 md:h-9" />
+          <img src="/v1.png" alt="valsamaki" className="w-8 h-8 md:w-9 md:h-9 object-contain" />
           <span className="font-display font-semibold text-xl text-[var(--color-foreground)] hidden sm:block" style={{ fontFamily: 'var(--font-display)' }}>
             valsamaki
           </span>

@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import type { AIContext } from '@/types/ai'
 import { logger } from '@/lib/logger'
 import { traverseKnowledgeGraph } from './knowledge-graph'
+import { buildDataFileContext } from './data-context'
 
 const INTERACTION_LIMIT = 20
 const MEMORY_LIMIT = 20
@@ -12,7 +13,10 @@ export async function buildLocalContext(
   location: { lat: number; lng: number } | null,
   queryTopic?: string
 ): Promise<AIContext> {
-  const context: AIContext = { userLocation: location ?? undefined }
+  const context: AIContext = {
+    userLocation: location ?? undefined,
+    staticData: buildDataFileContext(),
+  }
 
   try {
     const supabase = await createClient()

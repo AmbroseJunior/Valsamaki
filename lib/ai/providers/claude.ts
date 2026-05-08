@@ -60,6 +60,9 @@ export class ClaudeProvider implements AIProvider {
     if (context.nearbyEvents?.length) {
       parts.push(`\n## Upcoming Events Nearby\n${JSON.stringify(context.nearbyEvents, null, 2)}`)
     }
+    if (context.staticData) {
+      parts.push(`\n## Crete Data Directory\n${context.staticData}`)
+    }
     if (context.knowledgeNodes?.length) {
       parts.push(`\n## Mediterranean Diet Knowledge\n${context.knowledgeNodes.map((n) => `- ${n.label}: ${n.description}`).join('\n')}`)
     }

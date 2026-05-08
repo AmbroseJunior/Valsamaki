@@ -97,7 +97,7 @@ function LoginForm() {
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex flex-col items-center gap-2">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo.svg" alt="valsamaki" className="w-14 h-14" />
+            <img src="/v1.png" alt="valsamaki" className="w-16 h-16 object-contain" />
             <span className="font-display font-semibold text-2xl text-[var(--color-foreground)]">valsamaki</span>
             <span className="text-sm text-[var(--color-muted-foreground)]">{t('discoverCrete')}</span>
           </Link>

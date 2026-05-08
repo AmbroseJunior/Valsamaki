@@ -20,7 +20,8 @@ import type { EventRow } from '@/types/database'
 
 const ALL_EXPERIENCES: Experience[] = [...EXPERIENCES, ...SCRAPED_EXPERIENCES]
 
-function matchesQuery(text: string, q: string) {
+function matchesQuery(text: string | undefined | null, q: string): boolean {
+  if (!text) return false
   return text.toLowerCase().includes(q)
 }
 
@@ -65,8 +66,8 @@ export function UnifiedExperienceSearch() {
       matchesQuery(e.shortDescription, q) ||
       matchesQuery(e.description, q) ||
       matchesQuery(e.category, q) ||
-      e.tags.some((t) => matchesQuery(t, q)) ||
-      e.healthBenefits.some((h) => matchesQuery(h, q))
+      (e.tags ?? []).some((t) => matchesQuery(t, q)) ||
+      (e.healthBenefits ?? []).some((h) => matchesQuery(h, q))
     ).slice(0, 12)
   }, [q, isSearching])
 
@@ -79,7 +80,7 @@ export function UnifiedExperienceSearch() {
       matchesQuery(p.description, q) ||
       matchesQuery(p.subtitle, q) ||
       matchesQuery(p.category, q) ||
-      p.tags.some((t) => matchesQuery(t, q))
+      (p.tags ?? []).some((t) => matchesQuery(t, q))
     ).slice(0, 6)
   }, [q, isSearching])
 

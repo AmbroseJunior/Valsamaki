@@ -15,10 +15,11 @@ export interface RouteTarget {
 }
 
 export interface RouteInfo {
-  distance: string   // formatted "2.3 km"
-  duration: string   // formatted "28 min"
-  distanceM: number  // raw metres from OSRM
-  durationS: number  // raw seconds from OSRM
+  distance: string     // formatted "2.3 km"
+  duration: string     // formatted "28 min"
+  distanceM: number    // raw metres from OSRM
+  durationS: number    // raw seconds (adjusted for mode)
+  googleMapsUrl: string
 }
 
 export interface MapMarker {

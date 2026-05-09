@@ -8,12 +8,14 @@ export async function GET(request: NextRequest) {
   if (!coords || !/^[-\d.,;]+$/.test(coords)) {
     return NextResponse.json({ error: 'Invalid coords' }, { status: 400 })
   }
-  if (!['foot', 'car'].includes(profile)) {
+  // transit uses the road network (car profile) — duration adjusted client-side
+  const osrmProfile = profile === 'transit' ? 'car' : profile
+  if (!['foot', 'car', 'transit'].includes(profile)) {
     return NextResponse.json({ error: 'Invalid profile' }, { status: 400 })
   }
 
   const osrmUrl =
-    `https://router.project-osrm.org/route/v1/${profile}/${coords}` +
+    `https://router.project-osrm.org/route/v1/${osrmProfile}/${coords}` +
     `?overview=full&geometries=geojson`
 
   try {

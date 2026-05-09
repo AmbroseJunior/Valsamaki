@@ -140,10 +140,24 @@ export default function MapInner({
 
     let cancelled = false
     const origin = userOrigin ?? HERAKLION
-    // OSRM supports foot and car; transit approximated as foot
-    const profile = routeTarget.mode === 'driving' ? 'car' : 'foot'
+
+    // transit uses road profile; walk uses foot; drive uses car
+    const profile = routeTarget.mode === 'driving' ? 'car'
+                  : routeTarget.mode === 'transit'  ? 'transit'
+                  : 'foot'
+
     const coordStr = `${origin.lng},${origin.lat};${routeTarget.lng},${routeTarget.lat}`
     const routingUrl = `/api/routing?profile=${profile}&coords=${encodeURIComponent(coordStr)}`
+
+    // Google Maps deep-link (no API key needed)
+    const gmMode = routeTarget.mode === 'driving' ? 'driving'
+                 : routeTarget.mode === 'transit'  ? 'transit'
+                 : 'walking'
+    const googleMapsUrl =
+      `https://www.google.com/maps/dir/?api=1` +
+      `&origin=${origin.lat},${origin.lng}` +
+      `&destination=${routeTarget.lat},${routeTarget.lng}` +
+      `&travelmode=${gmMode}`
 
     fetch(routingUrl)
       .then((r) => r.json())
@@ -171,13 +185,20 @@ export default function MapInner({
           .addTo(mapRef.current)
         mapRef.current.fitBounds(routeLayerRef.current.getBounds(), { padding: [40, 40] })
 
+        // Bus travels ~1.7× slower than a car (stops, traffic, route detours)
+        const rawDurationS = route.duration
+        const adjustedDurationS = routeTarget.mode === 'transit'
+          ? Math.round(rawDurationS * 1.7)
+          : rawDurationS
+
         const distKm = (route.distance / 1000).toFixed(1)
-        const durMin = Math.round(route.duration / 60)
+        const durMin = Math.round(adjustedDurationS / 60)
         onRouteInfo?.({
           distance: `${distKm} km`,
           duration: durMin < 60 ? `${durMin} min` : `${Math.floor(durMin / 60)}h ${durMin % 60}m`,
           distanceM: route.distance,
-          durationS: route.duration,
+          durationS: adjustedDurationS,
+          googleMapsUrl,
         })
       })
       .catch(() => {

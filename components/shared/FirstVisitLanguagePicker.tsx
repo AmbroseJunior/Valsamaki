@@ -56,7 +56,7 @@ export function FirstVisitLanguagePicker() {
       {/* Logo + brand */}
       <div className="relative flex items-center gap-3 mb-2">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/logo.svg" alt="Valsamaki" className="w-14 h-14 drop-shadow-lg" />
+        <img src="/v1.png" alt="Valsamaki" className="w-14 h-14 object-contain drop-shadow-lg" />
         <div>
           <p className="font-display font-bold text-white text-3xl tracking-tight leading-none">valsamaki</p>
           <p className="text-[#FCDA06] text-xs font-semibold mt-0.5 tracking-widest uppercase">Authentic Crete</p>

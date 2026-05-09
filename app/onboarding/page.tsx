@@ -632,100 +632,28 @@ function ProducerOnboarding({ userId }: { userId: string }) {
   )
 }
 
-// ── Role picker (step 0 for OAuth users who haven't set a role yet) ───────────
-
-function RolePicker({ onPick }: { onPick: (r: 'user' | 'producer') => void }) {
-  return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-[var(--color-background)]">
-      <div className="w-full max-w-sm space-y-6 text-center">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/v1.png" alt="valsamaki" className="w-16 h-16 object-contain mx-auto" />
-        <div>
-          <h2 className="font-display font-bold text-2xl text-[var(--color-foreground)]">Welcome to valsamaki</h2>
-          <p className="text-sm text-[var(--color-muted-foreground)] mt-1">Tell us who you are so we can personalise your experience</p>
-        </div>
-        <div className="grid grid-cols-1 gap-3">
-          <button
-            onClick={() => onPick('user')}
-            className="flex items-center gap-4 px-6 py-5 rounded-[var(--radius-2xl)] border-2 border-[var(--color-border)] hover:border-[var(--highlight)] hover:bg-[var(--highlight)]/5 transition-all text-left"
-          >
-            <span className="text-4xl">🗺️</span>
-            <div>
-              <p className="font-bold text-[var(--color-foreground)]">Tourist / Visitor</p>
-              <p className="text-xs text-[var(--color-muted-foreground)] mt-0.5">Discover Cretan experiences, food & wellness</p>
-            </div>
-          </button>
-          <button
-            onClick={() => onPick('producer')}
-            className="flex items-center gap-4 px-6 py-5 rounded-[var(--radius-2xl)] border-2 border-[var(--color-border)] hover:border-[var(--highlight)] hover:bg-[var(--highlight)]/5 transition-all text-left"
-          >
-            <span className="text-4xl">🧑‍🌾</span>
-            <div>
-              <p className="font-bold text-[var(--color-foreground)]">Local Producer</p>
-              <p className="text-xs text-[var(--color-muted-foreground)] mt-0.5">List your farm, products or experiences</p>
-            </div>
-          </button>
-        </div>
-      </div>
-    </div>
-  )
-}
-
 // ── Root — detect role and branch ─────────────────────────────────────────────
 
 export default function OnboardingPage() {
   const [userId, setUserId] = useState<string | null>(null)
-  const [role, setRole] = useState<'user' | 'producer' | null>(null)
-  const [ready, setReady] = useState(false)
+  const [role, setRole] = useState<string | null>(null)
 
   useEffect(() => {
     const supabase = createClient()
     supabase.auth.getUser().then(async ({ data }) => {
       if (!data.user) return
-      const uid = data.user.id
-      setUserId(uid)
-
-      const { data: profile } = await supabase.from('profiles').select('role').eq('id', uid).single()
-      const savedRole = profile?.role as 'user' | 'producer' | undefined
-
-      // Check if user already picked a role before hitting Google OAuth
-      let intendedRole: 'user' | 'producer' | null = null
-      try {
-        const stored = sessionStorage.getItem('intended_role')
-        if (stored === 'producer' || stored === 'user') intendedRole = stored
-        sessionStorage.removeItem('intended_role')
-      } catch {}
-
-      if (intendedRole && intendedRole !== savedRole) {
-        // Persist the role they chose on the login page
-        await supabase.from('profiles').update({ role: intendedRole }).eq('id', uid)
-        setRole(intendedRole)
-      } else {
-        setRole(savedRole ?? null)
-      }
-      setReady(true)
+      setUserId(data.user.id)
+      const { data: profile } = await supabase.from('profiles').select('role').eq('id', data.user.id).single()
+      setRole(profile?.role ?? 'user')
     })
   }, [])
 
-  async function handleRolePick(picked: 'user' | 'producer') {
-    if (!userId) return
-    const supabase = createClient()
-    await supabase.from('profiles').update({ role: picked }).eq('id', userId)
-    setRole(picked)
-  }
-
-  if (!userId || !ready) {
+  if (!userId || !role) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <LoadingSpinner size="lg" />
       </div>
     )
-  }
-
-  // Role not yet determined — show the picker (happens for Google/Apple sign-ins
-  // where the user didn't interact with the login-page role selector)
-  if (!role) {
-    return <RolePicker onPick={handleRolePick} />
   }
 
   return role === 'producer'

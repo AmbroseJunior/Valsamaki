@@ -35,35 +35,43 @@ export function LikedExperiencesSection() {
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {likedExps.map((exp) => (
-          <Link
-            key={exp.id}
-            href={`/explore?q=${encodeURIComponent(exp.title)}`}
-            className="group block"
-          >
-            <div className="relative aspect-[4/3] rounded-[var(--radius-xl)] overflow-hidden bg-[var(--color-muted)]">
-              {exp.images[0] && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={exp.images[0]}
-                  alt={exp.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                />
+          <div key={exp.id} className="group flex flex-col">
+            <Link href={`/explore?q=${encodeURIComponent(exp.title)}`} className="block">
+              <div className="relative aspect-[4/3] rounded-[var(--radius-xl)] overflow-hidden bg-[var(--color-muted)]">
+                {exp.images[0] && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={exp.images[0]}
+                    alt={exp.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                <div className="absolute top-2 right-2 p-1 rounded-full bg-white/80">
+                  <Heart className="h-3 w-3 fill-[var(--highlight)] stroke-[var(--highlight)]" />
+                </div>
+                <div className="absolute bottom-0 left-0 right-0 p-2">
+                  <p className="text-white text-xs font-semibold line-clamp-2 leading-tight">{exp.title}</p>
+                  <p className="text-white/70 text-[10px] mt-0.5 flex items-center gap-0.5">
+                    <MapPin className="h-2.5 w-2.5 shrink-0" />{exp.location}
+                  </p>
+                </div>
+              </div>
+            </Link>
+            <div className="flex items-center justify-between mt-1 px-0.5">
+              {exp.price && (
+                <p className="text-xs text-[var(--color-muted-foreground)] truncate">{exp.price}</p>
               )}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-              <div className="absolute top-2 right-2 p-1 rounded-full bg-white/80">
-                <Heart className="h-3 w-3 fill-[var(--highlight)] stroke-[var(--highlight)]" />
-              </div>
-              <div className="absolute bottom-0 left-0 right-0 p-2">
-                <p className="text-white text-xs font-semibold line-clamp-2 leading-tight">{exp.title}</p>
-                <p className="text-white/70 text-[10px] mt-0.5 flex items-center gap-0.5">
-                  <MapPin className="h-2.5 w-2.5 shrink-0" />{exp.location}
-                </p>
-              </div>
+              {exp.coordinates && (
+                <Link
+                  href={`/map?lat=${exp.coordinates.lat}&lng=${exp.coordinates.lng}&label=${encodeURIComponent(exp.title)}`}
+                  className="ml-auto flex items-center gap-0.5 text-[10px] font-semibold text-[var(--highlight)] hover:underline shrink-0"
+                >
+                  <MapPin className="h-2.5 w-2.5" /> Map
+                </Link>
+              )}
             </div>
-            {exp.price && (
-              <p className="text-xs text-[var(--color-muted-foreground)] mt-1 px-0.5 truncate">{exp.price}</p>
-            )}
-          </Link>
+          </div>
         ))}
       </div>
     </section>

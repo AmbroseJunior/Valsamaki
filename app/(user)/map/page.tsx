@@ -537,6 +537,12 @@ export default function MapPage() {
   const [routeLoading, setRouteLoading] = useState(false)
   const [gpsCoords, setGpsCoords] = useState<{ lat: number; lng: number } | null>(null)
   const [geocodedCoords, setGeocodedCoords] = useState<{ lat: number; lng: number } | null>(null)
+  const [urlPin, setUrlPin] = useState<{ lat: number; lng: number; label: string } | null>(() => {
+    const lat = parseFloat(searchParams.get('lat') ?? '')
+    const lng = parseFloat(searchParams.get('lng') ?? '')
+    const label = searchParams.get('label') ?? ''
+    return !isNaN(lat) && !isNaN(lng) ? { lat, lng, label } : null
+  })
   const { userId } = useRole()
   const { coords } = useLocation(userId)
   const supabase = createClient()
@@ -709,8 +715,9 @@ export default function MapPage() {
     if (selectedMarket) return { lat: selectedMarket.lat, lng: selectedMarket.lng, mode: activeRouteMode }
     if (selectedExp?.coordinates) return { lat: selectedExp.coordinates.lat, lng: selectedExp.coordinates.lng, mode: activeRouteMode }
     if (selectedPlace) return { lat: selectedPlace.coordinates.lat, lng: selectedPlace.coordinates.lng, mode: activeRouteMode }
+    if (urlPin) return { lat: urlPin.lat, lng: urlPin.lng, mode: activeRouteMode }
     return undefined
-  }, [activeRouteMode, selectedBiz, selectedEvt, selectedMarket, selectedExp, selectedPlace, geocodedCoords])
+  }, [activeRouteMode, selectedBiz, selectedEvt, selectedMarket, selectedExp, selectedPlace, geocodedCoords, urlPin])
 
   const routeProps: RoutePanelProps = {
     activeRouteMode,
@@ -748,8 +755,11 @@ export default function MapPage() {
       .map((ex) => ({ id: `exp:${ex.id}`, lat: ex.coordinates.lat, lng: ex.coordinates.lng, type: 'experience' as const, label: ex.title }))
     const plMarkers: MapMarker[] = (showPl ? filteredPlaces : [])
       .map((p) => ({ id: `pl:${p.id}`, lat: p.coordinates.lat, lng: p.coordinates.lng, type: 'place' as const, label: p.title }))
-    return [...bMarkers, ...eMarkers, ...mMarkers, ...expMarkers, ...plMarkers]
-  }, [rawBusinesses, events, filteredMarkets, filteredExperiences, filteredPlaces, tab])
+    const pinMarker: MapMarker[] = urlPin
+      ? [{ id: 'url:pin', lat: urlPin.lat, lng: urlPin.lng, type: 'user' as const, label: urlPin.label || 'Selected location' }]
+      : []
+    return [...bMarkers, ...eMarkers, ...mMarkers, ...expMarkers, ...plMarkers, ...pinMarker]
+  }, [rawBusinesses, events, filteredMarkets, filteredExperiences, filteredPlaces, tab, urlPin])
 
   const flyTo = useMemo<{ lat: number; lng: number; zoom?: number } | undefined>(() => {
     const item = selectedBiz ?? selectedEvt
@@ -757,8 +767,9 @@ export default function MapPage() {
     if (selectedMarket) return { lat: selectedMarket.lat, lng: selectedMarket.lng, zoom: 16 }
     if (selectedExp?.coordinates) return { lat: selectedExp.coordinates.lat, lng: selectedExp.coordinates.lng, zoom: 15 }
     if (selectedPlace) return { lat: selectedPlace.coordinates.lat, lng: selectedPlace.coordinates.lng, zoom: 15 }
+    if (urlPin) return { lat: urlPin.lat, lng: urlPin.lng, zoom: 16 }
     return undefined
-  }, [selectedBiz, selectedEvt, selectedMarket, selectedExp, selectedPlace])
+  }, [selectedBiz, selectedEvt, selectedMarket, selectedExp, selectedPlace, urlPin])
 
   function handleMarkerClick(markerId: string) {
     if (markerId.startsWith('b:')) {

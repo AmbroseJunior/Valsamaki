@@ -102,7 +102,7 @@ export const SCRAPED_EXPERIENCES: Experience[] = [
     images: [
       'https://images.unsplash.com/photo-1539650116574-75c0c6d73e1e?w=800&q=80',
       'https://images.unsplash.com/photo-1577968897966-3d4325b36b61?w=800&q=80',
-      'https://images.unsplash.com/photo-1565799557900-2f90c0a7e3e7?w=800&q=80',
+      'https://images.unsplash.com/photo-1603565816030-6b389eeb23cb?w=800&q=80',
     ],
     shortDescription: 'Walk the labyrinthine corridors of Europe\'s oldest city — the 3,500-year-old Minoan palace.',
     description:
@@ -370,7 +370,7 @@ export const SCRAPED_EXPERIENCES: Experience[] = [
     images: [
       'https://images.unsplash.com/photo-1519046904884-53103b34b206?w=800&q=80',
       'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80',
-      'https://images.unsplash.com/photo-1565799557900-2f90c0a7e3e7?w=800&q=80',
+      'https://images.unsplash.com/photo-1470093851219-69951fcbb533?w=800&q=80',
     ],
     shortDescription: 'Europe\'s largest natural palm forest beside a turquoise bay, combined with a magnificent medieval monastery.',
     description:
@@ -441,7 +441,7 @@ export const SCRAPED_EXPERIENCES: Experience[] = [
     rating: 4.8,
     reviewCount: 48,
     images: [
-      'https://images.unsplash.com/photo-1565799557900-2f90c0a7e3e7?w=800&q=80',
+      'https://images.unsplash.com/photo-1530026186672-2cd00ffc50fe?w=800&q=80',
       'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?w=800&q=80',
       'https://images.unsplash.com/photo-1500462918059-b1a0cb512f1d?w=800&q=80',
     ],

@@ -16,16 +16,19 @@ interface ExperienceCardProps {
 export function ExperienceCard({ experience, onClick, className }: ExperienceCardProps) {
   const [imgIndex, setImgIndex] = useState(0)
   const [imgHovered, setImgHovered] = useState(false)
+  const [imgError, setImgError] = useState(false)
   const { isLiked, toggle: toggleLike } = useLikedExperiences()
 
   const prev = useCallback((e: React.MouseEvent) => {
     e.stopPropagation()
     setImgIndex((i) => (i - 1 + experience.images.length) % experience.images.length)
+    setImgError(false)
   }, [experience.images.length])
 
   const next = useCallback((e: React.MouseEvent) => {
     e.stopPropagation()
     setImgIndex((i) => (i + 1) % experience.images.length)
+    setImgError(false)
   }, [experience.images.length])
 
   const handleToggleLike = useCallback((e: React.MouseEvent) => {
@@ -48,14 +51,21 @@ export function ExperienceCard({ experience, onClick, className }: ExperienceCar
         onMouseEnter={() => setImgHovered(true)}
         onMouseLeave={() => setImgHovered(false)}
       >
-        <Image
-          src={experience.images[imgIndex]}
-          alt={experience.title}
-          fill
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
-          unoptimized
-        />
+        {imgError ? (
+          <div className="absolute inset-0 flex items-center justify-center bg-[var(--color-muted)]">
+            <span className="text-4xl opacity-40">🏛️</span>
+          </div>
+        ) : (
+          <Image
+            src={experience.images[imgIndex]}
+            alt={experience.title}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            unoptimized
+            onError={() => setImgError(true)}
+          />
+        )}
 
         {/* Category badge */}
         <div className="absolute top-3 left-3">

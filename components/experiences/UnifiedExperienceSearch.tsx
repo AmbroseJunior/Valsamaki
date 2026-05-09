@@ -267,6 +267,7 @@ function SectionHeader({ emoji, label, count, href }: { emoji: string; label: st
 }
 
 function PlaceCard({ place }: { place: CretePlace }) {
+  const [imgErr, setImgErr] = useState(false)
   return (
     <Link
       href={`/map?q=${encodeURIComponent(place.title)}`}
@@ -274,8 +275,12 @@ function PlaceCard({ place }: { place: CretePlace }) {
     >
       {place.image && (
         <div className="relative aspect-video overflow-hidden bg-[var(--color-muted)]">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={place.image} alt={place.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+          {imgErr ? (
+            <div className="w-full h-full flex items-center justify-center"><span className="text-4xl opacity-40">🏛️</span></div>
+          ) : (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={place.image} alt={place.title} onError={() => setImgErr(true)} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+          )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
           <span className="absolute bottom-2 left-2 text-[0.6rem] font-bold uppercase tracking-wide bg-white/20 backdrop-blur-sm text-white px-2 py-0.5 rounded-full">
             {place.region}

@@ -537,12 +537,12 @@ export default function MapPage() {
   const [routeLoading, setRouteLoading] = useState(false)
   const [gpsCoords, setGpsCoords] = useState<{ lat: number; lng: number } | null>(null)
   const [geocodedCoords, setGeocodedCoords] = useState<{ lat: number; lng: number } | null>(null)
-  const [urlPin, setUrlPin] = useState<{ lat: number; lng: number; label: string } | null>(() => {
+  const urlPin = useMemo(() => {
     const lat = parseFloat(searchParams.get('lat') ?? '')
     const lng = parseFloat(searchParams.get('lng') ?? '')
     const label = searchParams.get('label') ?? ''
     return !isNaN(lat) && !isNaN(lng) ? { lat, lng, label } : null
-  })
+  }, [searchParams])
   const { userId } = useRole()
   const { coords } = useLocation(userId)
   const supabase = createClient()

@@ -21,6 +21,9 @@ export default async function DashboardPage() {
     .eq('id', user.id)
     .single()
 
+  // New user who hasn't completed onboarding yet
+  if (!profile?.preferences) redirect('/onboarding')
+
   const t = await getTranslations('dashboard')
 
   const preferences = (profile?.preferences ?? null) as UserPreferences | null

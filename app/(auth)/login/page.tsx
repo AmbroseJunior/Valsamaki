@@ -74,10 +74,12 @@ function LoginForm() {
 
   async function handleGoogle() {
     setError('')
+    // Store intended role in sessionStorage — read back in onboarding
+    try { sessionStorage.setItem('intended_role', role) } catch {}
     const { error: oauthError } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}&role=${role}`,
+        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
       },
     })
     if (oauthError) setError(oauthError.message)
@@ -85,10 +87,11 @@ function LoginForm() {
 
   async function handleApple() {
     setError('')
+    try { sessionStorage.setItem('intended_role', role) } catch {}
     const { error: oauthError } = await supabase.auth.signInWithOAuth({
       provider: 'apple',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}&role=${role}`,
+        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
       },
     })
     if (oauthError) setError(oauthError.message)

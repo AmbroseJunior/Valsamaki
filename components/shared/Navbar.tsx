@@ -24,11 +24,15 @@ export function Navbar() {
   const { role } = useRole()
   const router = useRouter()
   const t = useTranslations('nav')
-  const [menuOpen, setMenuOpen] = useState(false)
+
+  const [modulesOpen, setModulesOpen] = useState(false)
+  const [profileOpen, setProfileOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [scrolled, setScrolled] = useState(false)
+
   const searchRef = useRef<HTMLInputElement>(null)
+  const profileRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 8)
@@ -39,6 +43,24 @@ export function Navbar() {
   useEffect(() => {
     if (searchOpen) searchRef.current?.focus()
   }, [searchOpen])
+
+  // Close profile dropdown on outside click
+  useEffect(() => {
+    if (!profileOpen) return
+    function onOutside(e: MouseEvent) {
+      if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
+        setProfileOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', onOutside)
+    return () => document.removeEventListener('mousedown', onOutside)
+  }, [profileOpen])
+
+  // Close both menus when route changes
+  useEffect(() => {
+    setModulesOpen(false)
+    setProfileOpen(false)
+  }, [pathname])
 
   async function handleSignOut() {
     const supabase = createClient()
@@ -72,7 +94,7 @@ export function Navbar() {
         <Link
           href={isGuest ? '/' : '/dashboard'}
           className="flex items-center gap-2 shrink-0"
-          onClick={() => setMenuOpen(false)}
+          onClick={() => { setModulesOpen(false); setProfileOpen(false) }}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/v1.png" alt="valsamaki" className="w-8 h-8 md:w-9 md:h-9 object-contain" />
@@ -175,57 +197,62 @@ export function Navbar() {
               </Link>
             </>
           ) : (
-            <div className="relative">
+            <>
+              {/* Profile dropdown — works on both mobile and desktop */}
+              <div className="relative" ref={profileRef}>
+                <button
+                  onClick={() => { setProfileOpen((v) => !v); setModulesOpen(false) }}
+                  className="flex items-center gap-1.5 p-2 rounded-[var(--radius)] hover:bg-[var(--color-muted)] transition-colors text-[var(--color-muted-foreground)]"
+                  aria-label="Profile menu"
+                >
+                  <User className="h-5 w-5" />
+                  <ChevronDown className={cn('h-3 w-3 transition-transform', profileOpen && 'rotate-180')} />
+                </button>
+
+                {profileOpen && (
+                  <div className="absolute right-0 top-full mt-1 w-48 bg-[var(--color-card)] border border-[var(--color-border)] rounded-[var(--radius-lg)] shadow-[var(--shadow-lg)] py-1 z-[var(--z-dropdown)]">
+                    <Link href="/dashboard" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-[var(--color-muted)] transition-colors" onClick={() => setProfileOpen(false)}>
+                      {t('dashboard')}
+                    </Link>
+                    <Link href="/settings" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-[var(--color-muted)] transition-colors" onClick={() => setProfileOpen(false)}>
+                      {t('settings')}
+                    </Link>
+                    <Link href="/explore?liked=1" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-[var(--color-muted)] transition-colors" onClick={() => setProfileOpen(false)}>
+                      ❤️ {t('likedExperiences')}
+                    </Link>
+                    {isProducer && (
+                      <>
+                        <Link href="/business" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-[var(--color-muted)] transition-colors" onClick={() => setProfileOpen(false)}>{t('business')}</Link>
+                        <Link href="/analytics" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-[var(--color-muted)] transition-colors" onClick={() => setProfileOpen(false)}>{t('analytics')}</Link>
+                      </>
+                    )}
+                    <div className="border-t border-[var(--color-border)] my-1" />
+                    <button
+                      onClick={() => { setProfileOpen(false); handleSignOut() }}
+                      className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-[var(--color-destructive)] hover:bg-[var(--color-muted)] transition-colors"
+                    >
+                      <LogOut className="h-4 w-4" />
+                      {t('signOut')}
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Mobile hamburger — modules only */}
               <button
-                onClick={() => setMenuOpen((v) => !v)}
-                className="flex items-center gap-1.5 p-2 rounded-[var(--radius)] hover:bg-[var(--color-muted)] transition-colors text-[var(--color-muted-foreground)]"
+                className="md:hidden p-2 rounded-[var(--radius)] hover:bg-[var(--color-muted)] transition-colors"
+                onClick={() => { setModulesOpen((v) => !v); setProfileOpen(false) }}
+                aria-label="Navigation menu"
               >
-                <User className="h-5 w-5" />
-                <ChevronDown className={cn('h-3 w-3 transition-transform', menuOpen && 'rotate-180')} />
+                {modulesOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
               </button>
-
-              {menuOpen && (
-                <div className="absolute right-0 top-full mt-1 w-44 bg-[var(--color-card)] border border-[var(--color-border)] rounded-[var(--radius-lg)] shadow-[var(--shadow-lg)] py-1 z-[var(--z-dropdown)]">
-                  <Link href="/dashboard" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-[var(--color-muted)] transition-colors" onClick={() => setMenuOpen(false)}>
-                    {t('dashboard')}
-                  </Link>
-                  <Link href="/settings" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-[var(--color-muted)] transition-colors" onClick={() => setMenuOpen(false)}>
-                    {t('settings')}
-                  </Link>
-                  <Link href="/explore?liked=1" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-[var(--color-muted)] transition-colors" onClick={() => setMenuOpen(false)}>
-                    ❤️ {t('likedExperiences')}
-                  </Link>
-                  {isProducer && (
-                    <>
-                      <Link href="/business" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-[var(--color-muted)] transition-colors" onClick={() => setMenuOpen(false)}>{t('business')}</Link>
-                      <Link href="/analytics" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-[var(--color-muted)] transition-colors" onClick={() => setMenuOpen(false)}>{t('analytics')}</Link>
-                    </>
-                  )}
-                  <div className="border-t border-[var(--color-border)] my-1" />
-                  <button
-                    onClick={() => { setMenuOpen(false); handleSignOut() }}
-                    className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-[var(--color-destructive)] hover:bg-[var(--color-muted)] transition-colors"
-                  >
-                    <LogOut className="h-4 w-4" />
-                    {t('signOut')}
-                  </button>
-                </div>
-              )}
-            </div>
+            </>
           )}
-
-          {/* Mobile hamburger */}
-          <button
-            className="md:hidden p-2 rounded-[var(--radius)] hover:bg-[var(--color-muted)] transition-colors"
-            onClick={() => setMenuOpen((v) => !v)}
-          >
-            {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>
         </div>
       </div>
 
-      {/* Mobile menu drawer */}
-      {menuOpen && (
+      {/* Mobile modules drawer — nav links only */}
+      {modulesOpen && (
         <div className="md:hidden bg-[var(--color-card)] border-t border-[var(--color-border)] shadow-[var(--shadow-lg)]">
           <div className="px-4 py-3 space-y-1">
             {/* Search on mobile */}
@@ -239,35 +266,31 @@ export function Navbar() {
               />
             </form>
 
-            {/* Language switcher — always visible for every user */}
+            {/* Language switcher */}
             <div className="flex items-center justify-between px-3 py-2 rounded-[var(--radius)] bg-[var(--color-muted)]">
               <span className="text-xs font-bold text-[var(--color-muted-foreground)] uppercase tracking-wide">{t('language')}</span>
               <LocaleSwitcher />
             </div>
 
-            {isGuest ? (
-              <>
-                <Link href="/login" onClick={() => setMenuOpen(false)} className="block px-3 py-2.5 text-sm font-semibold rounded-[var(--radius)] hover:bg-[var(--color-muted)]">{t('signIn')}</Link>
-                <Link href="/register" onClick={() => setMenuOpen(false)} className="block px-3 py-2.5 text-sm font-bold bg-[var(--highlight)] text-[var(--highlight-foreground)] rounded-[var(--radius)] text-center">{t('getStarted')}</Link>
-              </>
-            ) : (
-              <>
-                {NAV_LINKS.map(({ href, key }) => (
-                  <Link key={href} href={href} onClick={() => setMenuOpen(false)} className={cn('block px-3 py-2.5 text-sm font-semibold rounded-[var(--radius)] transition-colors', pathname.startsWith(href) ? 'bg-[var(--highlight)] text-[var(--highlight-foreground)]' : 'hover:bg-[var(--color-muted)]')}>
-                    {t(key)}
-                  </Link>
-                ))}
-                {isProducer && (
-                  <>
-                    <Link href="/business" onClick={() => setMenuOpen(false)} className="block px-3 py-2.5 text-sm font-semibold rounded-[var(--radius)] hover:bg-[var(--color-muted)]">{t('business')}</Link>
-                    <Link href="/advertise" onClick={() => setMenuOpen(false)} className="block px-3 py-2.5 text-sm font-semibold rounded-[var(--radius)] hover:bg-[var(--color-muted)]">{t('advertise')}</Link>
-                  </>
+            {/* Nav links */}
+            {NAV_LINKS.map(({ href, key }) => (
+              <Link
+                key={href}
+                href={href}
+                onClick={() => setModulesOpen(false)}
+                className={cn(
+                  'block px-3 py-2.5 text-sm font-semibold rounded-[var(--radius)] transition-colors',
+                  pathname.startsWith(href) ? 'bg-[var(--highlight)] text-[var(--highlight-foreground)]' : 'hover:bg-[var(--color-muted)]'
                 )}
-                <div className="border-t border-[var(--color-border)] pt-2 mt-2">
-                  <button onClick={() => { setMenuOpen(false); handleSignOut() }} className="flex items-center gap-2 w-full px-3 py-2.5 text-sm text-[var(--color-destructive)] rounded-[var(--radius)] hover:bg-[var(--color-muted)]">
-                    <LogOut className="h-4 w-4" /> {t('signOut')}
-                  </button>
-                </div>
+              >
+                {t(key)}
+              </Link>
+            ))}
+
+            {isProducer && (
+              <>
+                <Link href="/business" onClick={() => setModulesOpen(false)} className="block px-3 py-2.5 text-sm font-semibold rounded-[var(--radius)] hover:bg-[var(--color-muted)]">{t('business')}</Link>
+                <Link href="/advertise" onClick={() => setModulesOpen(false)} className="block px-3 py-2.5 text-sm font-semibold rounded-[var(--radius)] hover:bg-[var(--color-muted)]">{t('advertise')}</Link>
               </>
             )}
           </div>

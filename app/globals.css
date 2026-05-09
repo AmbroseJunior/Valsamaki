@@ -48,7 +48,27 @@
   }
 }
 
+/* Map page — subtract bottom nav only on mobile where it exists */
+.map-page {
+  height: calc(100dvh - var(--nav-height) - var(--bottom-nav-height));
+}
+@media (min-width: 768px) {
+  .map-page {
+    height: calc(100dvh - var(--nav-height));
+  }
+}
+
+@keyframes scannerLine {
+  0%, 100% { top: 4px; }
+  50%        { top: calc(100% - 4px); }
+}
+
 @layer utilities {
+  .animate-scanner-line {
+    animation: scannerLine 2.5s ease-in-out infinite;
+    position: absolute;
+  }
+
   .text-balance {
     text-wrap: balance;
   }

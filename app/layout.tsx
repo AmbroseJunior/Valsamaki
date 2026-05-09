@@ -6,7 +6,7 @@ import { Providers } from './providers'
 import { Navbar } from '@/components/shared/Navbar'
 import { BottomNav } from '@/components/shared/BottomNav'
 import { OfflineBanner } from '@/components/shared/OfflineBanner'
-import { WeatherChip } from '@/components/shared/WeatherChip'
+import { WeatherBox } from '@/components/shared/WeatherBox'
 import { FloatingChatbot } from '@/components/ai/FloatingChatbot'
 import { FirstVisitLanguagePicker } from '@/components/shared/FirstVisitLanguagePicker'
 import '@/styles/tokens.css'
@@ -60,7 +60,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               {children}
             </main>
             <BottomNav />
-            <WeatherChip />
+            <WeatherBox />
             <FloatingChatbot />
           </Providers>
         </NextIntlClientProvider>

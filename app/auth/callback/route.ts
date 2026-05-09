@@ -24,18 +24,32 @@ export async function GET(request: NextRequest) {
     const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code)
 
     if (!exchangeError) {
-      // Ensure a profile row exists for OAuth sign-ins (Google, Facebook, etc.)
       const { data: { user: authUser } } = await supabase.auth.getUser()
       if (authUser) {
-        await supabase.from('profiles').upsert(
-          {
+        // Check whether this is a brand-new user or a returning one
+        const { data: existingProfile } = await supabase
+          .from('profiles')
+          .select('preferences')
+          .eq('id', authUser.id)
+          .single()
+
+        if (!existingProfile) {
+          // Brand-new OAuth sign-in: create profile with the role they chose before clicking Google/Apple
+          const rawRole = searchParams.get('role')
+          const intendedRole = rawRole === 'producer' ? 'producer' : 'user'
+          await supabase.from('profiles').insert({
             id: authUser.id,
             name: authUser.user_metadata?.full_name ?? authUser.user_metadata?.name ?? null,
-            role: 'user',
+            role: intendedRole,
             language: 'en',
-          },
-          { onConflict: 'id', ignoreDuplicates: true }
-        )
+          })
+          return NextResponse.redirect(`${origin}/onboarding`)
+        }
+
+        // Returning user — preserve their existing role
+        // If they somehow never finished onboarding, send them back
+        const destination = !existingProfile.preferences ? '/onboarding' : next
+        return NextResponse.redirect(`${origin}${destination}`)
       }
 
       return NextResponse.redirect(`${origin}${next}`)

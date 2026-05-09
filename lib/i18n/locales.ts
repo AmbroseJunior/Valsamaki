@@ -14,3 +14,17 @@ export const LOCALE_LABELS: Record<Locale, string> = {
   ar: 'العربية',
   pt: 'Português',
 }
+
+export const LOCALE_FLAGS: Record<Locale, string> = {
+  en: '🇬🇧',
+  el: '🇬🇷',
+  es: '🇪🇸',
+  fr: '🇫🇷',
+  de: '🇩🇪',
+  it: '🇮🇹',
+  nl: '🇳🇱',
+  ru: '🇷🇺',
+  zh: '🇨🇳',
+  ar: '🇸🇦',
+  pt: '🇵🇹',
+}

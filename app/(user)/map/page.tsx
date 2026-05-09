@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import { useSearchParams } from 'next/navigation'
-import { Search, X, MapPin, Phone, Globe, Calendar, Ticket, Star, ExternalLink } from 'lucide-react'
+import { Search, X, MapPin, Phone, Globe, Calendar, Ticket, Star, ExternalLink, Navigation } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslations } from 'next-intl'
 import { createClient } from '@/lib/supabase/client'
@@ -29,7 +29,7 @@ const MapView = dynamic(
   { ssr: false, loading: () => <div className="w-full h-full bg-[var(--color-muted)] animate-pulse rounded-[var(--radius)]" /> }
 )
 
-type TabType = 'all' | 'events' | 'markets' | 'sights'
+type TabType = 'all' | 'markets' | 'sights' | 'experiences'
 type RouteMode = 'walking' | 'transit' | 'driving'
 
 type BusinessWithOwner = BusinessRow & {
@@ -54,18 +54,25 @@ function fmtMins(s: number) {
 }
 
 function RouteMetricsCard({ mode, info }: { mode: RouteMode; info: RouteInfo }) {
+  const t = useTranslations('map')
   const { distanceM, durationS } = info
 
   // Derived metrics
+  const distKm     = distanceM / 1000
   const steps      = Math.round(distanceM / 0.762)
-  const calories   = Math.round(distanceM * 0.065)          // ~65 kcal/km walking
-  const co2g       = Math.round(distanceM * 0.12)           // 120 g CO₂/km avg car
-  const fuelEur    = ((distanceM / 1000) * 7 / 100 * 1.85).toFixed(2) // 7 L/100 km @ €1.85
+  const calories   = Math.round(distanceM * 0.065)
+  const co2g       = Math.round(distanceM * 0.12)
+  const fuelEur    = (distKm * 7 / 100 * 1.85).toFixed(2)
+  // KTEL Crete fare: €1.70 base up to 5 km, tiered after
+  const busFare    = distKm <= 5  ? '€1.70'
+                   : distKm <= 15 ? '€2.50'
+                   : distKm <= 30 ? '€4.50'
+                   : `€${Math.min(15, 4.5 + (distKm - 30) * 0.20).toFixed(2)}`
 
-  // Estimated times for all 3 modes (ratios from the known mode)
-  const walkS  = mode === 'walking'  ? durationS : mode === 'driving' ? durationS * 4.2 : durationS * 1.8
-  const busS   = mode === 'transit'  ? durationS : mode === 'driving' ? durationS * 2.4 : durationS * 0.55
-  const driveS = mode === 'driving'  ? durationS : mode === 'walking' ? durationS * 0.24 : durationS * 0.42
+  // Accurate mode-comparison ratios: walk ≈ 4.5× drive, bus ≈ 1.7× drive
+  const walkS  = mode === 'walking' ? durationS : mode === 'driving' ? durationS * 4.5 : durationS * 2.65
+  const busS   = mode === 'transit' ? durationS : mode === 'driving' ? durationS * 1.7  : durationS * 0.38
+  const driveS = mode === 'driving' ? durationS : mode === 'walking' ? durationS * 0.22 : durationS * 0.59
   const maxS   = Math.max(walkS, busS, driveS)
 
   const modeConfig = {
@@ -75,9 +82,9 @@ function RouteMetricsCard({ mode, info }: { mode: RouteMode; info: RouteInfo }) 
       border: 'border-green-300 dark:border-green-700',
       barColor: 'bg-green-500',
       metrics: [
-        { icon: '👣', label: 'Steps',    value: steps.toLocaleString() },
-        { icon: '🔥', label: 'Calories', value: `~${calories} kcal` },
-        { icon: '🌱', label: 'CO₂',      value: 'Zero' },
+        { icon: '👣', label: t('steps'),    value: steps.toLocaleString() },
+        { icon: '🔥', label: t('calories'), value: `~${calories} kcal` },
+        { icon: '🌱', label: t('co2'),      value: t('co2Zero') },
       ],
     },
     transit: {
@@ -86,9 +93,9 @@ function RouteMetricsCard({ mode, info }: { mode: RouteMode; info: RouteInfo }) 
       border: 'border-blue-300 dark:border-blue-700',
       barColor: 'bg-blue-500',
       metrics: [
-        { icon: '🪙', label: 'Est. fare',   value: '~€1.20' },
-        { icon: '🌱', label: 'CO₂ saved',   value: `−${Math.round(co2g * 0.7)} g` },
-        { icon: '♿', label: 'Accessible',  value: 'Most stops' },
+        { icon: '🪙', label: t('estFare'),   value: `~${busFare}` },
+        { icon: '🌱', label: t('co2Saved'),   value: `−${Math.round(co2g * 0.7)} g` },
+        { icon: '♿', label: t('accessible'),  value: t('mostStops') },
       ],
     },
     driving: {
@@ -97,9 +104,9 @@ function RouteMetricsCard({ mode, info }: { mode: RouteMode; info: RouteInfo }) 
       border: 'border-red-300 dark:border-red-700',
       barColor: 'bg-red-500',
       metrics: [
-        { icon: '⛽', label: 'Fuel est.', value: `~€${fuelEur}` },
-        { icon: '💨', label: 'CO₂',       value: `~${co2g} g` },
-        { icon: '🅿️', label: 'Parking',   value: 'Plan ahead' },
+        { icon: '⛽', label: t('fuelEst'), value: `~€${fuelEur}` },
+        { icon: '💨', label: t('co2'),       value: `~${co2g} g` },
+        { icon: '🅿️', label: t('parking'),   value: t('parkingNote') },
       ],
     },
   }
@@ -118,7 +125,7 @@ function RouteMetricsCard({ mode, info }: { mode: RouteMode; info: RouteInfo }) 
         <div>
           <p className={`text-2xl font-bold leading-tight ${cfg.color}`}>{info.duration}</p>
           <p className="text-[11px] text-[var(--color-muted-foreground)] mt-0.5">
-            {info.distance} from your location
+            {info.distance} {t('fromYourLocation')}
           </p>
         </div>
         <span className="text-3xl leading-none">
@@ -138,9 +145,9 @@ function RouteMetricsCard({ mode, info }: { mode: RouteMode; info: RouteInfo }) 
       </div>
 
       {/* Mode comparison bars */}
-      <div className="px-3 pb-3 pt-2 border-t border-inherit space-y-2">
+      <div className="px-3 pt-2 border-t border-inherit space-y-2">
         <p className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-muted-foreground)] mb-1">
-          Mode comparison
+          {t('modeComparison')}
         </p>
         {bars.map(({ icon, label, s, barCls, active }) => (
           <div key={label} className="flex items-center gap-2">
@@ -159,6 +166,20 @@ function RouteMetricsCard({ mode, info }: { mode: RouteMode; info: RouteInfo }) 
             </span>
           </div>
         ))}
+      </div>
+
+      {/* Google Maps live navigation */}
+      <div className="px-3 pb-3 pt-2 border-t border-inherit">
+        <a
+          href={info.googleMapsUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center justify-center gap-2 w-full py-2 rounded-[var(--radius-lg)] bg-[var(--color-background)] border border-[var(--color-border)] hover:border-[var(--highlight)] transition-colors text-xs font-semibold text-[var(--color-foreground)]"
+        >
+          <Navigation className="h-3.5 w-3.5 text-[var(--highlight)]" />
+          Navigate with Google Maps
+          <ExternalLink className="h-3 w-3 text-[var(--color-muted-foreground)]" />
+        </a>
       </div>
     </div>
   )
@@ -223,7 +244,13 @@ function DirectionButtons({ activeRouteMode, onRouteMode, routeInfo, routeLoadin
 
       {!hasCoords && (
         <p className="text-[10px] text-[var(--color-muted-foreground)] text-center italic">
-          No map coordinates — directions unavailable
+          {t('noCoords')}
+        </p>
+      )}
+
+      {hasCoords && activeRouteMode && !routeLoading && !routeInfo && (
+        <p className="text-[10px] text-red-500 dark:text-red-400 text-center">
+          {t('routeError')}
         </p>
       )}
     </div>
@@ -508,9 +535,28 @@ export default function MapPage() {
   const [activeRouteMode, setActiveRouteMode] = useState<RouteMode | null>(null)
   const [routeInfo, setRouteInfo] = useState<RouteInfo | null>(null)
   const [routeLoading, setRouteLoading] = useState(false)
+  const [gpsCoords, setGpsCoords] = useState<{ lat: number; lng: number } | null>(null)
+  const [geocodedCoords, setGeocodedCoords] = useState<{ lat: number; lng: number } | null>(null)
+  const urlPin = useMemo(() => {
+    const lat = parseFloat(searchParams.get('lat') ?? '')
+    const lng = parseFloat(searchParams.get('lng') ?? '')
+    const label = searchParams.get('label') ?? ''
+    return !isNaN(lat) && !isNaN(lng) ? { lat, lng, label } : null
+  }, [searchParams])
   const { userId } = useRole()
   const { coords } = useLocation(userId)
   const supabase = createClient()
+
+  // Request GPS for ALL users (including guests) so routing always starts from real location
+  useEffect(() => {
+    if (!navigator.geolocation) return
+    const id = navigator.geolocation.watchPosition(
+      (pos) => setGpsCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+      () => {},
+      { enableHighAccuracy: true, maximumAge: 30_000 }
+    )
+    return () => navigator.geolocation.clearWatch(id)
+  }, [])
 
   // Sync URL param changes (e.g. navbar search)
   useEffect(() => {
@@ -549,6 +595,33 @@ export default function MapPage() {
       return (data ?? []) as EventRow[]
     },
   })
+
+  // Geocode address via Nominatim when selected item has no lat/lng
+  // Must be after useQuery declarations so rawBusinesses/events are in scope
+  useEffect(() => {
+    setGeocodedCoords(null)
+    let address: string | null = null
+
+    if (selectedBizId) {
+      const biz = rawBusinesses.find(b => b.id === selectedBizId)
+      if (biz?.lat && biz?.lng) return  // already has direct coords
+      address = biz?.address ?? null
+    } else if (selectedEvtId) {
+      const evt = events.find(e => e.id === selectedEvtId)
+      if (evt?.lat && evt?.lng) return  // already has direct coords
+      address = evt?.address ?? null
+    }
+
+    if (!address) return
+    let cancelled = false
+    fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address + ', Crete, Greece')}&format=json&limit=1`)
+      .then(r => r.json())
+      .then((data: Array<{ lat: string; lon: string }>) => {
+        if (!cancelled && data[0]) setGeocodedCoords({ lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) })
+      })
+      .catch(() => {})
+    return () => { cancelled = true }
+  }, [selectedBizId, selectedEvtId, rawBusinesses, events])
 
   const filteredMarkets = useMemo(() => {
     if (!s) return FARMERS_MARKETS
@@ -636,12 +709,15 @@ export default function MapPage() {
   const routeTarget = useMemo<RouteTarget | undefined>(() => {
     if (!activeRouteMode) return undefined
     if (selectedBiz?.lat && selectedBiz?.lng) return { lat: selectedBiz.lat, lng: selectedBiz.lng, mode: activeRouteMode }
+    if (geocodedCoords && selectedBiz) return { ...geocodedCoords, mode: activeRouteMode }
     if (selectedEvt?.lat && selectedEvt?.lng) return { lat: selectedEvt.lat, lng: selectedEvt.lng, mode: activeRouteMode }
+    if (geocodedCoords && selectedEvt) return { ...geocodedCoords, mode: activeRouteMode }
     if (selectedMarket) return { lat: selectedMarket.lat, lng: selectedMarket.lng, mode: activeRouteMode }
     if (selectedExp?.coordinates) return { lat: selectedExp.coordinates.lat, lng: selectedExp.coordinates.lng, mode: activeRouteMode }
     if (selectedPlace) return { lat: selectedPlace.coordinates.lat, lng: selectedPlace.coordinates.lng, mode: activeRouteMode }
+    if (urlPin) return { lat: urlPin.lat, lng: urlPin.lng, mode: activeRouteMode }
     return undefined
-  }, [activeRouteMode, selectedBiz, selectedEvt, selectedMarket, selectedExp, selectedPlace])
+  }, [activeRouteMode, selectedBiz, selectedEvt, selectedMarket, selectedExp, selectedPlace, geocodedCoords, urlPin])
 
   const routeProps: RoutePanelProps = {
     activeRouteMode,
@@ -650,18 +726,21 @@ export default function MapPage() {
     routeLoading,
     hasCoords: !!(
       (selectedBiz?.lat && selectedBiz?.lng) ||
+      (selectedBiz?.address && geocodedCoords) ||
       (selectedEvt?.lat && selectedEvt?.lng) ||
+      (selectedEvt?.address && geocodedCoords) ||
       selectedMarket ||
       selectedExp?.coordinates ||
-      selectedPlace
+      selectedPlace ||
+      geocodedCoords
     ),
   }
 
   const markers: MapMarker[] = useMemo(() => {
     const showBiz = tab === 'all'
-    const showEvt = tab === 'all' || tab === 'events'
+    const showEvt = tab === 'all'
     const showMkt = tab === 'all' || tab === 'markets'
-    const showExp = tab === 'all'
+    const showExp = tab === 'all' || tab === 'experiences'
     const showPl  = tab === 'all' || tab === 'sights'
     const bMarkers: MapMarker[] = (showBiz ? rawBusinesses : [])
       .filter((b) => b.lat && b.lng)
@@ -676,8 +755,11 @@ export default function MapPage() {
       .map((ex) => ({ id: `exp:${ex.id}`, lat: ex.coordinates.lat, lng: ex.coordinates.lng, type: 'experience' as const, label: ex.title }))
     const plMarkers: MapMarker[] = (showPl ? filteredPlaces : [])
       .map((p) => ({ id: `pl:${p.id}`, lat: p.coordinates.lat, lng: p.coordinates.lng, type: 'place' as const, label: p.title }))
-    return [...bMarkers, ...eMarkers, ...mMarkers, ...expMarkers, ...plMarkers]
-  }, [rawBusinesses, events, filteredMarkets, filteredExperiences, filteredPlaces, tab])
+    const pinMarker: MapMarker[] = urlPin
+      ? [{ id: 'url:pin', lat: urlPin.lat, lng: urlPin.lng, type: 'user' as const, label: urlPin.label || 'Selected location' }]
+      : []
+    return [...bMarkers, ...eMarkers, ...mMarkers, ...expMarkers, ...plMarkers, ...pinMarker]
+  }, [rawBusinesses, events, filteredMarkets, filteredExperiences, filteredPlaces, tab, urlPin])
 
   const flyTo = useMemo<{ lat: number; lng: number; zoom?: number } | undefined>(() => {
     const item = selectedBiz ?? selectedEvt
@@ -685,8 +767,9 @@ export default function MapPage() {
     if (selectedMarket) return { lat: selectedMarket.lat, lng: selectedMarket.lng, zoom: 16 }
     if (selectedExp?.coordinates) return { lat: selectedExp.coordinates.lat, lng: selectedExp.coordinates.lng, zoom: 15 }
     if (selectedPlace) return { lat: selectedPlace.coordinates.lat, lng: selectedPlace.coordinates.lng, zoom: 15 }
+    if (urlPin) return { lat: urlPin.lat, lng: urlPin.lng, zoom: 16 }
     return undefined
-  }, [selectedBiz, selectedEvt, selectedMarket, selectedExp, selectedPlace])
+  }, [selectedBiz, selectedEvt, selectedMarket, selectedExp, selectedPlace, urlPin])
 
   function handleMarkerClick(markerId: string) {
     if (markerId.startsWith('b:')) {
@@ -708,23 +791,29 @@ export default function MapPage() {
   }
 
   const visibleBusinesses = tab === 'all' ? rawBusinesses : []
-  const visibleEvents = tab === 'all' || tab === 'events' ? events : []
+  const visibleEvents = tab === 'all' ? events : []
   const visibleFarmersMarkets = tab === 'all' || tab === 'markets' ? filteredMarkets : []
-  const visibleExperiences = tab === 'all' ? filteredExperiences : []
+  const visibleExperiences = tab === 'all' || tab === 'experiences' ? filteredExperiences : []
   const visiblePlaces = tab === 'all' || tab === 'sights' ? filteredPlaces : []
   const totalCount = visibleBusinesses.length + visibleEvents.length + visibleFarmersMarkets.length + visibleExperiences.length + visiblePlaces.length
 
   const TABS = [
-    { key: 'all' as const,     label: `🌍 ${t('all')}` },
-    { key: 'events' as const,  label: `🎉 ${t('events')}` },
-    { key: 'markets' as const, label: `🌿 ${t('farmersMarkets')}` },
-    { key: 'sights' as const,  label: `🏛️ Sights` },
+    { key: 'all' as const,         label: `🌍 ${t('all')}` },
+    { key: 'markets' as const,     label: `🌿 ${t('farmersMarkets')}` },
+    { key: 'sights' as const,      label: `🏛️ ${t('sights')}` },
+    { key: 'experiences' as const, label: `✨ ${t('experiences')}` },
   ]
 
-  const userOrigin = coords?.lat && coords?.lng ? { lat: coords.lat, lng: coords.lng } : undefined
+  const effectiveCoords = coords ?? gpsCoords
+  // Memoize by value so MapInner's routing effect doesn't re-fire on every render
+  const userOrigin = useMemo<{ lat: number; lng: number } | undefined>(
+    () => effectiveCoords ? { lat: effectiveCoords.lat, lng: effectiveCoords.lng } : undefined,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [effectiveCoords?.lat, effectiveCoords?.lng]
+  )
 
   return (
-    <div className="flex flex-col md:flex-row" style={{ height: 'calc(100dvh - var(--nav-height) - var(--bottom-nav-height))' }}>
+    <div className="map-page flex flex-col md:flex-row">
       {/* Sidebar */}
       <div className={cn(
         'flex flex-col border-r border-[var(--color-border)] bg-[var(--color-background)] transition-all duration-200',

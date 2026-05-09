@@ -1,5 +1,5 @@
 import { RoleGate } from '@/components/shared/RoleGate'
-import { EventFeed } from '@/components/events/EventFeed'
+import { UnifiedExperienceSearch } from '@/components/experiences/UnifiedExperienceSearch'
 import { getTranslations } from 'next-intl/server'
 import type { Metadata } from 'next'
 
@@ -16,8 +16,9 @@ export default async function EventsPage() {
           {t('subtitle')}
         </p>
       </div>
+
       <RoleGate allow={['user', 'producer', 'admin']}>
-        <EventFeed />
+        <UnifiedExperienceSearch />
       </RoleGate>
     </div>
   )

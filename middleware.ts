@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from 'next/server'
 import { updateSession } from '@/lib/supabase/middleware'
 import { applySecurityHeaders } from '@/lib/security'
 
-const PUBLIC_ROUTES = ['/', '/login', '/register', '/auth', '/products']
+const PUBLIC_ROUTES = ['/', '/login', '/register', '/auth', '/map', '/explore', '/events', '/info', '/onboarding']
 const PRODUCER_ROUTES = ['/business', '/advertise', '/analytics']
 const ADMIN_ROUTES = ['/admin']
 
@@ -12,6 +12,11 @@ export async function middleware(request: NextRequest) {
 
   // OWASP A05 — apply security headers to every response
   applySecurityHeaders(response.headers)
+
+  // API routes handle their own auth — never redirect them to login
+  if (pathname.startsWith('/api/')) {
+    return response
+  }
 
   const isPublicRoute = PUBLIC_ROUTES.some((r) => pathname === r || pathname.startsWith(`${r}/`))
   const isAuthRoute = pathname.startsWith('/login') || pathname.startsWith('/register')

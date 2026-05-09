@@ -76,7 +76,9 @@ function LoginForm() {
     setError('')
     const { error: oauthError } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}` },
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}&role=${role}`,
+      },
     })
     if (oauthError) setError(oauthError.message)
   }
@@ -85,7 +87,9 @@ function LoginForm() {
     setError('')
     const { error: oauthError } = await supabase.auth.signInWithOAuth({
       provider: 'apple',
-      options: { redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}` },
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}&role=${role}`,
+      },
     })
     if (oauthError) setError(oauthError.message)
   }
@@ -97,7 +101,7 @@ function LoginForm() {
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex flex-col items-center gap-2">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo.svg" alt="valsamaki" className="w-14 h-14" />
+            <img src="/v1.png" alt="valsamaki" className="w-16 h-16 object-contain" />
             <span className="font-display font-semibold text-2xl text-[var(--color-foreground)]">valsamaki</span>
             <span className="text-sm text-[var(--color-muted-foreground)]">{t('discoverCrete')}</span>
           </Link>
@@ -248,6 +252,28 @@ function LoginForm() {
               </div>
               <div className="relative flex justify-center">
                 <span className="bg-[var(--color-card)] px-3 text-xs text-[var(--color-muted-foreground)] uppercase tracking-wide">{t('continueWith')}</span>
+              </div>
+            </div>
+
+            {/* Role picker — always shown before social sign-in */}
+            <div>
+              <p className="text-xs font-semibold text-[var(--color-muted-foreground)] uppercase tracking-wide mb-2">{t('iAmA')}</p>
+              <div className="grid grid-cols-2 gap-2">
+                {(['user', 'producer'] as const).map((r) => (
+                  <button
+                    key={r}
+                    type="button"
+                    onClick={() => setRole(r)}
+                    className={cn(
+                      'py-2.5 rounded-[var(--radius)] border text-sm font-semibold transition-colors',
+                      role === r
+                        ? 'bg-[var(--highlight)] text-[var(--highlight-foreground)] border-[var(--highlight)]'
+                        : 'border-[var(--color-border)] hover:bg-[var(--color-muted)] text-[var(--color-foreground)]'
+                    )}
+                  >
+                    {r === 'user' ? `🗺️ ${t('visitor')}` : `🧑‍🌾 ${t('producer')}`}
+                  </button>
+                ))}
               </div>
             </div>
 

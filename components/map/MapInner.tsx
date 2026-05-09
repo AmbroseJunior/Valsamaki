@@ -82,6 +82,16 @@ export default function MapInner({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // Invalidate map size on container resize (fixes grey tiles on sidebar toggle / responsive layout)
+  useEffect(() => {
+    if (!mapReady || !containerRef.current) return
+    const observer = new ResizeObserver(() => {
+      mapRef.current?.invalidateSize()
+    })
+    observer.observe(containerRef.current)
+    return () => observer.disconnect()
+  }, [mapReady])
+
   // Re-draw markers whenever data changes
   useEffect(() => {
     if (!mapReady) return
@@ -130,17 +140,33 @@ export default function MapInner({
 
     let cancelled = false
     const origin = userOrigin ?? HERAKLION
-    // OSRM supports foot and car; transit approximated as foot
-    const profile = routeTarget.mode === 'driving' ? 'car' : 'foot'
-    const osrmUrl =
-      `https://router.project-osrm.org/route/v1/${profile}/` +
-      `${origin.lng},${origin.lat};${routeTarget.lng},${routeTarget.lat}` +
-      `?overview=full&geometries=geojson`
 
-    fetch(osrmUrl)
+    // transit uses road profile; walk uses foot; drive uses car
+    const profile = routeTarget.mode === 'driving' ? 'car'
+                  : routeTarget.mode === 'transit'  ? 'transit'
+                  : 'foot'
+
+    const coordStr = `${origin.lng},${origin.lat};${routeTarget.lng},${routeTarget.lat}`
+    const routingUrl = `/api/routing?profile=${profile}&coords=${encodeURIComponent(coordStr)}`
+
+    // Google Maps deep-link (no API key needed)
+    const gmMode = routeTarget.mode === 'driving' ? 'driving'
+                 : routeTarget.mode === 'transit'  ? 'transit'
+                 : 'walking'
+    const googleMapsUrl =
+      `https://www.google.com/maps/dir/?api=1` +
+      `&origin=${origin.lat},${origin.lng}` +
+      `&destination=${routeTarget.lat},${routeTarget.lng}` +
+      `&travelmode=${gmMode}`
+
+    fetch(routingUrl)
       .then((r) => r.json())
       .then((data) => {
-        if (cancelled || !data.routes?.[0] || !mapRef.current || !LRef.current) return
+        if (cancelled) return
+        if (!data.routes?.[0] || !mapRef.current || !LRef.current) {
+          onRouteInfo?.(null)
+          return
+        }
         const route = data.routes[0]
         const latlngs: [number, number][] = route.geometry.coordinates.map(
           ([routeLng, routeLat]: [number, number]) => [routeLat, routeLng]
@@ -159,13 +185,20 @@ export default function MapInner({
           .addTo(mapRef.current)
         mapRef.current.fitBounds(routeLayerRef.current.getBounds(), { padding: [40, 40] })
 
+        // Bus travels ~1.7× slower than a car (stops, traffic, route detours)
+        const rawDurationS = route.duration
+        const adjustedDurationS = routeTarget.mode === 'transit'
+          ? Math.round(rawDurationS * 1.7)
+          : rawDurationS
+
         const distKm = (route.distance / 1000).toFixed(1)
-        const durMin = Math.round(route.duration / 60)
+        const durMin = Math.round(adjustedDurationS / 60)
         onRouteInfo?.({
           distance: `${distKm} km`,
           duration: durMin < 60 ? `${durMin} min` : `${Math.floor(durMin / 60)}h ${durMin % 60}m`,
           distanceM: route.distance,
-          durationS: route.duration,
+          durationS: adjustedDurationS,
+          googleMapsUrl,
         })
       })
       .catch(() => {

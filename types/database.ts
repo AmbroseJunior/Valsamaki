@@ -178,6 +178,53 @@ export type Database = {
           },
         ]
       }
+      itineraries: {
+        Row: {
+          id: string
+          user_id: string
+          title: string
+          tagline: string | null
+          days_count: number
+          interests: string[]
+          diet: string
+          style: string
+          data: Json
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          title: string
+          tagline?: string | null
+          days_count?: number
+          interests?: string[]
+          diet?: string
+          style?: string
+          data: Json
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          title?: string
+          tagline?: string | null
+          days_count?: number
+          interests?: string[]
+          diet?: string
+          style?: string
+          data?: Json
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "itineraries_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       knowledge_edges: {
         Row: {
           created_at: string

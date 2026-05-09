@@ -1,8 +1,9 @@
 import Image from 'next/image'
+import Link from 'next/link'
 import { validateUrl } from '@/lib/security'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { MapPin, Phone, Globe } from 'lucide-react'
+import { MapPin, Phone, Globe, Navigation } from 'lucide-react'
 import type { BusinessRow } from '@/types/database'
 
 interface ProducerCardProps {
@@ -14,7 +15,7 @@ export function ProducerCard({ business, distanceKm }: ProducerCardProps) {
   return (
     <Card className="overflow-hidden hover:shadow-[var(--shadow-md)] transition-shadow">
       {business.images?.[0] ? (
-        <div className="relative w-full h-40">
+        <div className="relative w-full aspect-[4/3]">
           <Image
             src={business.images[0]}
             alt={business.name}
@@ -23,7 +24,7 @@ export function ProducerCard({ business, distanceKm }: ProducerCardProps) {
           />
         </div>
       ) : (
-        <div className="w-full h-40 bg-[var(--color-muted)] flex items-center justify-center">
+        <div className="w-full aspect-[4/3] bg-[var(--color-muted)] flex items-center justify-center">
           <span className="text-4xl">🫒</span>
         </div>
       )}
@@ -62,11 +63,26 @@ export function ProducerCard({ business, distanceKm }: ProducerCardProps) {
           )}
         </div>
 
-        <div className="flex flex-wrap gap-1 pt-1">
+        <div className="flex flex-wrap gap-1 pt-1 items-center">
           <Badge variant="default">{business.category}</Badge>
           {business.tags?.slice(0, 3).map((tag) => (
             <Badge key={tag} variant="muted">{tag}</Badge>
           ))}
+          {(business.lat && business.lng) ? (
+            <Link
+              href={`/map?lat=${business.lat}&lng=${business.lng}&label=${encodeURIComponent(business.name)}`}
+              className="ml-auto flex items-center gap-1 text-xs font-semibold text-[var(--highlight)] hover:underline"
+            >
+              <Navigation className="h-3 w-3" /> Directions
+            </Link>
+          ) : business.address ? (
+            <Link
+              href={`/map?q=${encodeURIComponent(business.address)}`}
+              className="ml-auto flex items-center gap-1 text-xs font-semibold text-[var(--highlight)] hover:underline"
+            >
+              <Navigation className="h-3 w-3" /> Directions
+            </Link>
+          ) : null}
         </div>
       </CardContent>
     </Card>

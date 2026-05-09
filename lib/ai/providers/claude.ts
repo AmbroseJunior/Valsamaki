@@ -31,7 +31,7 @@ export class ClaudeProvider implements AIProvider {
     try {
       const response = await this.client.messages.create({
         model: 'claude-haiku-4-5-20251001',
-        max_tokens: 1024,
+        max_tokens: context.maxTokens ?? 1024,
         system: systemWithContext,
         messages: messages.map((m) => ({
           role: m.role as 'user' | 'assistant',
@@ -60,6 +60,9 @@ export class ClaudeProvider implements AIProvider {
     if (context.nearbyEvents?.length) {
       parts.push(`\n## Upcoming Events Nearby\n${JSON.stringify(context.nearbyEvents, null, 2)}`)
     }
+    if (context.staticData) {
+      parts.push(`\n## Crete Data Directory\n${context.staticData}`)
+    }
     if (context.knowledgeNodes?.length) {
       parts.push(`\n## Mediterranean Diet Knowledge\n${context.knowledgeNodes.map((n) => `- ${n.label}: ${n.description}`).join('\n')}`)
     }
@@ -67,6 +70,16 @@ export class ClaudeProvider implements AIProvider {
       parts.push(`\n## User Preferences\n${JSON.stringify(context.userPreferences, null, 2)}`)
     }
 
+    if (context.locale && context.locale !== 'en') {
+      const langName = LOCALE_NAMES[context.locale] ?? context.locale
+      parts.push(`\n## Language Instruction\nRespond ONLY in ${langName}. Do not switch to English.`)
+    }
+
     return parts.join('\n')
   }
+}
+
+const LOCALE_NAMES: Record<string, string> = {
+  el: 'Greek', de: 'German', es: 'Spanish', fr: 'French', it: 'Italian',
+  nl: 'Dutch', pt: 'Portuguese', ru: 'Russian', zh: 'Chinese (Simplified)', ar: 'Arabic',
 }

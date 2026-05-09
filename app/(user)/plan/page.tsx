@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Sparkles, MapPin, Clock, Loader2, RotateCcw, Share2, ChevronDown, ChevronUp } from 'lucide-react'
+import { Sparkles, MapPin, Clock, Loader2, RotateCcw, Share2, ChevronDown, ChevronUp, CheckCircle } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -30,34 +31,25 @@ interface Itinerary {
   localPhrase: { greek: string; pronunciation: string; meaning: string }
 }
 
-// ── Config ────────────────────────────────────────────────────────────────────
+// ── Static config (ids + emojis only — labels come from translations) ─────────
 
-const INTERESTS = [
-  { id: 'food', label: 'Local Food', emoji: '🍽️' },
-  { id: 'olive_oil', label: 'Olive Oil', emoji: '🫒' },
-  { id: 'hiking', label: 'Hiking', emoji: '🥾' },
-  { id: 'history', label: 'History', emoji: '🏛️' },
-  { id: 'beaches', label: 'Beaches', emoji: '🏖️' },
-  { id: 'wine', label: 'Wine', emoji: '🍷' },
-  { id: 'wellness', label: 'Wellness', emoji: '💆' },
-  { id: 'culture', label: 'Culture', emoji: '🎭' },
-  { id: 'markets', label: 'Markets', emoji: '🛒' },
-  { id: 'sea', label: 'Water Sports', emoji: '🚣' },
+const INTEREST_IDS = [
+  { id: 'food',      emoji: '🍽️' },
+  { id: 'olive_oil', emoji: '🫒' },
+  { id: 'hiking',    emoji: '🥾' },
+  { id: 'history',   emoji: '🏛️' },
+  { id: 'wellness',  emoji: '💆' },
+  { id: 'markets',   emoji: '🛒' },
+  { id: 'sea',       emoji: '🚣' },
 ]
 
-const DIETS = [
-  { id: 'none', label: 'No preference' },
-  { id: 'vegetarian', label: 'Vegetarian' },
-  { id: 'vegan', label: 'Vegan' },
-  { id: 'gluten_free', label: 'Gluten-free' },
-  { id: 'pescatarian', label: 'Pescatarian' },
-]
+const DIET_IDS = ['none', 'vegetarian', 'vegan', 'gluten_free', 'pescatarian']
 
-const STYLES = [
-  { id: 'relaxed', label: 'Relaxed', desc: 'Easy pace, fewer stops', emoji: '🌊' },
-  { id: 'balanced', label: 'Balanced', desc: 'Mix of activity & rest', emoji: '⚖️' },
-  { id: 'active', label: 'Active', desc: 'Pack the days full', emoji: '🏃' },
-  { id: 'cultural', label: 'Cultural', desc: 'Museums, history, art', emoji: '🏛️' },
+const STYLE_IDS = [
+  { id: 'relaxed',  emoji: '🌊' },
+  { id: 'balanced', emoji: '⚖️' },
+  { id: 'active',   emoji: '🏃' },
+  { id: 'cultural', emoji: '🏛️' },
 ]
 
 // ── Slot card ─────────────────────────────────────────────────────────────────
@@ -91,7 +83,7 @@ function SlotCard({ slot, label, color }: { slot: DaySlot; label: string; color:
 
 // ── Day card ──────────────────────────────────────────────────────────────────
 
-function DayCard({ plan, index }: { plan: DayPlan; index: number }) {
+function DayCard({ plan, index, labels }: { plan: DayPlan; index: number; labels: { morning: string; afternoon: string; evening: string } }) {
   const [open, setOpen] = useState(index === 0)
 
   const GRADIENTS = [
@@ -125,9 +117,9 @@ function DayCard({ plan, index }: { plan: DayPlan; index: number }) {
 
       {open && (
         <div className="px-4 pb-4 space-y-3 border-t border-[var(--color-border)] pt-3">
-          <SlotCard slot={plan.morning}   label="Morning"   color="border-amber-400" />
-          <SlotCard slot={plan.afternoon} label="Afternoon" color="border-blue-400" />
-          <SlotCard slot={plan.evening}   label="Evening"   color="border-purple-400" />
+          <SlotCard slot={plan.morning}   label={labels.morning}   color="border-amber-400" />
+          <SlotCard slot={plan.afternoon} label={labels.afternoon} color="border-blue-400" />
+          <SlotCard slot={plan.evening}   label={labels.evening}   color="border-purple-400" />
         </div>
       )}
     </div>
@@ -137,6 +129,8 @@ function DayCard({ plan, index }: { plan: DayPlan; index: number }) {
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 export default function PlanPage() {
+  const t = useTranslations('plan')
+
   const [days, setDays] = useState(3)
   const [interests, setInterests] = useState<string[]>([])
   const [diet, setDiet] = useState('none')
@@ -144,6 +138,9 @@ export default function PlanPage() {
   const [loading, setLoading] = useState(false)
   const [itinerary, setItinerary] = useState<Itinerary | null>(null)
   const [error, setError] = useState('')
+  const [saved, setSaved] = useState(false)
+
+  const slotLabels = { morning: t('morning'), afternoon: t('afternoon'), evening: t('evening') }
 
   function toggleInterest(id: string) {
     setInterests((prev) => prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id])
@@ -153,6 +150,7 @@ export default function PlanPage() {
     setLoading(true)
     setError('')
     setItinerary(null)
+    setSaved(false)
     try {
       const res = await fetch('/api/ai/itinerary', {
         method: 'POST',
@@ -162,8 +160,16 @@ export default function PlanPage() {
       const data = await res.json()
       if (data.error) throw new Error(data.error)
       setItinerary(data.itinerary)
+      // Save to user account + send email (fire and forget)
+      fetch('/api/user/save-itinerary', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ itinerary: data.itinerary, days, interests, diet, style }),
+      }).then((r) => { if (r.ok) setSaved(true) }).catch(() => {})
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to generate itinerary')
+      const raw = e instanceof Error ? e.message : ''
+      const isParseErr = /json|unexpected|position|\btoken\b/i.test(raw)
+      setError(isParseErr ? t('errorFormat') : (raw || 'Failed to generate itinerary'))
     } finally {
       setLoading(false)
     }
@@ -172,6 +178,7 @@ export default function PlanPage() {
   function reset() {
     setItinerary(null)
     setError('')
+    setSaved(false)
   }
 
   async function share() {
@@ -181,7 +188,6 @@ export default function PlanPage() {
       await navigator.share({ title: itinerary.title, text })
     } else {
       await navigator.clipboard.writeText(text)
-      alert('Copied to clipboard!')
     }
   }
 
@@ -190,12 +196,10 @@ export default function PlanPage() {
       {/* Header */}
       <div className="text-center space-y-2">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--highlight)]/10 text-[var(--highlight)] text-xs font-bold uppercase tracking-wider">
-          <Sparkles className="h-3 w-3" /> AI-Powered
+          <Sparkles className="h-3 w-3" /> {t('badge')}
         </div>
-        <h1 className="font-display text-3xl font-bold">Plan Your Crete Trip</h1>
-        <p className="text-[var(--color-muted-foreground)]">
-          Tell us your preferences — our AI builds a personalised day-by-day itinerary from real local experiences.
-        </p>
+        <h1 className="font-display text-3xl font-bold">{t('title')}</h1>
+        <p className="text-[var(--color-muted-foreground)]">{t('subtitle')}</p>
       </div>
 
       {!itinerary ? (
@@ -203,7 +207,7 @@ export default function PlanPage() {
           {/* Days */}
           <div className="bg-[var(--color-card)] border border-[var(--color-border)] rounded-[var(--radius-2xl)] p-5 space-y-3">
             <div className="flex items-center justify-between">
-              <p className="font-semibold">How many days?</p>
+              <p className="font-semibold">{t('daysLabel')}</p>
               <span className="text-2xl font-display font-bold text-[var(--highlight)]">{days}</span>
             </div>
             <input
@@ -212,15 +216,15 @@ export default function PlanPage() {
               className="w-full accent-[var(--highlight)]"
             />
             <div className="flex justify-between text-xs text-[var(--color-muted-foreground)]">
-              <span>1 day</span><span>7 days</span>
+              <span>{t('daysMin')}</span><span>{t('daysMax')}</span>
             </div>
           </div>
 
           {/* Interests */}
           <div className="bg-[var(--color-card)] border border-[var(--color-border)] rounded-[var(--radius-2xl)] p-5 space-y-3">
-            <p className="font-semibold">What are you into? <span className="text-xs font-normal text-[var(--color-muted-foreground)]">(pick any)</span></p>
+            <p className="font-semibold">{t('interestsLabel')} <span className="text-xs font-normal text-[var(--color-muted-foreground)]">{t('interestsPick')}</span></p>
             <div className="flex flex-wrap gap-2">
-              {INTERESTS.map(({ id, label, emoji }) => (
+              {INTEREST_IDS.map(({ id, emoji }) => (
                 <button
                   key={id}
                   onClick={() => toggleInterest(id)}
@@ -231,7 +235,7 @@ export default function PlanPage() {
                       : 'border-[var(--color-border)] text-[var(--color-muted-foreground)] hover:border-[var(--highlight)]'
                   )}
                 >
-                  <span>{emoji}</span> {label}
+                  <span>{emoji}</span> {t(`interests.${id}` as Parameters<typeof t>[0])}
                 </button>
               ))}
             </div>
@@ -239,9 +243,9 @@ export default function PlanPage() {
 
           {/* Travel style */}
           <div className="bg-[var(--color-card)] border border-[var(--color-border)] rounded-[var(--radius-2xl)] p-5 space-y-3">
-            <p className="font-semibold">Travel style</p>
+            <p className="font-semibold">{t('styleLabel')}</p>
             <div className="grid grid-cols-2 gap-2">
-              {STYLES.map(({ id, label, desc, emoji }) => (
+              {STYLE_IDS.map(({ id, emoji }) => (
                 <button
                   key={id}
                   onClick={() => setStyle(id)}
@@ -253,8 +257,8 @@ export default function PlanPage() {
                   )}
                 >
                   <span className="text-xl">{emoji}</span>
-                  <p className="font-semibold text-sm mt-1">{label}</p>
-                  <p className="text-xs text-[var(--color-muted-foreground)]">{desc}</p>
+                  <p className="font-semibold text-sm mt-1">{t(`styles.${id}` as Parameters<typeof t>[0])}</p>
+                  <p className="text-xs text-[var(--color-muted-foreground)]">{t(`styles.${id}Desc` as Parameters<typeof t>[0])}</p>
                 </button>
               ))}
             </div>
@@ -262,9 +266,9 @@ export default function PlanPage() {
 
           {/* Diet */}
           <div className="bg-[var(--color-card)] border border-[var(--color-border)] rounded-[var(--radius-2xl)] p-5 space-y-3">
-            <p className="font-semibold">Dietary preference</p>
+            <p className="font-semibold">{t('dietLabel')}</p>
             <div className="flex flex-wrap gap-2">
-              {DIETS.map(({ id, label }) => (
+              {DIET_IDS.map((id) => (
                 <button
                   key={id}
                   onClick={() => setDiet(id)}
@@ -275,7 +279,7 @@ export default function PlanPage() {
                       : 'border-[var(--color-border)] text-[var(--color-muted-foreground)] hover:border-[var(--highlight)]'
                   )}
                 >
-                  {label}
+                  {t(`diets.${id}` as Parameters<typeof t>[0])}
                 </button>
               ))}
             </div>
@@ -293,12 +297,12 @@ export default function PlanPage() {
             {loading ? (
               <>
                 <Loader2 className="h-5 w-5 animate-spin" />
-                Crafting your itinerary…
+                {t('generating')}
               </>
             ) : (
               <>
                 <Sparkles className="h-5 w-5" />
-                Generate My Itinerary
+                {t('generate')}
               </>
             )}
           </button>
@@ -315,7 +319,7 @@ export default function PlanPage() {
               <p className="text-white/80 mt-1">{itinerary.tagline}</p>
               <div className="flex items-center justify-center gap-2 mt-3">
                 <span className="text-xs font-bold uppercase tracking-wider bg-white/20 text-white px-3 py-1 rounded-full">
-                  {days} {days === 1 ? 'Day' : 'Days'}
+                  {days} {t('day')}
                 </span>
                 <span className="text-xs font-bold uppercase tracking-wider bg-white/20 text-white px-3 py-1 rounded-full capitalize">
                   {style}
@@ -324,17 +328,25 @@ export default function PlanPage() {
             </div>
           </div>
 
+          {/* Saved indicator */}
+          {saved && (
+            <div className="flex items-center gap-2 px-4 py-2.5 bg-green-50 border border-green-200 rounded-[var(--radius-xl)] text-sm text-green-700">
+              <CheckCircle className="h-4 w-4 shrink-0 text-green-500" />
+              <span>Saved to your account & emailed to you</span>
+            </div>
+          )}
+
           {/* Day cards */}
           <div className="space-y-3">
             {itinerary.days.map((plan, i) => (
-              <DayCard key={plan.day} plan={plan} index={i} />
+              <DayCard key={plan.day} plan={plan} index={i} labels={slotLabels} />
             ))}
           </div>
 
           {/* Local phrase */}
           {itinerary.localPhrase && (
             <div className="bg-[var(--color-card)] border border-[var(--color-border)] rounded-[var(--radius-2xl)] p-5 text-center space-y-1">
-              <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-muted-foreground)]">🗣️ Greek Phrase of the Trip</p>
+              <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-muted-foreground)]">{t('greekPhrase')}</p>
               <p className="font-display text-2xl font-bold text-[var(--highlight)]">{itinerary.localPhrase.greek}</p>
               <p className="text-sm text-[var(--color-muted-foreground)] italic">&quot;{itinerary.localPhrase.pronunciation}&quot;</p>
               <p className="text-sm text-[var(--color-foreground)] font-medium">{itinerary.localPhrase.meaning}</p>
@@ -344,7 +356,7 @@ export default function PlanPage() {
           {/* Packing tips */}
           {itinerary.packingTips?.length > 0 && (
             <div className="bg-[var(--color-card)] border border-[var(--color-border)] rounded-[var(--radius-2xl)] p-5 space-y-2">
-              <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-muted-foreground)]">🎒 Packing Tips</p>
+              <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-muted-foreground)]">{t('packingTips')}</p>
               <ul className="space-y-1.5">
                 {itinerary.packingTips.map((tip, i) => (
                   <li key={i} className="flex items-start gap-2 text-sm text-[var(--color-foreground)]">
@@ -361,13 +373,13 @@ export default function PlanPage() {
               onClick={reset}
               className="flex-1 flex items-center justify-center gap-2 py-3 border-2 border-[var(--color-border)] rounded-[var(--radius-full)] font-semibold hover:border-[var(--highlight)] transition-colors"
             >
-              <RotateCcw className="h-4 w-4" /> Start Over
+              <RotateCcw className="h-4 w-4" /> {t('startOver')}
             </button>
             <button
               onClick={share}
               className="flex-1 flex items-center justify-center gap-2 py-3 bg-[var(--highlight)] text-[var(--highlight-foreground)] rounded-[var(--radius-full)] font-semibold hover:opacity-90 transition-opacity"
             >
-              <Share2 className="h-4 w-4" /> Share Trip
+              <Share2 className="h-4 w-4" /> {t('shareTrip')}
             </button>
           </div>
         </div>

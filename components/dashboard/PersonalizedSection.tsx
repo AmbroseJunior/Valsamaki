@@ -7,54 +7,50 @@ import { Sparkles, Calendar, MapPin, ArrowRight, Utensils } from 'lucide-react'
 import Link from 'next/link'
 import { formatDate } from '@/lib/utils'
 
-const INTEREST_EXP_CATS: Record<string, ExperienceCategory[]> = {
-  local_food:  ['food_tour', 'market'],
-  olive_oil:   ['organic'],
-  hiking:      ['active'],
-  history:     ['active', 'market'],
-  wellness:    ['wellness'],
-  wine:        ['organic'],
+const MOTIVATION_EXP_CATS: Record<string, ExperienceCategory[]> = {
+  eat_well:       ['food_tour', 'market'],
+  cretan_diet:    ['organic', 'food_tour'],
+  health_science: ['wellness', 'organic'],
+  recovering:     ['wellness'],
+  better_habits:  ['wellness', 'organic'],
 }
 
-const INTEREST_BIZ_CATS: Record<string, string> = {
-  local_food: 'restaurant',
-  olive_oil:  'olive_farm',
-  wine:       'winery',
-  wellness:   'herb_farm',
+const MOTIVATION_BIZ_CATS: Record<string, string> = {
+  eat_well:       'restaurant',
+  cretan_diet:    'olive_farm',
+  health_science: 'herb_farm',
+  recovering:     'wellness',
+  better_habits:  'herb_farm',
 }
 
-const INTEREST_EVENT_CATS: Record<string, string[]> = {
-  local_food: ['food_wine', 'market', 'workshop'],
-  olive_oil:  ['food_wine', 'market'],
-  hiking:     ['outdoor', 'sports'],
-  history:    ['culture'],
-  wellness:   ['workshop'],
-  wine:       ['food_wine'],
+const MOTIVATION_EVENT_CATS: Record<string, string[]> = {
+  eat_well:       ['food_wine', 'market', 'workshop'],
+  cretan_diet:    ['food_wine', 'market'],
+  health_science: ['workshop'],
+  recovering:     ['workshop'],
+  better_habits:  ['workshop', 'outdoor'],
 }
 
-const DIET_NOTE: Record<string, string> = {
-  vegetarian:  'vegetarian-friendly',
-  vegan:       'plant-based',
-  pescatarian: 'seafood-inclusive',
-  gluten_free: 'gluten-free',
+const DIET_NOTE_KEYS: Record<string, string> = {
+  vegetarian:   'vegFriendly',
+  plant_based:  'plantBased',
+  pescetarian:  'seafoodInclusive',
+  avoid_gluten: 'glutenFree',
 }
 
-const INTEREST_LABELS: Record<string, string> = {
-  local_food: 'local food', olive_oil: 'olive oil', hiking: 'hiking',
-  history: 'history', wellness: 'wellness', wine: 'wine',
+const MOTIVATION_LABEL_KEYS: Record<string, string> = {
+  eat_well:       'interestLocalFood',
+  cretan_diet:    'interestOliveOil',
+  health_science: 'interestWellness',
+  recovering:     'interestWellness',
+  better_habits:  'interestWellness',
 }
 
 function getRecommendedExperiences(prefs: UserPreferences | null) {
-  if (!prefs?.interests?.length) return getFeaturedExperiences().slice(0, 4)
+  if (!prefs?.motivations?.length) return getFeaturedExperiences().slice(0, 4)
 
-  const catsSet = new Set(prefs.interests.flatMap((i) => INTEREST_EXP_CATS[i] ?? []))
+  const catsSet = new Set(prefs.motivations.flatMap((m) => MOTIVATION_EXP_CATS[m] ?? []))
   let matches = EXPERIENCES.filter((e) => catsSet.has(e.category as ExperienceCategory))
-
-  if (prefs.activity_level === 'high') {
-    matches = [...matches.filter((e) => e.category === 'active'), ...matches.filter((e) => e.category !== 'active')]
-  } else if (prefs.activity_level === 'low') {
-    matches = [...matches.filter((e) => e.category !== 'active'), ...matches.filter((e) => e.category === 'active')]
-  }
 
   if (matches.length < 4) {
     const seen = new Set(matches.map((e) => e.id))
@@ -66,13 +62,13 @@ function getRecommendedExperiences(prefs: UserPreferences | null) {
 }
 
 function getEventCategories(prefs: UserPreferences | null): string[] {
-  if (!prefs?.interests?.length) return []
-  return Array.from(new Set(prefs.interests.flatMap((i) => INTEREST_EVENT_CATS[i] ?? [])))
+  if (!prefs?.motivations?.length) return []
+  return Array.from(new Set(prefs.motivations.flatMap((m) => MOTIVATION_EVENT_CATS[m] ?? [])))
 }
 
 function getBizCategories(prefs: UserPreferences | null): string[] {
-  if (!prefs?.interests?.length) return []
-  return Array.from(new Set(prefs.interests.map((i) => INTEREST_BIZ_CATS[i]).filter(Boolean) as string[]))
+  if (!prefs?.motivations?.length) return []
+  return Array.from(new Set(prefs.motivations.map((m) => MOTIVATION_BIZ_CATS[m]).filter(Boolean) as string[]))
 }
 
 export async function PersonalizedSection({ preferences }: { preferences: UserPreferences | null }) {
@@ -82,14 +78,15 @@ export async function PersonalizedSection({ preferences }: { preferences: UserPr
   const recExps = getRecommendedExperiences(preferences)
   const eventCats = getEventCategories(preferences)
   const bizCats = getBizCategories(preferences)
-  const hasPrefs = !!preferences?.interests?.length
+  const hasPrefs = !!preferences?.motivations?.length
 
   const contextLabel = hasPrefs
     ? (() => {
-        const top = preferences!.interests!.slice(0, 2).map((i) => INTEREST_LABELS[i] ?? i)
-        const parts = [`Based on your interest in ${top.join(' & ')}`]
-        if (preferences?.dietary_preference && DIET_NOTE[preferences.dietary_preference]) {
-          parts.push(`${DIET_NOTE[preferences.dietary_preference]} options highlighted`)
+        const top = preferences!.motivations!.slice(0, 2).map((m) => t(MOTIVATION_LABEL_KEYS[m] as 'interestLocalFood' ?? 'interestLocalFood'))
+        const parts = [t('basedOnInterest', { interests: top.join(' & ') })]
+        const primaryDiet = preferences?.diet?.[0]
+        if (primaryDiet && DIET_NOTE_KEYS[primaryDiet]) {
+          parts.push(t('dietHighlighted', { diet: t(DIET_NOTE_KEYS[primaryDiet] as 'vegFriendly') }))
         }
         return parts.join(' · ')
       })()
@@ -220,8 +217,8 @@ export async function PersonalizedSection({ preferences }: { preferences: UserPr
             <div className="inline-flex p-2.5 bg-white/90 backdrop-blur-sm rounded-[var(--radius-xl)] mb-3 group-hover:scale-110 transition-transform">
               <MapPin className="h-6 w-6 text-amber-500" />
             </div>
-            <h3 className="font-display font-bold text-xl text-gray-900 mb-1">Map View</h3>
-            <p className="text-sm text-gray-800 font-medium">Find experiences near you</p>
+            <h3 className="font-display font-bold text-xl text-gray-900 mb-1">{t('mapView')}</h3>
+            <p className="text-sm text-gray-800 font-medium">{t('mapSubtitle')}</p>
           </div>
         </Link>
 
@@ -242,8 +239,8 @@ export async function PersonalizedSection({ preferences }: { preferences: UserPr
             <div className="inline-flex p-2.5 bg-white/90 backdrop-blur-sm rounded-[var(--radius-xl)] mb-3 group-hover:scale-110 transition-transform">
               <span className="text-xl leading-none">🌱</span>
             </div>
-            <h3 className="font-display font-bold text-xl text-white mb-1">Local Products</h3>
-            <p className="text-sm text-white/90 font-medium">Discover their natural properties and health benefits</p>
+            <h3 className="font-display font-bold text-xl text-white mb-1">{t('localProducts')}</h3>
+            <p className="text-sm text-white/90 font-medium">{t('localProductsSubtitle')}</p>
           </div>
         </Link>
       </div>

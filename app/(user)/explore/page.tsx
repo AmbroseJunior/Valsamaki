@@ -11,8 +11,9 @@ import { SCRAPED_EXPERIENCES } from '@/lib/data/scrapedExperiences'
 import type { Experience, ExperienceCategory } from '@/types/experience'
 
 const ALL_EXPERIENCES: Experience[] = [...EXPERIENCES, ...SCRAPED_EXPERIENCES]
-import { Sparkles, Search, X, SlidersHorizontal } from 'lucide-react'
+import { Sparkles, Search, X, SlidersHorizontal, ScanQrCode } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { QRScannerModal } from '@/components/scanner/QRScannerModal'
 
 type PriceFilter = 'all' | 'free' | 'under30' | 'under60'
 type DistanceFilter = 'all' | '5' | '10' | '25'
@@ -70,30 +71,30 @@ function filterAndSort(
   })
 }
 
-const PRICE_OPTIONS: { value: PriceFilter; label: string }[] = [
-  { value: 'all', label: 'Any price' },
-  { value: 'free', label: 'Free' },
-  { value: 'under30', label: 'Under €30' },
-  { value: 'under60', label: 'Under €60' },
-]
-
-const DISTANCE_OPTIONS: { value: DistanceFilter; label: string }[] = [
-  { value: 'all', label: 'Any distance' },
-  { value: '5', label: '≤ 5 km' },
-  { value: '10', label: '≤ 10 km' },
-  { value: '25', label: '≤ 25 km' },
-]
-
-const SORT_OPTIONS: { value: SortKey; label: string }[] = [
-  { value: 'default', label: 'Default' },
-  { value: 'rating', label: 'Top rated' },
-  { value: 'price_asc', label: 'Price ↑' },
-  { value: 'distance', label: 'Nearest' },
-]
-
 export default function ExplorePage() {
   const params = useSearchParams()
   const t = useTranslations('explore')
+
+  const PRICE_OPTIONS: { value: PriceFilter; label: string }[] = [
+    { value: 'all', label: t('priceAny') },
+    { value: 'free', label: t('priceFree') },
+    { value: 'under30', label: t('priceUnder30') },
+    { value: 'under60', label: t('priceUnder60') },
+  ]
+
+  const DISTANCE_OPTIONS: { value: DistanceFilter; label: string }[] = [
+    { value: 'all', label: t('distanceAny') },
+    { value: '5', label: '≤ 5 km' },
+    { value: '10', label: '≤ 10 km' },
+    { value: '25', label: '≤ 25 km' },
+  ]
+
+  const SORT_OPTIONS: { value: SortKey; label: string }[] = [
+    { value: 'default', label: t('filterSortDefault') },
+    { value: 'rating', label: t('filterSortRated') },
+    { value: 'price_asc', label: t('filterSortPrice') },
+    { value: 'distance', label: t('filterSortNearest') },
+  ]
   const [activeCategory, setActiveCategory] = useState<ExperienceCategory>('all')
   const [query, setQuery] = useState(params.get('q') ?? '')
   const [selectedExp, setSelectedExp] = useState<Experience | null>(null)
@@ -101,6 +102,7 @@ export default function ExplorePage() {
   const [distanceFilter, setDistanceFilter] = useState<DistanceFilter>('all')
   const [sortKey, setSortKey] = useState<SortKey>('default')
   const [showFilters, setShowFilters] = useState(false)
+  const [scanOpen, setScanOpen] = useState(false)
   const [aiSuggestions, setAiSuggestions] = useState<string[]>([])
   const [showSuggestions, setShowSuggestions] = useState(false)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -154,6 +156,15 @@ export default function ExplorePage() {
           </div>
 
           <div className="flex items-center gap-2">
+            {/* QR scan button */}
+            <button
+              onClick={() => setScanOpen(true)}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-[var(--radius-full)] border border-[var(--color-border)] bg-[var(--color-muted)] text-sm font-semibold text-[var(--color-muted-foreground)] hover:border-[var(--highlight)] hover:text-[var(--highlight)] transition-colors"
+            >
+              <ScanQrCode className="h-4 w-4" />
+              <span className="hidden sm:block">Scan</span>
+            </button>
+
             {/* Filter toggle */}
             <button
               onClick={() => setShowFilters((v) => !v)}
@@ -188,7 +199,7 @@ export default function ExplorePage() {
               {showSuggestions && aiSuggestions.length > 0 && (
                 <div className="absolute top-full left-0 right-0 mt-1 bg-[var(--color-card)] border border-[var(--color-border)] rounded-[var(--radius-lg)] shadow-[var(--shadow-lg)] overflow-hidden z-20">
                   <p className="px-3 pt-2 pb-1 text-[0.6rem] font-bold uppercase tracking-widest text-[var(--color-muted-foreground)] flex items-center gap-1">
-                    <Sparkles className="h-3 w-3 text-[var(--highlight)]" /> AI suggestions
+                    <Sparkles className="h-3 w-3 text-[var(--highlight)]" /> {t('aiSuggestions')}
                   </p>
                   {aiSuggestions.map((s) => (
                     <button
@@ -209,7 +220,7 @@ export default function ExplorePage() {
         {showFilters && (
           <div className="mb-4 p-4 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-card)] flex flex-wrap gap-6">
             <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-[var(--color-muted-foreground)] mb-2">Price</p>
+              <p className="text-xs font-bold uppercase tracking-wider text-[var(--color-muted-foreground)] mb-2">{t('priceLabel')}</p>
               <div className="flex flex-wrap gap-1.5">
                 {PRICE_OPTIONS.map(({ value, label }) => (
                   <button
@@ -229,7 +240,7 @@ export default function ExplorePage() {
             </div>
 
             <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-[var(--color-muted-foreground)] mb-2">Distance</p>
+              <p className="text-xs font-bold uppercase tracking-wider text-[var(--color-muted-foreground)] mb-2">{t('distanceLabel')}</p>
               <div className="flex flex-wrap gap-1.5">
                 {DISTANCE_OPTIONS.map(({ value, label }) => (
                   <button
@@ -249,7 +260,7 @@ export default function ExplorePage() {
             </div>
 
             <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-[var(--color-muted-foreground)] mb-2">Sort by</p>
+              <p className="text-xs font-bold uppercase tracking-wider text-[var(--color-muted-foreground)] mb-2">{t('sortBy')}</p>
               <div className="flex flex-wrap gap-1.5">
                 {SORT_OPTIONS.map(({ value, label }) => (
                   <button
@@ -273,7 +284,7 @@ export default function ExplorePage() {
                 onClick={() => { setPriceFilter('all'); setDistanceFilter('all'); setSortKey('default') }}
                 className="self-end text-xs font-semibold text-[var(--color-destructive)] hover:underline"
               >
-                Clear filters
+                {t('clearFilters')}
               </button>
             )}
           </div>
@@ -308,6 +319,7 @@ export default function ExplorePage() {
       </div>
 
       <ExperienceModal experience={selectedExp} onClose={() => setSelectedExp(null)} />
+      <QRScannerModal open={scanOpen} onClose={() => setScanOpen(false)} />
     </>
   )
 }

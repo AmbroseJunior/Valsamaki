@@ -11,6 +11,9 @@ export interface AIContext {
   knowledgeNodes?: KnowledgeNode[]
   conversationHistory?: AIMessage[]
   userLocation?: { lat: number; lng: number }
+  maxTokens?: number
+  locale?: string
+  staticData?: string
 }
 
 export interface AIProvider {

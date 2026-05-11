@@ -40,6 +40,7 @@ const FOOD_EMOJI: Record<string, string> = {
   '4': '🫖',
   '5': '🧀',
   '6': '🥬',
+  '7': '🌺',
 }
 
 const EVIDENCE: Record<string, { label: string; cls: string }> = {
@@ -60,7 +61,7 @@ const EVIDENCE: Record<string, { label: string; cls: string }> = {
 const STATS = [
   { value: '30%', label: 'Reduction in cardiovascular events with an EVOO-enriched Mediterranean diet (PREDIMED trial)', color: 'text-blue-600', border: 'border-blue-200' },
   { value: '521K', label: 'People tracked for 16 years linking daily olive oil to lower all-cause mortality (Zhang et al. 2021)', color: 'text-purple-600', border: 'border-purple-200' },
-  { value: '19', label: 'Peer-reviewed studies extracted across 6 Cretan foods — RCTs, meta-analyses, and large cohorts', color: 'text-green-600', border: 'border-green-200' },
+  { value: '25', label: 'Peer-reviewed studies extracted across 7 Cretan foods — RCTs, meta-analyses, and large cohorts', color: 'text-green-600', border: 'border-green-200' },
 ]
 
 export default function ProductsPage() {
@@ -93,7 +94,7 @@ export default function ProductsPage() {
             The Cretan Diet<br className="hidden md:block" /> & Local Foods
           </h1>
           <p className="text-base md:text-lg text-[var(--color-muted-foreground)] leading-relaxed max-w-2xl">
-            Six iconic Cretan foods — each with health benefits drawn directly from peer-reviewed
+            Seven iconic Cretan foods — each with health benefits drawn directly from peer-reviewed
             clinical trials, meta-analyses, and large-scale prospective studies.
           </p>
         </div>
@@ -104,7 +105,7 @@ export default function ProductsPage() {
         {/* Foods */}
         <section>
           <h2 className="font-display font-bold text-2xl md:text-3xl text-[var(--color-foreground)] mb-2">
-            Six Iconic Cretan Foods
+            Seven Iconic Cretan Foods
           </h2>
           <p className="text-[var(--color-muted-foreground)] mb-8">
             Evidence strength is labelled on every health benefit — no marketing, just the science.

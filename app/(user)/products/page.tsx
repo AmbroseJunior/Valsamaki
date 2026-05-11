@@ -56,6 +56,11 @@ const FOOD_EMOJI: Record<string, string> = {
   '20': '🌿',
   '21': '🍶',
   '22': '🪴',
+  '23': '🌳',
+  '24': '🫛',
+  '25': '🌰',
+  '26': '🥜',
+  '27': '🍃',
 }
 
 const EVIDENCE: Record<string, { label: string; cls: string }> = {
@@ -74,9 +79,9 @@ const EVIDENCE: Record<string, { label: string; cls: string }> = {
 }
 
 const STATS = [
-  { value: '30%', label: 'Reduction in cardiovascular events with an EVOO-enriched Mediterranean diet (PREDIMED trial)', color: 'text-blue-600', border: 'border-blue-200' },
-  { value: '521K', label: 'People tracked for 16 years linking daily olive oil to lower all-cause mortality (Zhang et al. 2021)', color: 'text-purple-600', border: 'border-purple-200' },
-  { value: '46', label: 'Peer-reviewed studies extracted across 22 Cretan foods — RCTs, meta-analyses, and large cohorts', color: 'text-green-600', border: 'border-green-200' },
+  { value: '19%', label: 'Lower all-cause mortality from >0.5 tbsp/day olive oil across 92,383 adults followed for 28 years (Guasch-Ferré et al. 2022, JACC)', color: 'text-blue-600', border: 'border-blue-200' },
+  { value: '733K', label: 'Participants pooled across 36 prospective studies confirming olive oil reduces all-cause and cardiometabolic mortality (Martinez-Gonzalez et al. 2022)', color: 'text-purple-600', border: 'border-purple-200' },
+  { value: '65', label: 'Peer-reviewed studies extracted across 27 Cretan foods — RCTs, meta-analyses, and large cohorts', color: 'text-green-600', border: 'border-green-200' },
 ]
 
 export default function ProductsPage() {
@@ -94,10 +99,10 @@ export default function ProductsPage() {
       <div className="bg-gradient-to-br from-[var(--highlight)]/20 to-green-50 dark:to-green-950/30 border-b border-[var(--color-border)]">
         <div className="max-w-4xl mx-auto px-4 md:px-6 py-12 md:py-16">
           <Link
-            href="/dashboard"
+            href="/explore"
             className="inline-flex items-center gap-1.5 text-sm text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)] mb-6 transition-colors"
           >
-            <ArrowLeft className="h-4 w-4" /> Back to dashboard
+            <ArrowLeft className="h-4 w-4" /> Back to explore
           </Link>
           <div className="flex items-center gap-2 mb-4">
             <Sparkles className="text-[var(--highlight)]" size={20} />
@@ -109,7 +114,7 @@ export default function ProductsPage() {
             The Cretan Diet<br className="hidden md:block" /> & Local Foods
           </h1>
           <p className="text-base md:text-lg text-[var(--color-muted-foreground)] leading-relaxed max-w-2xl">
-            Twenty-two iconic Cretan foods — each with health benefits drawn directly from peer-reviewed
+            Twenty-seven iconic Cretan foods — each with health benefits drawn directly from peer-reviewed
             clinical trials, meta-analyses, and large-scale prospective studies.
           </p>
         </div>
@@ -120,7 +125,7 @@ export default function ProductsPage() {
         {/* Foods */}
         <section>
           <h2 className="font-display font-bold text-2xl md:text-3xl text-[var(--color-foreground)] mb-2">
-            Twenty-Two Iconic Cretan Foods
+            Twenty-Seven Iconic Cretan Foods
           </h2>
           <p className="text-[var(--color-muted-foreground)] mb-8">
             Evidence strength is labelled on every health benefit — no marketing, just the science.

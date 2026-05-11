@@ -127,9 +127,14 @@ export default function ProductsPage() {
                       {FOOD_EMOJI[food.food_id] ?? '🌿'}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-display font-semibold text-lg text-[var(--color-foreground)] mb-1.5">
+                      <h3 className="font-display font-semibold text-lg text-[var(--color-foreground)] mb-0.5">
                         {food.name}
                       </h3>
+                      {food.local_name && (
+                        <p className="text-sm text-[var(--highlight)] font-medium mb-2">
+                          {food.local_name}
+                        </p>
+                      )}
                       <p className="text-sm text-[var(--color-muted-foreground)] mb-4 leading-relaxed">
                         {food.description}
                       </p>

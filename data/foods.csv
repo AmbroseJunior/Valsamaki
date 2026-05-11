@@ -1,9 +1,9 @@
-food_id,name,description,origin,image_url
-1,Cretan Extra Virgin Olive Oil,Cold-pressed olive oil from Cretan groves; among the highest polyphenol content of any EVOO globally.,Crete Greece,
-2,Stamnagathi (Wild Chicory),Bitter wild green foraged across Cretan hillsides; eaten boiled or in salads; rich in polyphenols and prebiotics.,Crete Greece,
-3,Cretan Thyme Honey,Raw honey produced by bees foraging on wild thyme in the Cretan highlands; prized for antimicrobial and antioxidant properties.,Crete Greece,
-4,Cretan Mountain Tea (Sideritis / Malotira),Dried flowering tops of Sideritis syriaca brewed as herbal tea; known locally as malotira in Crete; consumed daily across rural Crete for centuries.,Crete Greece,
-5,Cretan Sheep & Goat Dairy (Graviera & Anthotyros),Traditional cheeses made from free-range sheep and goat milk; Graviera is a hard aged cheese; Anthotyros is a fresh whey cheese.,Crete Greece,
-6,Purslane (Glistrida),Succulent wild green harvested from Cretan fields and roadsides; one of the richest plant sources of omega-3 fatty acids.,Crete Greece,
+food_id,name,description,origin,image_url,local_name
+1,Cretan Extra Virgin Olive Oil,Cold-pressed olive oil from Cretan groves; among the highest polyphenol content of any EVOO globally.,Crete Greece,,Κρητικό Ελαιόλαδο (Kritiko Elaiolado)
+2,Stamnagathi (Wild Chicory),Bitter wild green foraged across Cretan hillsides; eaten boiled or in salads; rich in polyphenols and prebiotics.,Crete Greece,,Σταμναγκάθι (Stamnagathi)
+3,Cretan Thyme Honey,Raw honey produced by bees foraging on wild thyme in the Cretan highlands; prized for antimicrobial and antioxidant properties.,Crete Greece,,Θυμαρίσιο Μέλι (Thymarisio Meli)
+4,Cretan Mountain Tea (Sideritis / Malotira),Dried flowering tops of Sideritis syriaca brewed as herbal tea; known locally as malotira in Crete; consumed daily across rural Crete for centuries.,Crete Greece,,Μαλοτήρα (Malotira)
+5,Cretan Sheep & Goat Dairy (Graviera & Anthotyros),Traditional cheeses made from free-range sheep and goat milk; Graviera is a hard aged cheese; Anthotyros is a fresh whey cheese.,Crete Greece,,Γραβιέρα & Ανθότυρο (Graviera & Anthotyros)
+6,Purslane (Glistrida),Succulent wild green harvested from Cretan fields and roadsides; one of the richest plant sources of omega-3 fatty acids.,Crete Greece,,Γλιστρίδα (Glistrida)
 
-7,Dittany of Crete (Origanum dictamnus),"Aromatic perennial herb endemic only to the cliffs and gorges of Crete; brewed as a delicate herbal infusion; used in Cretan folk medicine for over 2000 years; prized for digestive comfort and antimicrobial properties.",Crete Greece,
+7,Dittany of Crete (Origanum dictamnus),"Aromatic perennial herb endemic only to the cliffs and gorges of Crete; brewed as a delicate herbal infusion; used in Cretan folk medicine for over 2000 years; prized for digestive comfort and antimicrobial properties.",Crete Greece,,Δίκταμο (Diktamo)

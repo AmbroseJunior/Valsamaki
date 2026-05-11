@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from 'next/server'
 import { updateSession } from '@/lib/supabase/middleware'
 import { applySecurityHeaders } from '@/lib/security'
 
-const PUBLIC_ROUTES = ['/', '/login', '/register', '/auth', '/map', '/explore', '/events', '/info', '/onboarding']
+const PUBLIC_ROUTES = ['/', '/login', '/register', '/auth', '/map', '/explore', '/events', '/info', '/onboarding', '/products']
 const PRODUCER_ROUTES = ['/business', '/advertise', '/analytics']
 const ADMIN_ROUTES = ['/admin']
 

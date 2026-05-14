@@ -6,6 +6,9 @@ const PUBLIC_ROUTES = ['/', '/login', '/register', '/auth', '/map', '/explore', 
 const PRODUCER_ROUTES = ['/business', '/advertise', '/analytics']
 const ADMIN_ROUTES = ['/admin']
 
+// Routes accessible to everyone during the under-construction phase
+const MAINTENANCE_BYPASS = ['/coming-soon', '/login', '/auth']
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const { response, user, role } = await updateSession(request)
@@ -17,6 +20,14 @@ export async function middleware(request: NextRequest) {
   if (pathname.startsWith('/api/')) {
     return response
   }
+
+  // ── Under-construction gate ──────────────────────────────────────────────
+  // Only admin can access the full app until launch. Everyone else → /coming-soon.
+  const isBypass = MAINTENANCE_BYPASS.some((r) => pathname === r || pathname.startsWith(`${r}/`))
+  if (!isBypass && role !== 'admin') {
+    return NextResponse.redirect(new URL('/coming-soon', request.url))
+  }
+  // ─────────────────────────────────────────────────────────────────────────
 
   const isPublicRoute = PUBLIC_ROUTES.some((r) => pathname === r || pathname.startsWith(`${r}/`))
   const isAuthRoute = pathname.startsWith('/login') || pathname.startsWith('/register')

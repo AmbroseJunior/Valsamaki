@@ -8,7 +8,7 @@ import { BottomNav } from '@/components/shared/BottomNav'
 import { OfflineBanner } from '@/components/shared/OfflineBanner'
 import { WeatherBox } from '@/components/shared/WeatherBox'
 import { FloatingChatbot } from '@/components/ai/FloatingChatbot'
-import { WelcomeFlow } from '@/components/shared/WelcomeFlow'
+import { FirstVisitLanguagePicker } from '@/components/shared/FirstVisitLanguagePicker'
 import '@/styles/tokens.css'
 import './globals.css'
 
@@ -53,7 +53,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body className="bg-[var(--color-background)] text-[var(--color-foreground)] font-sans antialiased">
         <NextIntlClientProvider locale={locale} messages={messages}>
           <Providers>
-            <WelcomeFlow />
+            <FirstVisitLanguagePicker />
             <OfflineBanner />
             <Navbar />
             <main className="min-h-screen pt-[var(--nav-height)] pb-[var(--bottom-nav-height)] md:pb-0">

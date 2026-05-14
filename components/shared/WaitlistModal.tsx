@@ -127,14 +127,6 @@ export function WaitlistModal({ locale, onDismiss }: WaitlistModalProps) {
           </form>
         )}
 
-        {!done && (
-          <button
-            onClick={onDismiss}
-            className="text-white/35 text-sm hover:text-white/65 transition-colors"
-          >
-            Skip for now →
-          </button>
-        )}
       </div>
     </div>
   )

@@ -10,7 +10,11 @@ import type { Locale } from '@/lib/i18n/locales'
 // sessionStorage key — resets every new browser session so every visitor sees it
 const SESSION_KEY = 'valsamaki_lang_chosen'
 
-export function FirstVisitLanguagePicker() {
+interface FirstVisitLanguagePickerProps {
+  onDismiss?: (locale?: string) => void
+}
+
+export function FirstVisitLanguagePicker({ onDismiss }: FirstVisitLanguagePickerProps = {}) {
   const [visible, setVisible] = useState(false)
   const [selected, setSelected] = useState<Locale | null>(null)
   const [loading, setLoading] = useState(false)
@@ -35,12 +39,14 @@ export function FirstVisitLanguagePicker() {
       body: JSON.stringify({ locale }),
     })
     setVisible(false)
+    onDismiss?.(locale)
     startTransition(() => router.refresh())
   }
 
   function skip() {
     try { sessionStorage.setItem(SESSION_KEY, '1') } catch {}
     setVisible(false)
+    onDismiss?.()
   }
 
   return (

@@ -3,11 +3,11 @@ import { updateSession } from '@/lib/supabase/middleware'
 import { applySecurityHeaders } from '@/lib/security'
 
 const PUBLIC_ROUTES = ['/', '/login', '/register', '/auth', '/map', '/explore', '/events', '/info', '/onboarding', '/products']
-const PRODUCER_ROUTES = ['/business', '/advertise', '/analytics']
+const PRODUCER_ROUTES = ['/business', '/analytics']
 const ADMIN_ROUTES = ['/admin']
 
 // Routes accessible to everyone during the under-construction phase
-const MAINTENANCE_BYPASS = ['/coming-soon', '/login', '/auth']
+const MAINTENANCE_BYPASS = ['/coming-soon', '/thank-you', '/login', '/auth']
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl

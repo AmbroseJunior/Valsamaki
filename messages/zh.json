@@ -415,5 +415,31 @@
     "welcome": "欢迎 — 选择您的语言",
     "subtitle": "Καλώς ήρθες · Bienvenido · Bienvenue · Benvenuto",
     "continue": "不更改继续 →"
+  },
+  "comingSoon": {
+    "badge": "即将推出",
+    "headline": "克里特岛正在酝酿特别的东西。",
+    "description": "Valsamaki 将您与正宗的克里特岛生产商、当地体验和真正的地中海饮食相连接。留下您的邮箱——我们上线时会第一时间联系您。",
+    "joinCount": "加入已在列表中的 {count} 人",
+    "button": "上线时通知我 🫒",
+    "loading": "加入中…",
+    "error": "出了点问题——请重试。",
+    "perkTitle": "早鸟特权",
+    "perk1Emoji": "🗺️",
+    "perk1Label": "优先体验",
+    "perk1Desc": "率先探索克里特岛的正宗生产商",
+    "perk2Emoji": "🌿",
+    "perk2Label": "3个月免费",
+    "perk2Desc": "上线即享高级功能",
+    "perk3Emoji": "✨",
+    "perk3Label": "创始会员",
+    "perk3Desc": "前500名专属身份"
+  },
+  "thankYou": {
+    "founding": "创始会员",
+    "position": "候补名单第 #{position} 位",
+    "headline": "您已在名单上！",
+    "message": "感谢您加入。Valsamaki 上线时我们将亲自联系您——您将是最早体验正宗克里特岛的人之一。",
+    "watch": "敬请期待"
   }
 }

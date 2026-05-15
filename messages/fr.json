@@ -415,5 +415,31 @@
     "welcome": "Bienvenue — Choisissez votre langue",
     "subtitle": "Καλώς ήρθες · Bienvenido · Bienvenue · Benvenuto",
     "continue": "Continuer sans changer →"
+  },
+  "comingSoon": {
+    "badge": "Bientôt disponible",
+    "headline": "Quelque chose de spécial se prépare en Crète.",
+    "description": "Valsamaki vous connecte avec des producteurs crétois authentiques, des expériences locales et le vrai régime méditerranéen. Laissez votre email — nous vous contacterons dès le lancement.",
+    "joinCount": "Rejoignez {count} autres déjà sur la liste",
+    "button": "Me notifier au lancement 🫒",
+    "loading": "Inscription…",
+    "error": "Une erreur s'est produite — veuillez réessayer.",
+    "perkTitle": "Avantages des premiers inscrits",
+    "perk1Emoji": "🗺️",
+    "perk1Label": "Accès anticipé",
+    "perk1Desc": "Premier à découvrir les producteurs crétois",
+    "perk2Emoji": "🌿",
+    "perk2Label": "3 mois offerts",
+    "perk2Desc": "Fonctionnalités premium au lancement",
+    "perk3Emoji": "✨",
+    "perk3Label": "Membre fondateur",
+    "perk3Desc": "Statut exclusif pour les 500 premiers"
+  },
+  "thankYou": {
+    "founding": "Membre fondateur",
+    "position": "#{position} sur la liste",
+    "headline": "Vous êtes sur la liste !",
+    "message": "Merci de vous être inscrit·e. Nous vous contacterons personnellement lors du lancement de Valsamaki — vous serez parmi les tout premiers à vivre la Crète authentique.",
+    "watch": "Restez connecté·e"
   }
 }

@@ -415,5 +415,31 @@
     "welcome": "Willkommen — Wählen Sie Ihre Sprache",
     "subtitle": "Καλώς ήρθες · Bienvenido · Bienvenue · Benvenuto",
     "continue": "Ohne Änderung fortfahren →"
+  },
+  "comingSoon": {
+    "badge": "Demnächst",
+    "headline": "Etwas Besonderes entsteht auf Kreta.",
+    "description": "Valsamaki verbindet Sie mit authentischen kretischen Erzeugern, lokalen Erlebnissen und der echten mediterranen Ernährung. Hinterlassen Sie Ihre E-Mail — wir melden uns zum Launch.",
+    "joinCount": "{count} andere warten bereits",
+    "button": "Beim Launch benachrichtigen 🫒",
+    "loading": "Anmeldung…",
+    "error": "Etwas ist schiefgelaufen — bitte erneut versuchen.",
+    "perkTitle": "Vorteile für Early Birds",
+    "perk1Emoji": "🗺️",
+    "perk1Label": "Früher Zugang",
+    "perk1Desc": "Als Erste Kretas Produzenten entdecken",
+    "perk2Emoji": "🌿",
+    "perk2Label": "3 Monate gratis",
+    "perk2Desc": "Premium-Funktionen zum Launch",
+    "perk3Emoji": "✨",
+    "perk3Label": "Gründungsmitglied",
+    "perk3Desc": "Exklusiver Status für die ersten 500"
+  },
+  "thankYou": {
+    "founding": "Gründungsmitglied",
+    "position": "#{position} auf der Warteliste",
+    "headline": "Sie stehen auf der Liste!",
+    "message": "Danke für Ihre Anmeldung. Wir melden uns persönlich, wenn Valsamaki startet — Sie gehören zu den Ersten, die authentisches Kreta erleben.",
+    "watch": "Bleiben Sie gespannt"
   }
 }

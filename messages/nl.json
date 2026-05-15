@@ -414,5 +414,31 @@
     "welcome": "Welkom — Kies uw taal",
     "subtitle": "Καλώς ήρθες · Bienvenido · Bienvenue · Benvenuto",
     "continue": "Doorgaan zonder wijzigen →"
+  },
+  "comingSoon": {
+    "badge": "Binnenkort",
+    "headline": "Er brouwt iets bijzonders op Kreta.",
+    "description": "Valsamaki verbindt je met authentieke Kretenzische producenten, lokale ervaringen en het echte mediterrane dieet. Laat je e-mail achter — we nemen contact op zodra we live gaan.",
+    "joinCount": "Sluit je aan bij {count} anderen op de lijst",
+    "button": "Meld mij bij lancering 🫒",
+    "loading": "Aanmelden…",
+    "error": "Er ging iets mis — probeer opnieuw.",
+    "perkTitle": "Voordelen voor vroege vogels",
+    "perk1Emoji": "🗺️",
+    "perk1Label": "Vroege toegang",
+    "perk1Desc": "Als eerste Kreta's producenten ontdekken",
+    "perk2Emoji": "🌿",
+    "perk2Label": "3 maanden gratis",
+    "perk2Desc": "Premium functies bij lancering",
+    "perk3Emoji": "✨",
+    "perk3Label": "Oprichtend lid",
+    "perk3Desc": "Exclusieve status voor de eerste 500"
+  },
+  "thankYou": {
+    "founding": "Oprichtend lid",
+    "position": "#{position} op de wachtlijst",
+    "headline": "Je staat op de lijst!",
+    "message": "Bedankt voor je aanmelding. We nemen persoonlijk contact met je op wanneer Valsamaki lanceert — je bent een van de allereersten die authentiek Kreta ervaart.",
+    "watch": "Blijf op de hoogte"
   }
 }

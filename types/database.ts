@@ -442,6 +442,7 @@ export type Database = {
     }
     Views: {}
     Functions: {
+      get_waitlist_count: { Args: Record<string, never>; Returns: number }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
     }

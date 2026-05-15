@@ -1,15 +1,27 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTranslations, useLocale } from 'next-intl'
 import { Mail } from 'lucide-react'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export default function ComingSoonPage() {
+  const t = useTranslations('comingSoon')
+  const locale = useLocale()
   const router = useRouter()
+
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle')
+  const [count, setCount] = useState<number | null>(null)
+
+  useEffect(() => {
+    fetch('/api/waitlist/count')
+      .then((r) => r.json())
+      .then((d: { count?: number }) => setCount(d.count ?? 0))
+      .catch(() => {})
+  }, [])
 
   async function submit(e: React.FormEvent) {
     e.preventDefault()
@@ -20,11 +32,11 @@ export default function ComingSoonPage() {
       const res = await fetch('/api/waitlist', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: trimmed, source: 'coming_soon' }),
+        body: JSON.stringify({ email: trimmed, locale, source: 'coming_soon' }),
       })
-      const data = await res.json() as { ok?: boolean; already?: boolean }
+      const data = await res.json() as { ok?: boolean; already?: boolean; position?: number }
       if (data.ok || data.already) {
-        router.push('/thank-you')
+        router.push(`/thank-you?p=${data.position ?? 1}`)
       } else {
         setStatus('error')
       }
@@ -32,6 +44,12 @@ export default function ComingSoonPage() {
       setStatus('error')
     }
   }
+
+  const perks = [
+    { emoji: t('perk1Emoji'), label: t('perk1Label'), desc: t('perk1Desc') },
+    { emoji: t('perk2Emoji'), label: t('perk2Label'), desc: t('perk2Desc') },
+    { emoji: t('perk3Emoji'), label: t('perk3Label'), desc: t('perk3Desc') },
+  ]
 
   return (
     <div
@@ -46,7 +64,7 @@ export default function ComingSoonPage() {
         />
       </div>
 
-      <div className="relative w-full max-w-sm space-y-8 text-center">
+      <div className="relative w-full max-w-sm space-y-7 text-center py-8">
         {/* Logo */}
         <div className="flex items-center justify-center gap-3">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -63,20 +81,35 @@ export default function ComingSoonPage() {
           style={{ background: 'rgba(252,218,6,0.12)', border: '1px solid rgba(252,218,6,0.3)' }}
         >
           <span className="w-1.5 h-1.5 rounded-full bg-[#FCDA06] animate-pulse" />
-          <span className="text-[#FCDA06] text-xs font-bold tracking-widest uppercase">Coming Soon</span>
+          <span className="text-[#FCDA06] text-xs font-bold tracking-widest uppercase">{t('badge')}</span>
         </div>
 
         {/* Headline */}
         <div>
           <h1 className="text-3xl sm:text-4xl font-bold text-white mb-3 leading-tight">
-            Something special<br />is brewing in Crete.
+            {t('headline')}
           </h1>
           <p className="text-white/50 text-sm leading-relaxed">
-            Valsamaki connects you with authentic Cretan producers, local experiences,
-            and the real Mediterranean diet. Leave your email — we&apos;ll reach out
-            the moment we go live.
+            {t('description')}
           </p>
         </div>
+
+        {/* Social proof counter */}
+        {count !== null && count > 0 && (
+          <div
+            className="flex items-center justify-center gap-2 px-4 py-2 rounded-full mx-auto w-fit"
+            style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}
+          >
+            <div className="flex -space-x-1.5">
+              {['🇬🇷','🇩🇪','🇫🇷'].map((flag, i) => (
+                <span key={i} className="text-base">{flag}</span>
+              ))}
+            </div>
+            <span className="text-white/60 text-xs font-medium">
+              {t('joinCount', { count })}
+            </span>
+          </div>
+        )}
 
         {/* Form */}
         <form onSubmit={submit} className="space-y-3 text-left">
@@ -100,7 +133,7 @@ export default function ComingSoonPage() {
           </div>
 
           {status === 'error' && (
-            <p className="text-red-400 text-xs pl-1">Something went wrong — please try again.</p>
+            <p className="text-red-400 text-xs pl-1">{t('error')}</p>
           )}
 
           <button
@@ -109,9 +142,27 @@ export default function ComingSoonPage() {
             className="w-full py-3.5 rounded-2xl font-bold text-sm transition-opacity hover:opacity-90 disabled:opacity-40"
             style={{ background: '#FCDA06', color: '#1a1c0a' }}
           >
-            {status === 'loading' ? 'Joining…' : 'Notify me at launch 🫒'}
+            {status === 'loading' ? t('loading') : t('button')}
           </button>
         </form>
+
+        {/* Perks */}
+        <div className="pt-1">
+          <p className="text-white/30 text-xs font-semibold uppercase tracking-widest mb-4">{t('perkTitle')}</p>
+          <div className="grid grid-cols-3 gap-3">
+            {perks.map((perk, i) => (
+              <div
+                key={i}
+                className="flex flex-col items-center gap-2 px-2 py-4 rounded-2xl"
+                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
+              >
+                <span className="text-2xl">{perk.emoji}</span>
+                <p className="text-white text-xs font-bold leading-tight">{perk.label}</p>
+                <p className="text-white/40 text-[10px] leading-tight">{perk.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
 
         <p className="text-white/15 text-xs">
           © {new Date().getFullYear()} Valsamaki · Heraklion, Crete, Greece

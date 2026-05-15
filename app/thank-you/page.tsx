@@ -1,4 +1,14 @@
-export default function ThankYouPage() {
+import { getTranslations } from 'next-intl/server'
+
+interface Props {
+  searchParams: Promise<{ p?: string }>
+}
+
+export default async function ThankYouPage({ searchParams }: Props) {
+  const t = await getTranslations('thankYou')
+  const { p } = await searchParams
+  const position = p && /^\d+$/.test(p) ? parseInt(p, 10) : null
+
   return (
     <div
       className="fixed inset-0 z-[9000] flex flex-col items-center justify-center p-5 sm:p-8 overflow-y-auto"
@@ -23,23 +33,36 @@ export default function ThankYouPage() {
           </div>
         </div>
 
-        {/* Olive branch icon */}
+        {/* Olive */}
         <div className="text-7xl">🫒</div>
+
+        {/* Founding member badge */}
+        {position !== null && (
+          <div className="space-y-2">
+            <div
+              className="inline-flex items-center gap-2 px-5 py-2 rounded-full"
+              style={{ background: 'rgba(252,218,6,0.15)', border: '1px solid rgba(252,218,6,0.4)' }}
+            >
+              <span className="text-[#FCDA06] text-sm font-bold tracking-wide">✨ {t('founding')}</span>
+            </div>
+            <p className="text-white/40 text-sm font-mono">{t('position', { position })}</p>
+          </div>
+        )}
 
         {/* Message */}
         <div className="space-y-4">
           <h1 className="text-3xl sm:text-4xl font-bold text-white leading-tight">
-            You&apos;re on the list!
+            {t('headline')}
           </h1>
           <p className="text-white/60 text-base leading-relaxed">
-            Thank you for joining. We&apos;ll contact you personally when Valsamaki launches — you&apos;ll be among the very first to experience authentic Crete.
+            {t('message')}
           </p>
           <div
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full mt-2"
             style={{ background: 'rgba(252,218,6,0.12)', border: '1px solid rgba(252,218,6,0.25)' }}
           >
             <span className="w-1.5 h-1.5 rounded-full bg-[#FCDA06] animate-pulse" />
-            <span className="text-[#FCDA06] text-sm font-semibold">Watch this space</span>
+            <span className="text-[#FCDA06] text-sm font-semibold">{t('watch')}</span>
           </div>
         </div>
 

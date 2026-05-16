@@ -244,9 +244,11 @@ export default function ComingSoonPage() {
         </div>
       </div>
 
-      <p className="text-white/15 text-xs">
-        © {new Date().getFullYear()} Valsamaki · Heraklion, Crete, Greece
-      </p>
+      <div className="flex items-center justify-center gap-3 text-white/15 text-xs">
+        <span>© {new Date().getFullYear()} Valsamaki · Heraklion, Crete, Greece</span>
+        <span>·</span>
+        <a href="/login" className="hover:text-white/40 transition-colors">🔑</a>
+      </div>
     </div>
   )
 }

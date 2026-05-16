@@ -1,27 +1,54 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, startTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTranslations, useLocale } from 'next-intl'
-import { Mail } from 'lucide-react'
+import { Mail, Check } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { SUPPORTED_LOCALES, LOCALE_LABELS, LOCALE_FLAGS } from '@/lib/i18n/locales'
+import type { Locale } from '@/lib/i18n/locales'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const SESSION_KEY = 'valsamaki_lang_chosen'
 
 export default function ComingSoonPage() {
   const t = useTranslations('comingSoon')
   const locale = useLocale()
   const router = useRouter()
 
+  const [step, setStep] = useState<'loading' | 'language' | 'waitlist'>('loading')
+  const [selected, setSelected] = useState<Locale | null>(null)
+  const [picking, setPicking] = useState(false)
   const [email, setEmail] = useState('')
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'loading' | 'error'>('idle')
   const [count, setCount] = useState<number | null>(null)
 
   useEffect(() => {
+    setStep(sessionStorage.getItem(SESSION_KEY) ? 'waitlist' : 'language')
+  }, [])
+
+  useEffect(() => {
+    if (step !== 'waitlist') return
     fetch('/api/waitlist/count')
       .then((r) => r.json())
       .then((d: { count?: number }) => setCount(d.count ?? 0))
       .catch(() => {})
-  }, [])
+  }, [step])
+
+  async function pickLanguage(loc: Locale) {
+    if (picking) return
+    setSelected(loc)
+    setPicking(true)
+    try { sessionStorage.setItem(SESSION_KEY, '1') } catch {}
+    await fetch('/api/locale', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ locale: loc }),
+    })
+    setStep('waitlist')
+    setPicking(false)
+    startTransition(() => router.refresh())
+  }
 
   async function submitEmail(e: React.FormEvent) {
     e.preventDefault()
@@ -45,6 +72,74 @@ export default function ComingSoonPage() {
     }
   }
 
+  const bg = (
+    <div className="pointer-events-none absolute inset-0 overflow-hidden">
+      <div
+        className="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full opacity-20"
+        style={{ background: 'radial-gradient(circle, #FCDA06 0%, transparent 70%)' }}
+      />
+    </div>
+  )
+
+  const logo = (
+    <div className="flex items-center justify-center gap-3">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/v1.png" alt="Valsamaki" className="w-14 h-14 object-contain drop-shadow-lg" />
+      <div className="text-left">
+        <p className="font-display font-bold text-white text-3xl tracking-tight leading-none">valsamaki</p>
+        <p className="text-[#FCDA06] text-xs font-semibold mt-0.5 tracking-widest uppercase">Authentic Crete</p>
+      </div>
+    </div>
+  )
+
+  const shell = 'fixed inset-0 z-[9000] flex flex-col items-center justify-center p-5 sm:p-8 overflow-y-auto'
+  const shellStyle = { background: 'linear-gradient(150deg, #0f1a0f 0%, #1c2a0e 40%, #1a1c0a 100%)' }
+
+  /* ── Loading ─────────────────────────────────────────────────────────────── */
+  if (step === 'loading') return <div className={shell} style={shellStyle}>{bg}</div>
+
+  /* ── STEP 1: Language picker ─────────────────────────────────────────────── */
+  if (step === 'language') return (
+    <div className={shell} style={shellStyle}>
+      {bg}
+      <div className="relative w-full max-w-md space-y-8 text-center py-8">
+        {logo}
+
+        <div>
+          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">Welcome — Choose your language</h2>
+          <p className="text-white/50 text-sm">Καλώς ήρθες · Bienvenido · Bienvenue · Benvenuto</p>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+          {SUPPORTED_LOCALES.map((loc) => (
+            <button
+              key={loc}
+              onClick={() => pickLanguage(loc)}
+              disabled={picking}
+              className={cn(
+                'flex flex-col items-center gap-1.5 px-3 py-4 rounded-2xl border-2 transition-all duration-200',
+                'bg-white/5 hover:bg-white/12',
+                selected === loc
+                  ? 'border-[#FCDA06] bg-[#FCDA06]/15 scale-[1.03] shadow-[0_0_20px_#FCDA0640]'
+                  : 'border-white/15 hover:border-white/35',
+                picking && selected !== loc && 'opacity-30 pointer-events-none'
+              )}
+            >
+              <span className="text-3xl leading-none">{LOCALE_FLAGS[loc]}</span>
+              <span className="text-sm font-bold text-white leading-tight text-center">{LOCALE_LABELS[loc]}</span>
+              {selected === loc && <Check className="h-3.5 w-3.5 text-[#FCDA06] mt-0.5" />}
+            </button>
+          ))}
+        </div>
+
+        <p className="text-white/15 text-xs">
+          © {new Date().getFullYear()} Valsamaki · Heraklion, Crete, Greece
+        </p>
+      </div>
+    </div>
+  )
+
+  /* ── STEP 2: Waitlist ────────────────────────────────────────────────────── */
   const perks = [
     { emoji: t('perk1Emoji'), label: t('perk1Label'), desc: t('perk1Desc') },
     { emoji: t('perk2Emoji'), label: t('perk2Label'), desc: t('perk2Desc') },
@@ -52,29 +147,10 @@ export default function ComingSoonPage() {
   ]
 
   return (
-    <div
-      className="fixed inset-0 z-[9000] flex flex-col items-center justify-center p-5 sm:p-8 overflow-y-auto"
-      style={{ background: 'linear-gradient(150deg, #0f1a0f 0%, #1c2a0e 40%, #1a1c0a 100%)' }}
-    >
-      {/* Glow */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div
-          className="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full opacity-20"
-          style={{ background: 'radial-gradient(circle, #FCDA06 0%, transparent 70%)' }}
-        />
-      </div>
-
+    <div className={shell} style={shellStyle}>
+      {bg}
       <div className="relative w-full max-w-sm space-y-7 text-center py-8">
-
-        {/* Logo */}
-        <div className="flex items-center justify-center gap-3">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/v1.png" alt="Valsamaki" className="w-14 h-14 object-contain drop-shadow-lg" />
-          <div className="text-left">
-            <p className="font-display font-bold text-white text-3xl tracking-tight leading-none">valsamaki</p>
-            <p className="text-[#FCDA06] text-xs font-semibold mt-0.5 tracking-widest uppercase">Authentic Crete</p>
-          </div>
-        </div>
+        {logo}
 
         {/* Badge */}
         <div
@@ -87,9 +163,7 @@ export default function ComingSoonPage() {
 
         {/* Headline */}
         <div>
-          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-3 leading-tight">
-            {t('headline')}
-          </h1>
+          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-3 leading-tight">{t('headline')}</h1>
           <p className="text-white/50 text-sm leading-relaxed">{t('description')}</p>
         </div>
 
@@ -104,9 +178,7 @@ export default function ComingSoonPage() {
                 <span key={i} className="text-base">{flag}</span>
               ))}
             </div>
-            <span className="text-white/60 text-xs font-medium">
-              {t('joinCount', { count })}
-            </span>
+            <span className="text-white/60 text-xs font-medium">{t('joinCount', { count })}</span>
           </div>
         )}
 
@@ -163,13 +235,12 @@ export default function ComingSoonPage() {
           </div>
         </div>
 
-        {/* Footer */}
+        {/* Footer — admin link is the 🔑, invisible to regular users */}
         <div className="flex items-center justify-center gap-3 text-white/15 text-xs">
           <span>© {new Date().getFullYear()} Valsamaki · Heraklion, Crete, Greece</span>
           <span>·</span>
           <a href="/login" className="hover:text-white/40 transition-colors">🔑</a>
         </div>
-
       </div>
     </div>
   )

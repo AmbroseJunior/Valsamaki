@@ -33,7 +33,9 @@ export async function middleware(request: NextRequest) {
   const isAuthRoute = pathname.startsWith('/login') || pathname.startsWith('/register')
 
   if (isAuthRoute && user) {
-    return NextResponse.redirect(new URL('/dashboard', request.url))
+    // Non-admin users who reach /login are sent back to coming-soon (not the full app)
+    const dest = role === 'admin' ? '/dashboard' : '/coming-soon'
+    return NextResponse.redirect(new URL(dest, request.url))
   }
 
   if (!isPublicRoute && !user) {

@@ -1,7 +1,7 @@
 import OpenAI from 'openai'
 import type { AIProvider, AIMessage, AIContext } from '@/types/ai'
 import { logger } from '@/lib/logger'
-import { buildCretanKnowledgeBlock } from '@/lib/ai/cretan-knowledge'
+import { retrieveRelevantKnowledge } from '@/lib/ai/rag'
 
 const TIMEOUT_MS = 20_000
 
@@ -35,7 +35,8 @@ export class DeepSeekProvider implements AIProvider {
   async chat(messages: AIMessage[], context: AIContext): Promise<string> {
     if (!this.isAvailable()) throw new Error('DeepSeek API key not configured')
 
-    const systemMessage = this.buildSystemMessage(context)
+    const latestUserMsg = [...messages].reverse().find((m) => m.role === 'user')?.content ?? ''
+    const systemMessage = this.buildSystemMessage(context, latestUserMsg)
     const openaiMessages: OpenAI.Chat.ChatCompletionMessageParam[] = [
       { role: 'system', content: systemMessage },
       ...messages.map((m) => ({ role: m.role, content: m.content })),
@@ -71,14 +72,14 @@ export class DeepSeekProvider implements AIProvider {
     return this.chat([{ role: 'user', content: prompt }], context)
   }
 
-  private buildSystemMessage(context: AIContext): string {
+  private buildSystemMessage(context: AIContext, userQuery: string): string {
     const parts: string[] = [CRETAN_SYSTEM_PREAMBLE]
 
-    // Always inject the verified food/health knowledge base
+    // RAG: inject only the food knowledge relevant to this specific query
     try {
-      parts.push(`\n${buildCretanKnowledgeBlock()}`)
+      parts.push(`\n${retrieveRelevantKnowledge(userQuery, 8)}`)
     } catch (err) {
-      logger.warn('Could not load Cretan knowledge block', err)
+      logger.warn('Could not retrieve relevant knowledge', err)
     }
 
     if (context.nearbyBusinesses?.length) {

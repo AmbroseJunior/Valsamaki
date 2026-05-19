@@ -102,3 +102,9 @@ food_id,goal_id,evidence_strength,subcategory,notes
 41,2,2,cholesterol,Skendrovič 2026 review: EU-authorised omega-3 cardiovascular health claims; both species meet regulatory evidence threshold
 41,1,2,antioxidant,Anti-inflammatory effects of EPA/DHA documented; selenium supports glutathione peroxidase activity (Skendrovič 2026)
 41,6,2,cognitive,DHA essential for brain structure; EU cognitive health claims authorised for omega-3 from Sparus aurata and Dicentrarchus labrax (Skendrovič 2026)
+42,6,3,stress;cognitive,"Han 2024 meta-analysis 46 RCTs: depression ES -4.26, anxiety ES -3.75; cognitive function non-inferior to conventional drugs; neuroprotection via crocin/crocetin; Sarris 2021 meta-review confirms"
+42,8,3,quality,Han 2024 meta-analysis: sleep disorder improvement ES -1.91 (95% CI -2.88 to -0.93) across RCTs; saffron vs placebo and vs conventional sleep aids
+43,1,1,immune,Tsavea 2022: antibacterial activity comparable/superior to Manuka honey in vitro; multiple mechanisms; in vitro only — no human RCT
+43,4,1,cellular,Tsavea 2022: FRAP antioxidant values higher than most European honeys; polyphenol composition documented; in vitro only
+44,7,2,postprandial,Grancieri 2025 clinical trial (n=11): all cowpea varieties significantly lower iAUC than glucose; satiety benefit confirmed
+44,1,2,antioxidant,Grancieri 2025: biofortified cowpeas reduced NF-κB activation; polyphenol antioxidant capacity confirmed

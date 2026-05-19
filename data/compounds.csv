@@ -105,3 +105,12 @@ compound_id,food_id,name,description
 123,41,Omega-3 Fatty Acids (EPA & DHA),"Both Sparus aurata and Dicentrarchus labrax deliver significant long-chain omega-3 fatty acids supporting cardiovascular, cognitive, and visual health under EU-authorised health claims."
 124,41,Selenium & Phosphorus,High selenium content supports antioxidant enzyme systems; phosphorus is essential for bone mineralisation and ATP-based cellular energy metabolism.
 125,41,Complete Protein,Sea bream and sea bass provide high biological value protein containing all essential amino acids; their amino acid profile meets EU criteria for authorised protein nutrition claims.
+126,42,Safranal,The primary volatile compound responsible for saffron's aroma; exerts anxiolytic and antidepressant effects via serotonin reuptake inhibition and GABA-A receptor modulation.
+127,42,Crocin & Crocetin,"Carotenoid glycosides responsible for saffron's deep colour; studied for neuroprotective, antidepressant, and cognitive-enhancing effects across multiple human RCTs."
+128,42,Kaempferol,A flavonoid in saffron petals with anti-inflammatory and antioxidant properties; contributes to the compound's overall neuroprotective profile.
+129,43,Polyphenols & Flavonoids,Pine honey has a distinct phenolic profile from floral honeys; total phenolic content ~451 mg GAE/kg; FRAP antioxidant values higher than most European monofloral honeys.
+130,43,Hydrogen Peroxide & Defensin-1,Key antibacterial agents in pine honey; activity against nosocomial and foodborne pathogens — in Greek studies comparable or superior to Manuka honey for some strains.
+131,43,Oligosaccharides & Minerals,"Honeydew honeys are rich in oligosaccharides with prebiotic potential, and have higher mineral content (potassium, calcium, magnesium) than nectar honeys."
+132,44,Resistant Starch & Soluble Fibre,"Black-eyed peas have a low glycemic index; their resistant starch and soluble fibre slow glucose absorption, blunt postprandial insulin response, and promote satiety."
+133,44,Plant Protein & Iron,Vigna unguiculata provides ~24g protein per 100g dry weight with a favourable amino acid profile; a good plant-based iron source especially for low-meat diets.
+134,44,"Polyphenols (Vitexin, Isovitexin)",Black-eyed peas contain flavone C-glycosides with documented NF-κB pathway inhibition and antioxidant activity; contribute to anti-inflammatory properties.

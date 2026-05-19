@@ -108,3 +108,5 @@ food_id,goal_id,evidence_strength,subcategory,notes
 43,4,1,cellular,Tsavea 2022: FRAP antioxidant values higher than most European honeys; polyphenol composition documented; in vitro only
 44,7,2,postprandial,Grancieri 2025 clinical trial (n=11): all cowpea varieties significantly lower iAUC than glucose; satiety benefit confirmed
 44,1,2,antioxidant,Grancieri 2025: biofortified cowpeas reduced NF-κB activation; polyphenol antioxidant capacity confirmed
+45,3,1,microbiome,"Inferred: sour trahanas contains LAB from fermented sheep/goat milk; same LAB genera (Lactobacillus, Streptococcus) documented with probiotic properties in Greek dairy fermentations (Lappa 2024, Papadakis 2021); no trahanas-specific human RCT exists"
+45,5,1,vitality,Inferred: fermented wheat-milk combination provides complete protein and complex carbs; fermentation improves digestibility and resistant starch content; compositional evidence only

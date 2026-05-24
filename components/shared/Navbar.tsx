@@ -128,7 +128,7 @@ export function Navbar() {
                 href="/business"
                 className={cn(
                   'px-3 py-1.5 rounded-[var(--radius)] text-sm font-semibold transition-colors',
-                  pathname.startsWith('/business') || pathname.startsWith('/advertise') || pathname.startsWith('/analytics')
+                  pathname.startsWith('/business') || pathname.startsWith('/analytics')
                     ? 'bg-[var(--highlight)] text-[var(--highlight-foreground)]'
                     : 'text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)] hover:bg-[var(--color-muted)]'
                 )}
@@ -290,7 +290,6 @@ export function Navbar() {
             {isProducer && (
               <>
                 <Link href="/business" onClick={() => setModulesOpen(false)} className="block px-3 py-2.5 text-sm font-semibold rounded-[var(--radius)] hover:bg-[var(--color-muted)]">{t('business')}</Link>
-                <Link href="/advertise" onClick={() => setModulesOpen(false)} className="block px-3 py-2.5 text-sm font-semibold rounded-[var(--radius)] hover:bg-[var(--color-muted)]">{t('advertise')}</Link>
               </>
             )}
           </div>

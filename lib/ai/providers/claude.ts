@@ -1,6 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk'
 import type { AIProvider, AIMessage, AIContext } from '@/types/ai'
 import { logger } from '@/lib/logger'
+import { retrieveRelevantKnowledge } from '@/lib/ai/rag'
 
 const SYSTEM_PROMPT = `You are Ask Valsamaki, an AI assistant specializing in Crete, Greece.
 You have deep knowledge of Cretan cuisine, the Mediterranean diet, local producers, olive oil,
@@ -26,7 +27,8 @@ export class ClaudeProvider implements AIProvider {
   async chat(messages: AIMessage[], context: AIContext): Promise<string> {
     if (!this.isAvailable()) throw new Error('Anthropic API key not configured')
 
-    const systemWithContext = this.buildSystem(context)
+    const latestUserMsg = [...messages].reverse().find((m) => m.role === 'user')?.content ?? ''
+    const systemWithContext = this.buildSystem(context, latestUserMsg)
 
     try {
       const response = await this.client.messages.create({
@@ -51,8 +53,15 @@ export class ClaudeProvider implements AIProvider {
     return this.chat([{ role: 'user', content: prompt }], context)
   }
 
-  private buildSystem(context: AIContext): string {
+  private buildSystem(context: AIContext, userQuery: string): string {
     const parts: string[] = [SYSTEM_PROMPT]
+
+    // RAG: inject only the food knowledge sections relevant to this query
+    try {
+      parts.push(`\n${retrieveRelevantKnowledge(userQuery, 8)}`)
+    } catch (err) {
+      logger.warn('Could not retrieve relevant knowledge (claude)', err)
+    }
 
     if (context.nearbyBusinesses?.length) {
       parts.push(`\n## Nearby Businesses\n${JSON.stringify(context.nearbyBusinesses, null, 2)}`)

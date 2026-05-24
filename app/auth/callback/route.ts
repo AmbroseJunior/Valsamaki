@@ -24,31 +24,29 @@ export async function GET(request: NextRequest) {
     const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code)
 
     if (!exchangeError) {
+      // Ensure a profile row exists for OAuth sign-ins (Google, Apple, etc.)
       const { data: { user: authUser } } = await supabase.auth.getUser()
       if (authUser) {
-        // Check whether this is a brand-new user or a returning one
-        const { data: existingProfile } = await supabase
+        await supabase.from('profiles').upsert(
+          {
+            id: authUser.id,
+            name: authUser.user_metadata?.full_name ?? authUser.user_metadata?.name ?? null,
+            role: 'user',
+            language: 'en',
+          },
+          { onConflict: 'id', ignoreDuplicates: true }
+        )
+
+        // New users (no preferences yet) complete the questionnaire first
+        // The onboarding page reads 'intended_role' from sessionStorage to
+        // show tourist vs producer flow when the user chose via the role picker
+        const { data: profile } = await supabase
           .from('profiles')
           .select('preferences')
           .eq('id', authUser.id)
           .single()
 
-        if (!existingProfile) {
-          // Brand-new OAuth sign-in: create profile with the role they chose before clicking Google/Apple
-          const rawRole = searchParams.get('role')
-          const intendedRole = rawRole === 'producer' ? 'producer' : 'user'
-          await supabase.from('profiles').insert({
-            id: authUser.id,
-            name: authUser.user_metadata?.full_name ?? authUser.user_metadata?.name ?? null,
-            role: intendedRole,
-            language: 'en',
-          })
-          return NextResponse.redirect(`${origin}/onboarding`)
-        }
-
-        // Returning user — preserve their existing role
-        // If they somehow never finished onboarding, send them back
-        const destination = !existingProfile.preferences ? '/onboarding' : next
+        const destination = !profile?.preferences ? '/onboarding' : next
         return NextResponse.redirect(`${origin}${destination}`)
       }
 

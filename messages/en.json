@@ -8,7 +8,6 @@
     "chatbot": "Ask Valsamaki",
     "business": "My Business",
     "analytics": "Analytics",
-    "advertise": "Advertise",
     "signOut": "Sign Out",
     "settings": "Settings",
     "signIn": "Sign In",
@@ -411,5 +410,31 @@
     "welcome": "Welcome — Choose your language",
     "subtitle": "Καλώς ήρθες · Bienvenido · Bienvenue · Benvenuto",
     "continue": "Continue without changing →"
+  },
+  "comingSoon": {
+    "badge": "Coming Soon",
+    "headline": "Something special is brewing in Crete.",
+    "description": "Valsamaki connects you with authentic Cretan producers, local experiences, and the real Mediterranean diet. Drop your email — we'll reach out the moment we go live.",
+    "joinCount": "Join {count} others already on the list",
+    "button": "Notify me at launch 🫒",
+    "loading": "Joining…",
+    "error": "Something went wrong — please try again.",
+    "perkTitle": "Early bird perks",
+    "perk1Emoji": "🗺️",
+    "perk1Label": "Early Access",
+    "perk1Desc": "First to discover Crete's hidden producers & gems",
+    "perk2Emoji": "🌿",
+    "perk2Label": "3 Months Free",
+    "perk2Desc": "Full premium features at launch, on us",
+    "perk3Emoji": "✨",
+    "perk3Label": "Founding Member",
+    "perk3Desc": "Exclusive status for the first 500 to join"
+  },
+  "thankYou": {
+    "founding": "Founding Member",
+    "position": "#{position} on the waitlist",
+    "headline": "You're on the list!",
+    "message": "Thank you for joining. We'll contact you personally when Valsamaki launches — you'll be among the very first to experience authentic Crete.",
+    "watch": "Watch this space"
   }
 }

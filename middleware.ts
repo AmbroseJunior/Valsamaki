@@ -3,8 +3,11 @@ import { updateSession } from '@/lib/supabase/middleware'
 import { applySecurityHeaders } from '@/lib/security'
 
 const PUBLIC_ROUTES = ['/', '/login', '/register', '/auth', '/map', '/explore', '/events', '/info', '/onboarding', '/products']
-const PRODUCER_ROUTES = ['/business', '/advertise', '/analytics']
+const PRODUCER_ROUTES = ['/business', '/analytics']
 const ADMIN_ROUTES = ['/admin']
+
+// Routes accessible to everyone during the under-construction phase
+const MAINTENANCE_BYPASS = ['/coming-soon', '/thank-you', '/login', '/auth']
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
@@ -18,12 +21,29 @@ export async function middleware(request: NextRequest) {
     return response
   }
 
-  const isPublicRoute = PUBLIC_ROUTES.some((r) => pathname === r || pathname.startsWith(`${r}/`))
+  // ── Under-construction gate ──────────────────────────────────────────────
+  // Only admin can access the full app. Everyone else sees /coming-soon.
+  // Bypass routes (/coming-soon, /thank-you, /login, /auth) skip the gate
+  // AND all remaining auth checks — they must be reachable by anyone.
+  const isBypass = MAINTENANCE_BYPASS.some((r) => pathname === r || pathname.startsWith(`${r}/`))
   const isAuthRoute = pathname.startsWith('/login') || pathname.startsWith('/register')
 
-  if (isAuthRoute && user) {
-    return NextResponse.redirect(new URL('/dashboard', request.url))
+  if (isBypass) {
+    // Logged-in user on the login page → send them to the right place
+    if (isAuthRoute && user) {
+      const dest = role === 'admin' ? '/dashboard' : '/coming-soon'
+      return NextResponse.redirect(new URL(dest, request.url))
+    }
+    // All other bypass routes (/coming-soon, /thank-you, /auth) — let through
+    return response
   }
+
+  if (role !== 'admin') {
+    return NextResponse.redirect(new URL('/coming-soon', request.url))
+  }
+  // ─────────────────────────────────────────────────────────────────────────
+
+  const isPublicRoute = PUBLIC_ROUTES.some((r) => pathname === r || pathname.startsWith(`${r}/`))
 
   if (!isPublicRoute && !user) {
     const loginUrl = new URL('/login', request.url)
@@ -32,16 +52,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl)
   }
 
-  const isProducerRoute = PRODUCER_ROUTES.some((r) => pathname.startsWith(r))
-  if (isProducerRoute && role !== 'producer' && role !== 'admin') {
-    return NextResponse.redirect(new URL('/dashboard', request.url))
-  }
-
-  const isAdminRoute = ADMIN_ROUTES.some((r) => pathname.startsWith(r))
-  if (isAdminRoute && role !== 'admin') {
-    return NextResponse.redirect(new URL('/dashboard', request.url))
-  }
-
+  // Only admins reach this point — producer/admin sub-route checks are for post-launch
   return response
 }
 

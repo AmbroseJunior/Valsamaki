@@ -8,7 +8,6 @@
     "chatbot": "Guia IA",
     "business": "Meu Negócio",
     "analytics": "Análises",
-    "advertise": "Publicidade",
     "signOut": "Sair",
     "settings": "Configurações",
     "signIn": "Entrar",
@@ -416,5 +415,31 @@
     "welcome": "Bem-vindo — Escolha seu idioma",
     "subtitle": "Καλώς ήρθες · Bienvenido · Bienvenue · Benvenuto",
     "continue": "Continuar sem alterar →"
+  },
+  "comingSoon": {
+    "badge": "Em breve",
+    "headline": "Algo especial está a surgir em Creta.",
+    "description": "O Valsamaki conecta-te com produtores cretenses autênticos, experiências locais e a verdadeira dieta mediterrânica. Deixa o teu email — entraremos em contacto assim que formos ao ar.",
+    "joinCount": "Junta-te a {count} outros já na lista",
+    "button": "Notifica-me no lançamento 🫒",
+    "loading": "A aderir…",
+    "error": "Algo correu mal — tenta novamente.",
+    "perkTitle": "Vantagens para os primeiros",
+    "perk1Emoji": "🗺️",
+    "perk1Label": "Acesso antecipado",
+    "perk1Desc": "Primeiro a descobrir os produtores autênticos de Creta",
+    "perk2Emoji": "🌿",
+    "perk2Label": "3 meses grátis",
+    "perk2Desc": "Funcionalidades premium no lançamento",
+    "perk3Emoji": "✨",
+    "perk3Label": "Membro fundador",
+    "perk3Desc": "Estatuto exclusivo para os primeiros 500"
+  },
+  "thankYou": {
+    "founding": "Membro fundador",
+    "position": "#{position} na lista de espera",
+    "headline": "Estás na lista!",
+    "message": "Obrigado por te juntares. Entraremos em contacto pessoalmente quando o Valsamaki lançar — serás um dos primeiros a experienciar a Creta autêntica.",
+    "watch": "Fica atento"
   }
 }

@@ -55,7 +55,7 @@ const CATEGORIES: Category[] = [
     id: 'herbs',
     name: 'Herbs & Teas',
     blurb: 'Aromatic plants gathered from Cretan hillsides — used as tea, seasoning, and traditional medicine for centuries.',
-    foodIds: ['4', '7', '17', '20', '22', '23', '27', '34', '42'],
+    foodIds: ['4', '7', '17', '20', '22', '23', '27', '34', '42', '49', '54', '57'],
     accent: 'from-teal-100 to-teal-50 dark:from-teal-900/30 dark:to-teal-950/30 border-teal-200 dark:border-teal-800',
     tile: 'hover:border-teal-400 dark:hover:border-teal-600',
   },
@@ -63,7 +63,7 @@ const CATEGORIES: Category[] = [
     id: 'greens',
     name: 'Wild Greens & Vegetables',
     blurb: 'Horta, allium, and garden vegetables — the colourful base of the Cretan plate, much of it still foraged from the wild.',
-    foodIds: ['2', '6', '10', '24', '29', '33'],
+    foodIds: ['2', '6', '10', '24', '29', '33', '53', '56'],
     accent: 'from-lime-100 to-lime-50 dark:from-lime-900/30 dark:to-lime-950/30 border-lime-200 dark:border-lime-800',
     tile: 'hover:border-lime-500 dark:hover:border-lime-600',
   },
@@ -71,7 +71,7 @@ const CATEGORIES: Category[] = [
     id: 'fruits',
     name: 'Fruits & Nuts',
     blurb: 'Sun-ripened fruit and tree nuts — concentrated polyphenols, healthy fats, and centuries of agricultural tradition.',
-    foodIds: ['9', '25', '26', '31'],
+    foodIds: ['9', '25', '26', '31', '47', '48', '50', '55'],
     accent: 'from-orange-100 to-orange-50 dark:from-orange-900/30 dark:to-orange-950/30 border-orange-200 dark:border-orange-800',
     tile: 'hover:border-orange-400 dark:hover:border-orange-600',
   },
@@ -79,7 +79,7 @@ const CATEGORIES: Category[] = [
     id: 'legumes',
     name: 'Legumes & Grains',
     blurb: 'Pulses, ancient grains, and the carob pod — the slow-release carbohydrates that fuelled rural Crete for millennia.',
-    foodIds: ['8', '12', '44', '45'],
+    foodIds: ['8', '12', '44', '45', '46', '51'],
     accent: 'from-amber-100 to-amber-50 dark:from-amber-900/30 dark:to-amber-950/30 border-amber-200 dark:border-amber-800',
     tile: 'hover:border-amber-500 dark:hover:border-amber-600',
   },
@@ -95,7 +95,7 @@ const CATEGORIES: Category[] = [
     id: 'pantry-wild',
     name: 'Honey, Salt & Hand-Gathered',
     blurb: 'Wild thyme honey from Cretan apiaries, sea salt from coastal pans, and snails hand-gathered after the autumn rains — the pantry and foraged foods that complete the Cretan table.',
-    foodIds: ['3', '32', '35', '43'],
+    foodIds: ['3', '32', '35', '43', '52'],
     accent: 'from-stone-100 to-stone-50 dark:from-stone-900/30 dark:to-stone-950/30 border-stone-300 dark:border-stone-700',
     tile: 'hover:border-stone-400 dark:hover:border-stone-600',
   },
@@ -127,7 +127,7 @@ const EVIDENCE: Record<string, { label: string; cls: string }> = {
 const STATS = [
   { value: '19%', label: 'Lower all-cause mortality from >0.5 tbsp/day olive oil across 92,383 adults followed for 28 years (Guasch-Ferré et al. 2022, JACC)', color: 'text-blue-600', border: 'border-blue-200' },
   { value: '733K', label: 'Participants pooled across 36 prospective studies confirming olive oil reduces all-cause and cardiometabolic mortality (Martinez-Gonzalez et al. 2022)', color: 'text-purple-600', border: 'border-purple-200' },
-  { value: '81', label: 'Peer-reviewed studies extracted across 38 Cretan foods — RCTs, meta-analyses, and large prospective cohorts', color: 'text-green-600', border: 'border-green-200' },
+  { value: '95', label: 'Peer-reviewed studies extracted across 50 Cretan foods — RCTs, meta-analyses, and large prospective cohorts', color: 'text-green-600', border: 'border-green-200' },
 ]
 
 // Render up to 3 filled dots based on the food's highest evidence strength
@@ -184,7 +184,7 @@ export default function ProductsPage() {
             The Cretan Diet<br className="hidden md:block" /> & Local Foods
           </h1>
           <p className="text-base md:text-lg text-[var(--color-muted-foreground)] leading-relaxed max-w-2xl">
-            Thirty-eight iconic Cretan foods — each with health benefits drawn directly from peer-reviewed
+            Fifty iconic Cretan foods — each with health benefits drawn directly from peer-reviewed
             clinical trials, meta-analyses, and large-scale prospective studies.
           </p>
         </div>
